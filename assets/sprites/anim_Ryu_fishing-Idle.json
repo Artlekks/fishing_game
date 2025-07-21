@@ -1,0 +1,20 @@
+{ "frames": [
+   {
+    "filename": "anim_Ryu_fishing #Idle.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 192, "h": 192 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 192, "h": 192 },
+    "sourceSize": { "w": 192, "h": 192 },
+    "duration": 120
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.6-x64",
+  "image": "anim_Ryu_fishing-Idle.png",
+  "format": "I8",
+  "size": { "w": 192, "h": 192 },
+  "scale": "1"
+ }
+}

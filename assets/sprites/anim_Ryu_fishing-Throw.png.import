@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhh6e2kbjdwcm"
-path="res://.godot/imported/Ryu_Fishing.png-21830e8f6cac100306942b789d657d9d.ctex"
+uid="uid://cfsk2abqasr47"
+path="res://.godot/imported/anim_Ryu_fishing-Throw.png-7b5d528cc70da51d6fd6ed2379cb8015.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/Ryu_Fishing.png"
-dest_files=["res://.godot/imported/Ryu_Fishing.png-21830e8f6cac100306942b789d657d9d.ctex"]
+source_file="res://assets/sprites/anim_Ryu_fishing-Throw.png"
+dest_files=["res://.godot/imported/anim_Ryu_fishing-Throw.png-7b5d528cc70da51d6fd6ed2379cb8015.ctex"]
 
 [params]
 
