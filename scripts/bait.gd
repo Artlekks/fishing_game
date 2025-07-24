@@ -1,6 +1,8 @@
 extends Area2D
 
 signal bait_landed
+signal bait_despawned
+
 
 var reeling_target: Vector2
 var reeling = false
@@ -38,6 +40,7 @@ func _process(delta):
 		else:
 			global_position = reeling_target
 			reeling = false
+			emit_signal("bait_despawned")
 			queue_free()
 
 
@@ -50,4 +53,5 @@ func stop_reeling():
 	
 func _on_area_entered(area):
 	if area.name == "DespawnZone":
+		emit_signal("bait_despawned")
 		queue_free()

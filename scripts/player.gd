@@ -83,7 +83,8 @@ func start_throw_finish():
 	anim.play("throw_line_finish")
 	if not bait_thrown:
 		await get_tree().create_timer(0.4).timeout  # ⏳ delay here (in seconds)
-		spawn_and_throw_bait()
+		spawn_and_throw_bait() 
+		
 
 
 func _on_animation_finished():
@@ -115,6 +116,8 @@ func spawn_and_throw_bait():
 	var end_pos = start_pos + Vector2(120, -80)
 	bait_ref.throw_to(end_pos)
 	bait_ref.bait_landed.connect(_on_bait_landed)
+	bait_ref.bait_despawned.connect(_on_bait_despawned)
+
 
 func _on_bait_landed():
 	bait_landed = true
@@ -124,3 +127,11 @@ func start_reeling():
 	is_reeling = true
 	if bait_ref and bait_ref.is_inside_tree():
 		bait_ref.reel_to(global_position + Vector2(0, -20))
+		
+func _on_bait_despawned():
+	print("🔥 Bait despawned")
+	bait_thrown = false
+	bait_landed = false
+	is_reeling = false
+	bait_spawned = false
+	anim.play("idle")
