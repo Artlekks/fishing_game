@@ -47,13 +47,12 @@ func _process(_delta):
 		elif bait_landed and !is_reeling:
 			start_reeling()
 
-	# Reeling hold/release logic
+	# Reeling logic (hold K)
 	if bait_landed:
 		if Input.is_action_pressed("throw_line"):
 			if not is_reeling:
 				start_reeling()
 
-			# Handle left/right reel animation
 			if Input.is_action_pressed("reeling_left"):
 				anim.play("reeling_left")
 			elif Input.is_action_pressed("reeling_right"):
@@ -66,6 +65,12 @@ func _process(_delta):
 				anim.play("reeling_static")
 				if bait_ref and bait_ref.is_inside_tree():
 					bait_ref.stop_reeling()
+			else:
+				# Turning without reeling
+				if Input.is_action_pressed("reeling_left"):
+					anim.play("reeling_idle_left")
+				elif Input.is_action_pressed("reeling_right"):
+					anim.play("reeling_idle_right")
 
 func start_throw():
 	is_throwing = true
