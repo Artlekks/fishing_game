@@ -12,6 +12,7 @@ var bait_landed = false
 var bait_spawned = false
 var waiting_for_k_release_after_throw = false
 var pending_forward_step = false
+var waiting_for_throw_finish = false  # NEW
 
 var bait_ref : Node2D = null
 
@@ -25,7 +26,14 @@ func _process(_delta):
 	if not ready_to_fish:
 		return
 
-	# Wait for K release after throw
+	# 🎯 After throw_line → wait for second K press to finish
+	if waiting_for_throw_finish:
+		if Input.is_action_just_pressed("throw_line"):
+			waiting_for_throw_finish = false
+			start_throw_finish()
+		return
+
+	# ⏳ Wait for K release after throw_finish
 	if waiting_for_k_release_after_throw:
 		if !Input.is_action_pressed("throw_line"):
 			anim.play("reeling_static")
@@ -35,19 +43,14 @@ func _process(_delta):
 				pending_forward_step = false
 		return
 
-	# Spawn bait at key frame
-	if is_throwing and anim.animation == "throw_line" and anim.frame == THROW_BAIT_FRAME and !bait_spawned:
-		spawn_and_throw_bait()
-		bait_spawned = true
-
-	# Press K (throw or start reeling)
+	# 🎯 K pressed: either start throw or start reeling
 	if Input.is_action_just_pressed("throw_line"):
-		if not bait_thrown:
+		if not bait_thrown and !is_throwing and !waiting_for_throw_finish:
 			start_throw()
 		elif bait_landed and !is_reeling:
 			start_reeling()
 
-	# Reeling logic (hold K)
+	# 🎣 Reeling logic (hold K)
 	if bait_landed:
 		if Input.is_action_pressed("throw_line"):
 			if not is_reeling:
@@ -66,7 +69,6 @@ func _process(_delta):
 				if bait_ref and bait_ref.is_inside_tree():
 					bait_ref.stop_reeling()
 			else:
-				# Turning without reeling
 				if Input.is_action_pressed("reeling_left"):
 					anim.play("reeling_idle_left")
 				elif Input.is_action_pressed("reeling_right"):
@@ -77,11 +79,24 @@ func start_throw():
 	bait_spawned = false
 	anim.play("throw_line")
 
+func start_throw_finish():
+	anim.play("throw_line_finish")
+	if not bait_thrown:
+		await get_tree().create_timer(0.4).timeout  # ⏳ delay here (in seconds)
+		spawn_and_throw_bait()
+
+
 func _on_animation_finished():
 	if anim.animation == "prep_fishing":
 		ready_to_fish = true
+
 	elif anim.animation == "throw_line":
 		is_throwing = false
+		waiting_for_throw_finish = true
+		anim.play("throw_line_idle")
+
+	elif anim.animation == "throw_line_finish":
+		bait_thrown = true  # allow reeling
 		if Input.is_action_pressed("throw_line"):
 			anim.play("throw_idle")
 			waiting_for_k_release_after_throw = true
@@ -100,8 +115,6 @@ func spawn_and_throw_bait():
 	var end_pos = start_pos + Vector2(120, -80)
 	bait_ref.throw_to(end_pos)
 	bait_ref.bait_landed.connect(_on_bait_landed)
-
-	bait_thrown = true
 
 func _on_bait_landed():
 	bait_landed = true

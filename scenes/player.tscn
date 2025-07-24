@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=3 uid="uid://bqcst4aainsyr"]
+[gd_scene load_steps=66 format=3 uid="uid://bqcst4aainsyr"]
 
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://cx6o50whycw8f" path="res://scripts/player.gd" id="1_g2els"]
@@ -183,35 +183,51 @@ region = Rect2(1536, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pf23h"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(1728, 0, 192, 192)
+region = Rect2(1152, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dt7fs"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(1920, 0, 192, 192)
+region = Rect2(1344, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wqfne"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(2112, 0, 192, 192)
+region = Rect2(1536, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wnwbv"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(2304, 0, 192, 192)
+region = Rect2(1728, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gl8cc"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(2496, 0, 192, 192)
+region = Rect2(1920, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_487ah"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(2688, 0, 192, 192)
+region = Rect2(2112, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_md1ol"]
 atlas = ExtResource("3_qlg0r")
-region = Rect2(2880, 0, 192, 192)
+region = Rect2(2304, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bj30b"]
 atlas = ExtResource("3_qlg0r")
+region = Rect2(2496, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lxlsd"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(2688, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ha2mi"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(2880, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_apa73"]
+atlas = ExtResource("3_qlg0r")
 region = Rect2(3072, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_74r1k"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(1152, 0, 192, 192)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_4r5pv"]
 animations = [{
@@ -389,7 +405,12 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_31cv2")
+}],
+"loop": false,
+"name": &"throw_line",
+"speed": 14.0
 }, {
+"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_pf23h")
 }, {
@@ -413,9 +434,26 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_bj30b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lxlsd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ha2mi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_apa73")
 }],
 "loop": false,
-"name": &"throw_line",
+"name": &"throw_line_finish",
+"speed": 14.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_74r1k")
+}],
+"loop": false,
+"name": &"throw_line_idle",
 "speed": 14.0
 }]
 
@@ -428,7 +466,7 @@ script = ExtResource("1_g2els")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-4, -27)
 sprite_frames = SubResource("SpriteFrames_4r5pv")
-animation = &"reeling_idle_right"
+animation = &"throw_line_idle"
 autoplay = "prep_fishing"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
