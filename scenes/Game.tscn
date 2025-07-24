@@ -62,5 +62,7 @@ position = Vector2(98.725, 0)
 texture = ExtResource("4_78awf")
 
 [node name="Bar" type="Sprite2D" parent="CanvasLayer/PowerBarUI"]
-position = Vector2(-3.7, 0)
+position = Vector2(-357.095, 0.441)
 texture = ExtResource("5_s0nni")
+centered = false
+offset = Vector2(0, -12.105)
