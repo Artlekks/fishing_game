@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://c5yseklexbdb8"]
+[gd_scene load_steps=7 format=3 uid="uid://c5yseklexbdb8"]
 
 [ext_resource type="Script" uid="uid://bex6cneyan5k5" path="res://scripts/bait.gd" id="1_hfv2b"]
 [ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="2_ubynk"]
@@ -25,7 +25,11 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="bait" type="Node2D"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ubynk"]
+radius = 2.80359
+height = 8.41076
+
+[node name="bait" type="Area2D"]
 script = ExtResource("1_hfv2b")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -34,3 +38,7 @@ sprite_frames = SubResource("SpriteFrames_xcvwp")
 animation = &"bait"
 frame = 1
 frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 0.918026
+shape = SubResource("CapsuleShape2D_ubynk")

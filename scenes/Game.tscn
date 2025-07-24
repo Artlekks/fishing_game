@@ -1,10 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://dcyiodpgbrpgw"]
+[gd_scene load_steps=6 format=3 uid="uid://dcyiodpgbrpgw"]
 
 [ext_resource type="Script" uid="uid://bwjtugh352xhf" path="res://scripts/game.gd" id="1_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://bqcst4aainsyr" path="res://scenes/player.tscn" id="1_ibkli"]
 [ext_resource type="Texture2D" uid="uid://3jmou6ohi7af" path="res://assets/backgrounds/Background_02.png" id="1_qbsmt"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_qbsmt"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cpr0p"]
+height = 26.3554
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_cpr0p")
@@ -27,3 +30,11 @@ shape = SubResource("WorldBoundaryShape2D_qbsmt")
 position = Vector2(-120, 65)
 offset = Vector2(220, -120)
 zoom = Vector2(4.09, 3.055)
+
+[node name="DespawnZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DespawnZone"]
+position = Vector2(-19, 23)
+rotation = -0.658117
+scale = Vector2(4.405, 4.405)
+shape = SubResource("CapsuleShape2D_cpr0p")
