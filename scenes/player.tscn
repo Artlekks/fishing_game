@@ -1,4 +1,4 @@
-[gd_scene load_steps=60 format=3 uid="uid://bqcst4aainsyr"]
+[gd_scene load_steps=62 format=3 uid="uid://bqcst4aainsyr"]
 
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://cx6o50whycw8f" path="res://scripts/player.gd" id="1_g2els"]
@@ -96,6 +96,14 @@ region = Rect2(384, 0, 192, 192)
 [sub_resource type="AtlasTexture" id="AtlasTexture_4gjji"]
 atlas = ExtResource("4_smehm")
 region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2gdjj"]
+atlas = ExtResource("4_tuyoq")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sc3ue"]
+atlas = ExtResource("5_fjrip")
+region = Rect2(0, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jc3p3"]
 atlas = ExtResource("4_tuyoq")
@@ -290,6 +298,22 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_2gdjj")
+}],
+"loop": false,
+"name": &"reeling_idle_left",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sc3ue")
+}],
+"loop": false,
+"name": &"reeling_idle_right",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_jc3p3")
 }, {
 "duration": 1.0,
@@ -404,7 +428,7 @@ script = ExtResource("1_g2els")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-4, -27)
 sprite_frames = SubResource("SpriteFrames_4r5pv")
-animation = &"reeling_idle"
+animation = &"reeling_idle_right"
 autoplay = "prep_fishing"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
