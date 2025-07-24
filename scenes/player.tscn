@@ -1,7 +1,7 @@
 [gd_scene load_steps=60 format=3 uid="uid://bqcst4aainsyr"]
 
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="1_3vyb7"]
-[ext_resource type="Script" uid="uid://cx6o50whycw8f" path="res://player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://cx6o50whycw8f" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_tuyoq"]
 [ext_resource type="Texture2D" uid="uid://cfsk2abqasr47" path="res://assets/sprites/anim_Ryu_fishing-Throw.png" id="3_qlg0r"]
 [ext_resource type="Texture2D" uid="uid://dhnxck8w2y6oa" path="res://assets/sprites/anim_Ryu_fishing-Reel_Idle.png" id="4_smehm"]
@@ -404,9 +404,12 @@ script = ExtResource("1_g2els")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-4, -27)
 sprite_frames = SubResource("SpriteFrames_4r5pv")
-animation = &"reeling_static"
+animation = &"reeling_idle"
 autoplay = "prep_fishing"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-1, -24)
 shape = SubResource("CapsuleShape2D_60mlk")
+
+[node name="BaitSpawn" type="Marker2D" parent="."]
+position = Vector2(-18, -59)

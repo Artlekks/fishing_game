@@ -1,11 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://dcyiodpgbrpgw"]
+[gd_scene load_steps=5 format=3 uid="uid://dcyiodpgbrpgw"]
 
+[ext_resource type="Script" uid="uid://bwjtugh352xhf" path="res://scripts/game.gd" id="1_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://bqcst4aainsyr" path="res://scenes/player.tscn" id="1_ibkli"]
 [ext_resource type="Texture2D" uid="uid://3jmou6ohi7af" path="res://assets/backgrounds/Background_02.png" id="1_qbsmt"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_qbsmt"]
 
 [node name="Game" type="Node2D"]
+script = ExtResource("1_cpr0p")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(100, -55)

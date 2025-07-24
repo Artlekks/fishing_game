@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 @onready var anim = $AnimatedSprite2D
 @onready var bait_scene = preload("res://scenes/Bait.tscn") # Adjust path if needed
+@onready var bait_spawn_point = $BaitSpawn
 
 var ready_to_fish = false
 var is_throwing = false
@@ -11,6 +12,7 @@ var bait_landed = false
 var bait_spawned = false
 var waiting_for_k_release_after_throw = false
 var pending_forward_step = false  # NEW: move player only after release
+
 
 const THROW_BAIT_FRAME = 11
 
@@ -81,14 +83,19 @@ func _on_animation_finished():
 			global_position += Vector2(12, 0)
 
 func spawn_and_throw_bait():
+	print("Spawning bait...")  # debug print
+
 	var bait = bait_scene.instantiate()
-	get_parent().add_child(bait)
+	get_tree().current_scene.add_child(bait)  # clean and safe
 
-	var start_pos = global_position + Vector2(0, -20)
-	var end_pos = global_position + Vector2(30, -10)
-
+	var start_pos = bait_spawn_point.global_position
 	bait.global_position = start_pos
+
+	print("Bait position:", bait.global_position)
+
+	var end_pos = start_pos + Vector2(120, -80)  # ← toss farther and upward
 	bait.throw_to(end_pos)
+
 	bait.bait_landed.connect(_on_bait_landed)
 
 	bait_thrown = true

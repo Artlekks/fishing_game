@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c5yseklexbdb8"]
 
-[ext_resource type="Script" uid="uid://bex6cneyan5k5" path="res://bait.gd" id="1_hfv2b"]
+[ext_resource type="Script" uid="uid://bex6cneyan5k5" path="res://scripts/bait.gd" id="1_hfv2b"]
 [ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="2_ubynk"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c7usv"]
@@ -29,7 +29,7 @@ animations = [{
 script = ExtResource("1_hfv2b")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(542, 320)
+scale = Vector2(0.1, 0.1)
 sprite_frames = SubResource("SpriteFrames_xcvwp")
 animation = &"bait"
 frame = 1
