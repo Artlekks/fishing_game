@@ -3,6 +3,7 @@ extends CharacterBody2D
 @onready var anim = $AnimatedSprite2D
 @onready var bait_scene = preload("res://scenes/Bait.tscn")
 @onready var bait_spawn_point = $BaitSpawn
+@onready var power_bar = get_node("../CanvasLayer/PowerBarUI")  # ✅ Correct
 
 var ready_to_fish = false
 var is_throwing = false
@@ -13,11 +14,10 @@ var bait_spawned = false
 var waiting_for_k_release_after_throw = false
 var pending_forward_step = false
 var waiting_for_throw_finish = false
-var has_moved_forward = false  # NEW
+var has_moved_forward = false
+var stored_power := 1.0  # NEW
 
 var bait_ref : Node2D = null
-
-const THROW_BAIT_FRAME = 11
 
 func _ready():
 	anim.play("prep_fishing")
@@ -27,14 +27,17 @@ func _process(_delta):
 	if not ready_to_fish:
 		return
 
-	# Wait for second press to finish throw
+	# After throw_line: wait for 2nd K to finish
 	if waiting_for_throw_finish:
 		if Input.is_action_just_pressed("throw_line"):
 			waiting_for_throw_finish = false
+			stored_power = power_bar.get_power()
+			power_bar.stop()
+			power_bar.hide()
 			start_throw_finish()
 		return
 
-	# Wait for K release after throw
+	# After throw_line_finish: wait for K release to move forward
 	if waiting_for_k_release_after_throw:
 		if !Input.is_action_pressed("throw_line"):
 			anim.play("reeling_static")
@@ -45,14 +48,14 @@ func _process(_delta):
 				pending_forward_step = false
 		return
 
-	# Press K: start throw or reeling
+	# Press K: start throw or start reeling
 	if Input.is_action_just_pressed("throw_line"):
 		if not bait_thrown and !is_throwing and !waiting_for_throw_finish:
 			start_throw()
 		elif bait_landed and !is_reeling:
 			start_reeling()
 
-	# Reeling (hold K)
+	# Reeling logic
 	if bait_landed:
 		if Input.is_action_pressed("throw_line"):
 			if not is_reeling:
@@ -80,12 +83,13 @@ func start_throw():
 	is_throwing = true
 	bait_spawned = false
 	anim.play("throw_line")
+	power_bar.start()
 
 func start_throw_finish():
 	anim.play("throw_line_finish")
+	await get_tree().create_timer(0.2).timeout
 	if not bait_thrown:
-		await get_tree().create_timer(0.2).timeout
-		spawn_and_throw_bait()
+		spawn_and_throw_bait(stored_power)
 
 func _on_animation_finished():
 	if anim.animation == "prep_fishing":
@@ -109,14 +113,15 @@ func _on_animation_finished():
 				global_position += Vector2(12, 0)
 				has_moved_forward = true
 
-func spawn_and_throw_bait():
+func spawn_and_throw_bait(power := 1.0):
 	bait_ref = bait_scene.instantiate()
 	get_tree().current_scene.add_child(bait_ref)
 
 	var start_pos = bait_spawn_point.global_position
 	bait_ref.global_position = start_pos
 
-	var end_pos = start_pos + Vector2(120, -80)
+	var distance = lerp(80.0, 200.0, power)
+	var end_pos = start_pos + Vector2(distance, -80)
 	bait_ref.throw_to(end_pos)
 	bait_ref.bait_landed.connect(_on_bait_landed)
 	bait_ref.bait_despawned.connect(_on_bait_despawned)
