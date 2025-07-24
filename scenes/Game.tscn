@@ -19,7 +19,7 @@ scale = Vector2(0.16, 0.16)
 texture = ExtResource("1_qbsmt")
 
 [node name="Player" parent="." instance=ExtResource("1_ibkli")]
-position = Vector2(2, 24)
+position = Vector2(-4, 27)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
