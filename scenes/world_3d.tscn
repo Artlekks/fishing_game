@@ -29,4 +29,4 @@ fov = 45.0
 [node name="GroundAnchor" type="Node3D" parent="."]
 
 [node name="Player3D" parent="GroundAnchor" instance=ExtResource("2_g5kxi")]
-transform = Transform3D(0.752042, -0.351307, 0.529292, -0.273248, 0.893836, 0.697724, -0.490828, -1.03587, 0.422548, -2.90086, 0.721894, 1.76359)
+transform = Transform3D(0.752042, -0.351307, 0.529292, -0.273248, 0.893836, 0.697724, -0.490828, -1.03587, 0.422548, -2.90049, 0.847392, 1.76359)

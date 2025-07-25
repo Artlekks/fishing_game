@@ -13,4 +13,4 @@ transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"prep_fishing"
+animation = &"reeling_idle"
