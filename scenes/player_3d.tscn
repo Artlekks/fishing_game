@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://c05klp7s2dqe8"]
+
+[ext_resource type="Script" uid="uid://bsejqcttoj4k2" path="res://scripts/player_3d.gd" id="1_52vux"]
+[ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
+
+[node name="Player3D" type="Node3D"]
+script = ExtResource("1_52vux")
+
+[node name="Billboard" type="Node3D" parent="."]
+transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Billboard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+texture_filter = 0
+sprite_frames = ExtResource("2_reoop")
+animation = &"prep_fishing"

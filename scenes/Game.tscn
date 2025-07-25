@@ -10,7 +10,7 @@
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_qbsmt"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cpr0p"]
-radius = 16.4765
+radius = 16.4764
 height = 32.9529
 
 [node name="Game" type="Node2D"]
