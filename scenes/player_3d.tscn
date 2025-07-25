@@ -10,7 +10,9 @@ script = ExtResource("1_52vux")
 transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Billboard"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"reeling_idle"
+animation = &"idle"
+
+[node name="BaitSpawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.181, 0.01, 0)

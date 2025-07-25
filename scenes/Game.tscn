@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bqcst4aainsyr" path="res://scenes/player.tscn" id="1_ibkli"]
 [ext_resource type="Texture2D" uid="uid://3jmou6ohi7af" path="res://assets/backgrounds/Background_02.png" id="1_qbsmt"]
 [ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="4_78awf"]
-[ext_resource type="Script" uid="uid://dgqgxoslgmsq0" path="res://scenes/power_bar_ui.gd" id="4_aug50"]
+[ext_resource type="Script" uid="uid://dgqgxoslgmsq0" path="res://scripts/power_bar_ui.gd" id="4_aug50"]
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="5_s0nni"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_qbsmt"]
