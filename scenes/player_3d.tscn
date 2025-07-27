@@ -437,11 +437,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -40.0
-offset_right = 20.0
+offset_left = 22.205
+offset_top = -58.005
+offset_right = 62.205
+offset_bottom = -18.005
 grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(0.62, 0.62)
 
 [node name="PowerBarBG" type="Sprite2D" parent="power_bar_layer/power_bar_ui"]
 texture = ExtResource("3_4jfb6")

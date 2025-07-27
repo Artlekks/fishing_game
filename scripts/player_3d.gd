@@ -49,13 +49,8 @@ func start_throw():
 	print("▶ → throw_line")
 	current_state = "throw_line"
 	transitioning = true
-	await play_and_wait("throw_line")
 
-	print("▶ → throw_line_idle (waiting for 2nd K)")
-	current_state = "throw_line_idle"
-	await play_and_wait("throw_line_idle")
-
-	# Start power bar charge + slide in
+	# 👇 Power bar shows immediately
 	power = 0.0
 	power_dir = 1
 	charging = true
@@ -65,33 +60,28 @@ func start_throw():
 
 	power_bar_tween = create_tween()
 	var track_in = power_bar_tween.tween_property(
-		power_bar_ui, "position:y", POWERBAR_ONSCREEN_Y, 0.4
+		power_bar_ui, "position:y", POWERBAR_ONSCREEN_Y, 0.2
 	)
 	track_in.set_trans(Tween.TRANS_QUAD)
 	track_in.set_ease(Tween.EASE_OUT)
 
+	# THEN play the animations
+	await play_and_wait("throw_line")
+	await play_and_wait("throw_line_idle")
 
+	print("▶ → throw_line_idle (waiting for 2nd K)")
+	current_state = "throw_line_idle"
 	transitioning = false
+
 
 func finish_throw():
 	print("▶ → throw_line_finish")
 	current_state = "throw_line_finish"
 	transitioning = true
 
-	charging = false
+	charging = false  # stop power fill, but leave bar visible
 
-	# Slide power bar out
-	power_bar_tween = create_tween()
-	var track_out = power_bar_tween.tween_property(
-		power_bar_ui, "position:y", POWERBAR_OFFSCREEN_Y, 0.4
-	)
-	track_out.set_trans(Tween.TRANS_QUAD)
-	track_out.set_ease(Tween.EASE_IN)
-
-	await power_bar_tween.finished
-	power_bar_layer.visible = false
-
-	var _locked_power = power  # this will be used for bait force/distance later
+	var _locked_power = power  # placeholder until used
 
 	await play_and_wait("throw_line_finish")
 
@@ -101,6 +91,7 @@ func finish_throw():
 
 	print("▶ throw complete. Waiting for bait logic...")
 	transitioning = false
+
 
 func play_and_wait(state_name: String) -> void:
 	current_state = state_name
