@@ -1,6 +1,6 @@
 [gd_scene load_steps=29 format=3 uid="uid://c05klp7s2dqe8"]
 
-[ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scenes/player_3d.gd" id="1_reoop"]
+[ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
@@ -399,7 +399,7 @@ states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
 transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy")]
-graph_offset = Vector2(128, -8)
+graph_offset = Vector2(56, -2)
 
 [node name="Player3D" type="Node3D"]
 script = ExtResource("1_reoop")
@@ -415,7 +415,8 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"throw_line_finish"
+animation = &"prep_fishing"
+frame = 16
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
