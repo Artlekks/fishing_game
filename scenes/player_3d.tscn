@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=25 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 
@@ -51,8 +51,12 @@ func fix_all_animations():
 	print(\"🎉 All animations restored with correct frame key.\")
 "
 
+[sub_resource type="Animation" id="Animation_52vux"]
+length = 0.001
+
 [sub_resource type="Animation" id="Animation_reoop"]
 length = 0.125
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -68,14 +72,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["fishing_idle"]
 }
 
 [sub_resource type="Animation" id="Animation_2djwe"]
@@ -95,14 +99,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["prep_fishing"]
 }
 
 [sub_resource type="Animation" id="Animation_4jfb6"]
@@ -122,14 +126,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_idle"]
 }
 
 [sub_resource type="Animation" id="Animation_yevqy"]
@@ -149,14 +153,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_idle_left"]
 }
 
 [sub_resource type="Animation" id="Animation_sxlqi"]
@@ -176,14 +180,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_idle_right"]
 }
 
 [sub_resource type="Animation" id="Animation_460ac"]
@@ -203,14 +207,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_left"]
 }
 
 [sub_resource type="Animation" id="Animation_ali1n"]
@@ -230,14 +234,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_right"]
 }
 
 [sub_resource type="Animation" id="Animation_aoiyr"]
@@ -258,14 +262,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["reeling_static"]
 }
 
 [sub_resource type="Animation" id="Animation_60w1x"]
@@ -286,14 +290,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["throw_idle"]
 }
 
 [sub_resource type="Animation" id="Animation_0nu4v"]
@@ -313,14 +317,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["throw_line"]
 }
 
 [sub_resource type="Animation" id="Animation_jwcha"]
@@ -340,14 +344,14 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["throw_line_finish"]
 }
 
 [sub_resource type="Animation" id="Animation_ooxxp"]
@@ -367,18 +371,15 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:frame")
+tracks/1/path = NodePath("AnimatedSprite3D:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0]
+"update": 1,
+"values": ["throw_line_idle"]
 }
-
-[sub_resource type="Animation" id="Animation_52vux"]
-length = 0.001
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_a83gf"]
 _data = {
@@ -418,10 +419,6 @@ animation = &"throw_line_idle"
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_11qcf"]
 advance_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_borun"]
-switch_mode = 2
-advance_mode = 2
-
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_8eai5"]
 states/End/position = Vector2(1002, 172)
 states/Start/position = Vector2(122, 90)
@@ -437,8 +434,8 @@ states/throw_line_finish/node = SubResource("AnimationNodeAnimation_4jfb6")
 states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
-transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_borun")]
-graph_offset = Vector2(82, 8)
+transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf")]
+graph_offset = Vector2(46, 8)
 
 [node name="Player3D" type="Node3D"]
 script = SubResource("GDScript_52vux")
@@ -454,7 +451,7 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"throw_line_idle"
+animation = &"prep_fishing"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
