@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="FishingGame"
-run/main_scene="uid://dcyiodpgbrpgw"
+run/main_scene="uid://do1idbq5tp58x"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/AS2P/plugin.cfg")
 
 [input]
 

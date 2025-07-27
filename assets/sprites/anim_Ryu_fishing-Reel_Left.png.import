@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://td7suklcspwa"
-path.s3tc="res://.godot/imported/anim_Ryu_fishing-Reel_Left.png-b9b6df31e12b52a586ff183a60ad6c8a.s3tc.ctex"
+path="res://.godot/imported/anim_Ryu_fishing-Reel_Left.png-b9b6df31e12b52a586ff183a60ad6c8a.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/anim_Ryu_fishing-Reel_Left.png"
-dest_files=["res://.godot/imported/anim_Ryu_fishing-Reel_Left.png-b9b6df31e12b52a586ff183a60ad6c8a.s3tc.ctex"]
+dest_files=["res://.godot/imported/anim_Ryu_fishing-Reel_Left.png-b9b6df31e12b52a586ff183a60ad6c8a.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

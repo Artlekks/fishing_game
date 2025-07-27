@@ -1,18 +1,466 @@
-[gd_scene load_steps=3 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=26 format=3 uid="uid://c05klp7s2dqe8"]
 
-[ext_resource type="Script" uid="uid://bsejqcttoj4k2" path="res://scripts/player_3d.gd" id="1_52vux"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 
+[sub_resource type="GDScript" id="GDScript_52vux"]
+script/source = "@tool
+extends Node3D
+
+@onready var anim_player := $AnimationPlayer
+@onready var sprite := $AnimatedSprite3D
+
+func _ready():
+	if not Engine.is_editor_hint():
+		return
+	fix_all_animations()
+
+func fix_all_animations():
+	var sprite_frames: SpriteFrames = sprite.sprite_frames
+	var anims = anim_player.get_animation_list()
+	var base_path = sprite.get_path_to(sprite)
+
+	for anim_name in anims:
+		var anim = anim_player.get_animation(anim_name)
+
+		# Delete garbage tracks (e.g. Player3D:frame)
+		for i in range(anim.get_track_count() - 1, -1, -1):
+			var path_str := str(anim.track_get_path(i))
+			if path_str.ends_with(\":animation\") or path_str.ends_with(\"Player3D:frame\"):
+				anim.remove_track(i)
+				print(\"❌ Removed:\", path_str)
+
+		# Get correct frame index from SpriteFrames
+		if sprite_frames.has_animation(anim_name):
+			var frame_count = sprite_frames.get_frame_count(anim_name)
+			if frame_count > 0:
+				var first_frame = 0  # You can later extend this to use frame by name
+				var full_path = NodePath(str(base_path) + \":frame\")
+
+				var frame_track = anim.find_track(full_path, Animation.TYPE_VALUE)
+				if frame_track == -1:
+					frame_track = anim.add_track(Animation.TYPE_VALUE)
+					anim.track_set_path(frame_track, full_path)
+
+				anim.track_insert_key(frame_track, 0.0, first_frame)
+				print(\"✅ Fixed:\", anim_name, \"→ frame =\", first_frame)
+			else:
+				print(\"⚠️ SpriteFrames has no frames for:\", anim_name)
+		else:
+			print(\"⚠️ SpriteFrames missing:\", anim_name)
+
+	print(\"🎉 All animations restored with correct frame key.\")
+"
+
+[sub_resource type="Animation" id="Animation_reoop"]
+length = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_2djwe"]
+length = 2.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_4jfb6"]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_yevqy"]
+length = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_sxlqi"]
+length = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_460ac"]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_ali1n"]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_aoiyr"]
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_60w1x"]
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_0nu4v"]
+length = 0.642857
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0714286, 0.142857, 0.214286, 0.285714, 0.357143, 0.428571, 0.5, 0.571429),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_jwcha"]
+length = 0.785714
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0714286, 0.142857, 0.214286, 0.285714, 0.357143, 0.428571, 0.5, 0.571429, 0.642857, 0.714286),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_ooxxp"]
+length = 0.0714286
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_52vux"]
+length = 0.001
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_a83gf"]
+_data = {
+&"RESET": SubResource("Animation_52vux"),
+&"fishing_idle": SubResource("Animation_reoop"),
+&"prep_fishing": SubResource("Animation_2djwe"),
+&"reeling_idle": SubResource("Animation_4jfb6"),
+&"reeling_idle_left": SubResource("Animation_yevqy"),
+&"reeling_idle_right": SubResource("Animation_sxlqi"),
+&"reeling_left": SubResource("Animation_460ac"),
+&"reeling_right": SubResource("Animation_ali1n"),
+&"reeling_static": SubResource("Animation_aoiyr"),
+&"throw_idle": SubResource("Animation_60w1x"),
+&"throw_line": SubResource("Animation_0nu4v"),
+&"throw_line_finish": SubResource("Animation_jwcha"),
+&"throw_line_idle": SubResource("Animation_ooxxp")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jrod8"]
+animation = &"fishing_idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ucsik"]
+animation = &"prep_fishing"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_reoop"]
+animation = &"throw_idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2djwe"]
+animation = &"throw_line"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4jfb6"]
+animation = &"throw_line_finish"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_yevqy"]
+animation = &"throw_line_idle"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_11qcf"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_borun"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_8eai5"]
+states/End/position = Vector2(1002, 172)
+states/Start/position = Vector2(122, 90)
+states/fishing_idle/node = SubResource("AnimationNodeAnimation_jrod8")
+states/fishing_idle/position = Vector2(406, 90)
+states/prep_fishing/node = SubResource("AnimationNodeAnimation_ucsik")
+states/prep_fishing/position = Vector2(252, 90)
+states/throw_idle/node = SubResource("AnimationNodeAnimation_reoop")
+states/throw_idle/position = Vector2(1002, 90)
+states/throw_line/node = SubResource("AnimationNodeAnimation_2djwe")
+states/throw_line/position = Vector2(546, 90)
+states/throw_line_finish/node = SubResource("AnimationNodeAnimation_4jfb6")
+states/throw_line_finish/position = Vector2(854, 90)
+states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
+states/throw_line_idle/position = Vector2(694, 90)
+transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_borun")]
+graph_offset = Vector2(82, 8)
+
 [node name="Player3D" type="Node3D"]
-script = ExtResource("1_52vux")
-
-[node name="Billboard" type="Node3D" parent="."]
-transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Billboard"]
-texture_filter = 0
-sprite_frames = ExtResource("2_reoop")
-animation = &"idle"
+script = SubResource("GDScript_52vux")
 
 [node name="BaitSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.181, 0.01, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
+centered = false
+offset = Vector2(-100, -69)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+sprite_frames = ExtResource("2_reoop")
+animation = &"throw_line_idle"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_a83gf")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_8eai5")
+anim_player = NodePath("../AnimationPlayer")

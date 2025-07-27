@@ -1,0 +1,113 @@
+[gd_scene load_steps=6 format=3 uid="uid://c05klp7s2dqe8"]
+
+[ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
+
+[sub_resource type="GDScript" id="GDScript_52vux"]
+script/source = "@tool
+extends Node3D
+
+@export var sprite: AnimatedSprite3D
+@export var anim_player: AnimationPlayer
+
+func _ready():
+	if not Engine.is_editor_hint():
+		return
+
+	if not sprite or not anim_player:
+		print(\"❌ Missing references.\")
+		return
+
+	var frames = sprite.frames
+
+	for anim_name in frames.get_animation_names():
+		var frame_count = frames.get_frame_count(anim_name)
+		var fps = frames.get_animation_speed(anim_name)
+		var duration = frame_count / float(fps)
+
+		var anim = Animation.new()
+		anim.length = duration
+		anim.loop = frames.is_animation_looping(anim_name)
+
+		var track = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track, NodePath(\"%s:frame\" % sprite.get_path()))
+
+		for i in range(frame_count):
+			var time = i / float(fps)
+			anim.track_insert_key(track, time, i)
+
+		anim_player.add_animation(anim_name, anim)
+
+	print(\"✅ All SpriteFrames animations copied to AnimationPlayer.\")
+"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2djwe"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_sxlqi"]
+
+[sub_resource type="GDScript" id="GDScript_reoop"]
+script/source = "@tool
+extends Node3D
+
+@export var sprite: AnimatedSprite3D
+@export var anim_player: AnimationPlayer
+
+func _ready():
+	if not Engine.is_editor_hint():
+		return
+
+	if not sprite or not anim_player:
+		print(\"❌ Missing references.\")
+		return
+
+	var frames = sprite.frames
+
+	for anim_name in frames.get_animation_names():
+		var frame_count = frames.get_frame_count(anim_name)
+		var fps = frames.get_animation_speed(anim_name)
+		var duration = frame_count / float(fps)
+
+		var anim = Animation.new()
+		anim.length = duration
+		anim.loop = frames.is_animation_looping(anim_name)
+
+		var track = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track, \"%s:frame\" % sprite.get_path())
+
+		for i in range(frame_count):
+			var time = i / float(fps)
+			anim.track_insert_key(track, time, i)
+
+		anim_player.add_animation(anim_name, anim)
+
+	print(\"✅ All SpriteFrames animations copied to AnimationPlayer.\")
+"
+
+[node name="Player3D" type="Node3D"]
+script = SubResource("GDScript_52vux")
+
+[node name="BaitSpawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
+centered = false
+offset = Vector2(-100, -69)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+sprite_frames = ExtResource("2_reoop")
+animation = &"prep_fishing"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_2djwe")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_sxlqi")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="SpriteFramesConverter" type="Node3D" parent="." node_paths=PackedStringArray("sprite", "anim_player")]
+script = SubResource("GDScript_reoop")
+sprite = NodePath("../AnimatedSprite3D")
+anim_player = NodePath("../AnimationPlayer")

@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://do1idbq5tp58x"]
+
+[ext_resource type="Texture2D" uid="uid://3jmou6ohi7af" path="res://assets/backgrounds/Background_02.png" id="1_ii0nw"]
+[ext_resource type="Script" uid="uid://dun1krrx27r4j" path="res://scripts/world_3d.gd" id="1_yppe2"]
+[ext_resource type="PackedScene" uid="uid://c05klp7s2dqe8" path="res://scenes/player_3d.tscn" id="2_g5kxi"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_g5kxi"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yppe2"]
+shading_mode = 0
+disable_ambient_light = true
+disable_fog = true
+albedo_texture = ExtResource("1_ii0nw")
+
+[node name="World3D" type="Node3D"]
+script = ExtResource("1_yppe2")
+
+[node name="BackgroundPlane" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.2, 0, 0, 0, 1, 0, 0, 0, 3.2, 0, 0, 0)
+mesh = SubResource("PlaneMesh_g5kxi")
+surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 7.65813, 0)
+fov = 45.0
+
+[node name="GroundAnchor" type="Node3D" parent="."]
+
+[node name="Player3D" parent="GroundAnchor" instance=ExtResource("2_g5kxi")]
+transform = Transform3D(1.2, 0, 0, 0, -5.24537e-08, 1.2, 0, -1.2, -5.24537e-08, -3.03953, 0.0838104, 1.60469)

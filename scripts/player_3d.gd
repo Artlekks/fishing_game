@@ -1,87 +1,57 @@
 extends Node3D
 
-@onready var anim := $Billboard/AnimatedSprite3D
-@onready var bait_spawn_point := $BaitSpawn
-@onready var bait_scene := preload("res://scenes/bait_3d.tscn")
+@onready var anim_tree: AnimationTree = $AnimationTree
+@onready var anim_state = anim_tree.get("parameters/playback")
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
 
-var bait_thrown := false
-var bait_ref: Node3D = null
+@onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 
-var ready_to_fish := false
-var is_throwing := false
-var waiting_for_throw_finish := false
-var in_reeling_mode := false
+var current_state: String = "prep_fishing"
+var transitioning: bool = false
 
 func _ready():
-	anim.play("prep_fishing")
-	anim.animation_finished.connect(_on_animation_finished)
+	sprite.speed_scale = 0.0
 
-func _process(_delta):
-	if not ready_to_fish:
+	anim_tree.active = true
+
+	print("▶ Starting prep_fishing")
+	await play_state("prep_fishing")
+
+	print("▶ → fishing_idle")
+	await play_state("fishing_idle")
+
+func _unhandled_input(event: InputEvent):
+	if transitioning:
 		return
 
-	# Press K to throw or start reeling
 	if Input.is_action_just_pressed("throw_line"):
-		if not is_throwing and not waiting_for_throw_finish and not in_reeling_mode:
-			start_throw()
-		elif waiting_for_throw_finish:
-			waiting_for_throw_finish = false
-			start_throw_finish()
-		elif in_reeling_mode:
-			anim.play("reeling_idle")
-
-	# Hold K while reeling
-	if in_reeling_mode and Input.is_action_pressed("throw_line"):
-		if Input.is_action_pressed("reeling_left"):
-			anim.play("reeling_left")
-		elif Input.is_action_pressed("reeling_right"):
-			anim.play("reeling_right")
-		else:
-			anim.play("reeling_idle")
-
-	elif in_reeling_mode and !Input.is_action_pressed("throw_line"):
-		anim.play("reeling_static")
-
-	# R to reset the scene
-	if Input.is_action_just_pressed("reset_game"):
-		get_tree().reload_current_scene()
+		match current_state:
+			"fishing_idle":
+				start_throw()
+			"throw_line_idle":
+				finish_throw()
 
 func start_throw():
-	is_throwing = true
-	anim.play("throw_line")
+	await play_state("throw_line")
+	await play_state("throw_line_idle")  # waits for 2nd K
 
-func start_throw_finish():
-	anim.play("throw_line_finish")
-	await get_tree().create_timer(0.25).timeout
-	spawn_and_throw_bait()
+func finish_throw():
+	await play_state("throw_line_finish")
+	await play_state("throw_idle")
 
-func _on_animation_finished():
-	match anim.animation:
-		"prep_fishing":
-			ready_to_fish = true
-			anim.play("idle")
+	# Optional for now — this will be replaced by bait landing logic later
+	await play_state("reeling_idle")
 
-		"throw_line":
-			is_throwing = false
-			waiting_for_throw_finish = true
-			anim.play("throw_line_idle")
+func play_state(state_name: String) -> void:
+	transitioning = true
+	current_state = state_name
+	print("▶ → %s" % state_name)
 
-		"throw_line_finish":
-			if Input.is_action_pressed("throw_line"):
-				anim.play("throw_idle")
-			else:
-				anim.play("reeling_static")
-			in_reeling_mode = true
+	anim_state.travel(state_name)
 
-func spawn_and_throw_bait():
-	if bait_thrown:
-		return
+	await wait_for_anim(state_name)
+	transitioning = false
 
-	bait_ref = bait_scene.instantiate()
-	get_tree().current_scene.add_child(bait_ref)
-
-	bait_ref.global_position = bait_spawn_point.global_position
-	var end_pos = bait_ref.global_position + Vector3(0, 0, -2.5)  # cast forward (Z axis)
-	bait_ref.throw_to(end_pos)
-
-	bait_thrown = true
+func wait_for_anim(state_name: String) -> void:
+	var anim_length = anim_player.get_animation(state_name).length
+	await get_tree().create_timer(anim_length).timeout

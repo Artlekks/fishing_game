@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://c05klp7s2dqe8"]
+
+[ext_resource type="Script" uid="uid://ql50ono67ktu" path="res://scenes/sprite_to_animplayer.gd" id="1_reoop"]
+[ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
+[ext_resource type="Script" uid="uid://drqmji1thlij2" path="res://scenes/sprite_frames_converter.gd" id="3_2djwe"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2djwe"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_sxlqi"]
+
+[node name="Player3D" type="Node3D"]
+script = ExtResource("1_reoop")
+
+[node name="BaitSpawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+transform = Transform3D(2.48, 0, 0, 0, 2.48, 0, 0, 0, 2.48, 0, 0, 0)
+centered = false
+offset = Vector2(-100, -69)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+sprite_frames = ExtResource("2_reoop")
+animation = &"prep_fishing"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_2djwe")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_sxlqi")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="SpriteFramesConverter" type="Node3D" parent="." node_paths=PackedStringArray("sprite", "anim_player")]
+script = ExtResource("3_2djwe")
+sprite = NodePath("../AnimatedSprite3D")
+anim_player = NodePath("../AnimationPlayer")
