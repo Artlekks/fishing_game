@@ -3,11 +3,19 @@ extends Node3D
 @onready var anim_tree = $AnimationTree
 @onready var anim_state = anim_tree.get("parameters/playback")
 @onready var anim_player = $AnimationPlayer
+@onready var power_bar_layer = $power_bar_layer
+@onready var power_bar_fill = $power_bar_layer/power_bar_ui/PowerBarFill
+
+var power := 0.0
+var power_dir := 1
+const POWER_SPEED := 1.5
+var charging := false
 
 var current_state := "prep_fishing"
 var transitioning := false
 
 func _ready():
+	power_bar_fill.scale.x = 0.0
 	anim_tree.active = true
 
 	print("▶ Starting prep_fishing")
@@ -16,6 +24,9 @@ func _ready():
 	print("▶ → fishing_idle")
 	await play_and_wait("fishing_idle")
 	current_state = "fishing_idle"
+	
+	power_bar_layer.visible = false
+
 
 func _unhandled_input(_event: InputEvent):  # <- warning fixed
 	if transitioning:
@@ -33,12 +44,14 @@ func start_throw():
 	current_state = "throw_line"
 	transitioning = true
 	await play_and_wait("throw_line")
-
+	
 	print("▶ → throw_line_idle (waiting for 2nd K)")
 	current_state = "throw_line_idle"
 	await play_and_wait("throw_line_idle")
 
 	transitioning = false  # ready for second K press
+	power_bar_layer.visible = true
+	charging = true
 
 func finish_throw():
 	print("▶ → throw_line_finish")
@@ -49,6 +62,10 @@ func finish_throw():
 	print("▶ → throw_idle")
 	current_state = "throw_idle"
 	await play_and_wait("throw_idle")
+	
+	charging = false
+	power_bar_layer.visible = false
+	var locked_power = power  # you'll use this for bait strength later
 
 	# You’ll replace this later when bait touches water
 	print("▶ throw complete. Waiting for bait logic...")
@@ -61,3 +78,16 @@ func play_and_wait(state_name: String) -> void:
 	var anim = anim_player.get_animation(state_name)
 	if anim:
 		await get_tree().create_timer(anim.length).timeout
+		
+func _process(delta):
+	if charging:
+		power += POWER_SPEED * power_dir * delta
+
+		if power > 1.0:
+			power = 1.0
+			power_dir = -1
+		elif power < 0.0:
+			power = 0.0
+			power_dir = 1
+
+		power_bar_fill.scale.x = power  # fill the bar visually
