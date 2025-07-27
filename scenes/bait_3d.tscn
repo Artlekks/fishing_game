@@ -21,7 +21,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_bae6e")
 }],
 "loop": true,
-"name": &"bait",
+"name": &"bait_idle",
 "speed": 8.0
 }]
 
@@ -31,6 +31,7 @@ script = ExtResource("1_b07vr")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.7, 0, 0, 0, -3.0598e-08, 0.7, 0, -0.7, -3.0598e-08, 0, 0, 0)
+billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_ni2xf")
-animation = &"bait"
+animation = &"bait_idle"

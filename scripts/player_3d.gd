@@ -8,6 +8,8 @@ extends Node3D
 @onready var power_bar_ui = $power_bar_layer/power_bar_ui
 @onready var power_bar_fill = $power_bar_layer/power_bar_ui/PowerBarFill
 
+var power_bar_final_pos: Vector2  # saved editor position
+
 var power := 0.0
 var power_dir := 1
 var charging := false
@@ -17,13 +19,16 @@ var current_state := "prep_fishing"
 var transitioning := false
 
 const POWER_SPEED := 0.5
-const POWERBAR_OFFSCREEN_Y := 800
-const POWERBAR_ONSCREEN_Y := 500
+
+var bait_scene := preload("res://scenes/bait_3d.tscn")
+var bait_instance: Node3D
 
 func _ready():
-	power_bar_fill.scale.x = 0.0
+	# Save the final position from editor, then move off screen
+	power_bar_final_pos = power_bar_ui.position
+	power_bar_ui.position.y = 800
 	power_bar_layer.visible = false
-	power_bar_ui.position.y = POWERBAR_OFFSCREEN_Y
+	power_bar_fill.scale.x = 0.0
 
 	anim_tree.active = true
 
@@ -50,22 +55,20 @@ func start_throw():
 	current_state = "throw_line"
 	transitioning = true
 
-	# 👇 Power bar shows immediately
+	# Show and animate power bar immediately
 	power = 0.0
 	power_dir = 1
 	charging = true
 	power_bar_fill.scale.x = 0.0
-	power_bar_ui.position.y = POWERBAR_OFFSCREEN_Y
 	power_bar_layer.visible = true
 
 	power_bar_tween = create_tween()
 	var track_in = power_bar_tween.tween_property(
-		power_bar_ui, "position:y", POWERBAR_ONSCREEN_Y, 0.2
+		power_bar_ui, "position", power_bar_final_pos, 0.2
 	)
 	track_in.set_trans(Tween.TRANS_QUAD)
 	track_in.set_ease(Tween.EASE_OUT)
 
-	# THEN play the animations
 	await play_and_wait("throw_line")
 	await play_and_wait("throw_line_idle")
 
@@ -73,15 +76,15 @@ func start_throw():
 	current_state = "throw_line_idle"
 	transitioning = false
 
-
 func finish_throw():
 	print("▶ → throw_line_finish")
 	current_state = "throw_line_finish"
 	transitioning = true
 
-	charging = false  # stop power fill, but leave bar visible
+	charging = false
 
-	var _locked_power = power  # placeholder until used
+	var locked_power = power
+	spawn_bait(locked_power)
 
 	await play_and_wait("throw_line_finish")
 
@@ -92,6 +95,29 @@ func finish_throw():
 	print("▶ throw complete. Waiting for bait logic...")
 	transitioning = false
 
+func spawn_bait(power_value: float):
+	print("▶ Spawning bait...")
+
+	bait_instance = bait_scene.instantiate()
+	get_tree().current_scene.add_child(bait_instance)
+
+	var start_pos = global_position + Vector3(2, 0, 0)
+	bait_instance.global_position = start_pos
+
+	var distance = lerp(3.0, 10.0, power_value)
+	var target_pos = start_pos + Vector3(distance, 0, 0)
+
+	bait_instance.throw_to(target_pos, 1.5, 0.6)
+
+	bait_instance.bait_landed.connect(_on_bait_landed)
+	bait_instance.bait_despawned.connect(_on_bait_despawned)
+
+func _on_bait_landed():
+	print("🪝 Bait landed — ready to reel.")
+
+func _on_bait_despawned():
+	print("❌ Bait despawned.")
+	bait_instance = null
 
 func play_and_wait(state_name: String) -> void:
 	current_state = state_name
