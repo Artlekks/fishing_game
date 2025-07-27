@@ -37,10 +37,11 @@ func _ready():
 	power_bar_fill.scale.x = 0.0
 
 	# Setup direction line
-	for i in range(1, 9):
-		var dot = direction_line.get_node("Dot%d" % i)
+	for i in range(8):
+		var dot = direction_line.get_node("dot_%d" % i)
 		dot.visible = false
 		direction_dots.append(dot)
+
 	direction_line.visible = false
 
 	anim_tree.active = true

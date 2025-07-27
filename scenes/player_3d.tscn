@@ -1,9 +1,10 @@
-[gd_scene load_steps=32 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=33 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 [ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="3_4jfb6"]
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="4_yevqy"]
+[ext_resource type="Script" uid="uid://dulpsesmj61fl" path="res://scenes/direction_line.gd" id="5_sxlqi"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="5_yevqy"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
@@ -455,8 +456,9 @@ texture = ExtResource("4_yevqy")
 offset = Vector2(353.5, 0)
 
 [node name="DirectionLine" type="Node3D" parent="."]
+script = ExtResource("5_sxlqi")
 
-[node name="Dot1" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_0" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.5, 0.275, 0)
 billboard = 1
 shaded = true
@@ -464,7 +466,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot2" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_1" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.725, 0.375, 0)
 billboard = 1
 shaded = true
@@ -472,7 +474,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot3" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_2" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.95, 0.475, 0)
 billboard = 1
 shaded = true
@@ -480,7 +482,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot4" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_3" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.2, 0.575, 0)
 billboard = 1
 shaded = true
@@ -488,7 +490,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot5" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_4" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.425, 0.675, 0)
 billboard = 1
 shaded = true
@@ -496,7 +498,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot6" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_5" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.65, 0.775, 0)
 billboard = 1
 shaded = true
@@ -504,7 +506,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot7" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_6" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.875, 0.875, 0)
 billboard = 1
 shaded = true
@@ -512,7 +514,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
 
-[node name="Dot8" type="Sprite3D" parent="DirectionLine"]
+[node name="dot_7" type="Sprite3D" parent="DirectionLine"]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 2.1, 0.975, 0)
 billboard = 1
 shaded = true
