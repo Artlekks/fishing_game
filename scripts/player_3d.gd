@@ -8,27 +8,40 @@ extends Node3D
 @onready var power_bar_ui = $power_bar_layer/power_bar_ui
 @onready var power_bar_fill = $power_bar_layer/power_bar_ui/PowerBarFill
 
-var power_bar_final_pos: Vector2  # saved editor position
+@onready var bait_spawn = $BaitSpawn
+@onready var fish_zone = get_tree().current_scene.get_node("FishZone/Center")
 
+@onready var direction_line = $DirectionLine
+var direction_dots: Array[Sprite3D] = []
+var show_dots := false
+
+var power_bar_final_pos: Vector2
 var power := 0.0
 var power_dir := 1
 var charging := false
 var power_bar_tween: Tween
+
+var bait_scene := preload("res://scenes/bait_3d.tscn")
+var bait_instance: Node3D
 
 var current_state := "prep_fishing"
 var transitioning := false
 
 const POWER_SPEED := 0.5
 
-var bait_scene := preload("res://scenes/bait_3d.tscn")
-var bait_instance: Node3D
-
 func _ready():
-	# Save the final position from editor, then move off screen
+	# Setup power bar
 	power_bar_final_pos = power_bar_ui.position
 	power_bar_ui.position.y = 800
 	power_bar_layer.visible = false
 	power_bar_fill.scale.x = 0.0
+
+	# Setup direction line
+	for i in range(1, 9):
+		var dot = direction_line.get_node("Dot%d" % i)
+		dot.visible = false
+		direction_dots.append(dot)
+	direction_line.visible = false
 
 	anim_tree.active = true
 
@@ -36,6 +49,7 @@ func _ready():
 	await play_and_wait("prep_fishing")
 
 	print("▶ → fishing_idle")
+	await show_direction_line()
 	await play_and_wait("fishing_idle")
 	current_state = "fishing_idle"
 
@@ -44,6 +58,10 @@ func _unhandled_input(_event: InputEvent):
 		return
 
 	if Input.is_action_just_pressed("throw_line"):
+		# Hide direction line immediately
+		show_dots = false
+		direction_line.visible = false
+
 		match current_state:
 			"fishing_idle":
 				start_throw()
@@ -55,7 +73,7 @@ func start_throw():
 	current_state = "throw_line"
 	transitioning = true
 
-	# Show and animate power bar immediately
+	# Show and animate power bar
 	power = 0.0
 	power_dir = 1
 	charging = true
@@ -63,11 +81,11 @@ func start_throw():
 	power_bar_layer.visible = true
 
 	power_bar_tween = create_tween()
-	var track_in = power_bar_tween.tween_property(
+	var track = power_bar_tween.tween_property(
 		power_bar_ui, "position", power_bar_final_pos, 0.2
 	)
-	track_in.set_trans(Tween.TRANS_QUAD)
-	track_in.set_ease(Tween.EASE_OUT)
+	track.set_trans(Tween.TRANS_QUAD)
+	track.set_ease(Tween.EASE_OUT)
 
 	await play_and_wait("throw_line")
 	await play_and_wait("throw_line_idle")
@@ -82,7 +100,6 @@ func finish_throw():
 	transitioning = true
 
 	charging = false
-
 	var locked_power = power
 	spawn_bait(locked_power)
 
@@ -101,14 +118,13 @@ func spawn_bait(power_value: float):
 	bait_instance = bait_scene.instantiate()
 	get_tree().current_scene.add_child(bait_instance)
 
-	var start_pos = global_position + Vector3(2, 0, 0)
+	var start_pos = bait_spawn.global_position
 	bait_instance.global_position = start_pos
 
 	var distance = lerp(3.0, 10.0, power_value)
-	var target_pos = start_pos + Vector3(distance, 0, 0)
+	var end_pos = fish_zone.global_position
 
-	bait_instance.throw_to(target_pos, 1.5, 0.6)
-
+	bait_instance.throw_to(end_pos, 1.5, 0.6)
 	bait_instance.bait_landed.connect(_on_bait_landed)
 	bait_instance.bait_despawned.connect(_on_bait_despawned)
 
@@ -139,3 +155,13 @@ func _process(delta):
 			power_dir = 1
 
 		power_bar_fill.scale.x = power
+
+func show_direction_line() -> void:
+	show_dots = true
+	direction_line.visible = true
+
+	for i in range(direction_dots.size()):
+		if not show_dots:
+			break
+		direction_dots[i].visible = true
+		await get_tree().create_timer(0.05).timeout

@@ -14,8 +14,9 @@ func throw_to(end_pos: Vector3, height := 1.0, duration := 0.6):
 	tween.tween_method(func(t):
 		var pos = Vector3()
 		pos.x = lerp(start.x, end_pos.x, t)
-		pos.y = start.y  # flat plane for now
-		pos.z = lerp(start.z, end_pos.z, t) + sin(t * PI) * height
+		pos.y = lerp(start.y, end_pos.y, t) + sin(t * PI) * height
+		pos.z = lerp(start.z, end_pos.z, t)
+
 		global_position = pos
 	, 0.0, 1.0, duration)
 

@@ -32,3 +32,8 @@ size = 4.56
 
 [node name="Player3D" parent="GroundAnchor" instance=ExtResource("2_g5kxi")]
 transform = Transform3D(1.2, 0, 0, 0, 1.2, 2.84217e-14, 0, -2.84217e-14, 1.2, -3.03953, 0.0838104, 2.61636)
+
+[node name="FishZone" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.76942, 0, -0.419337)
+
+[node name="Center" type="Marker3D" parent="FishZone"]
