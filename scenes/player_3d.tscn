@@ -1,7 +1,9 @@
-[gd_scene load_steps=29 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=31 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
+[ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="3_4jfb6"]
+[ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="4_yevqy"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
 length = 0.001
@@ -426,3 +428,26 @@ libraries = {
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_8eai5")
 anim_player = NodePath("../AnimationPlayer")
+
+[node name="power_bar_layer" type="CanvasLayer" parent="."]
+
+[node name="power_bar_ui" type="Control" parent="power_bar_layer"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="PowerBarBG" type="Sprite2D" parent="power_bar_layer/power_bar_ui"]
+texture = ExtResource("3_4jfb6")
+
+[node name="PowerBarFill" type="Sprite2D" parent="power_bar_layer/power_bar_ui"]
+position = Vector2(-456, 0)
+texture = ExtResource("4_yevqy")
+offset = Vector2(353.5, 0)
