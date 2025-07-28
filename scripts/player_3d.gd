@@ -59,12 +59,28 @@ func _ready():
 
 func _reset_after_reeling():
 	print("🔁 Returning to fishing_idle...")
+
+	# Reset bait-related flags
 	bait_instance = null
 	is_bait_ready = false
 	is_reeling = false
+
+	# Reset power bar UI
+	charging = false
+	power = 0.0
+	power_dir = 1
+	if power_bar_tween:
+		power_bar_tween.kill()
+
+	power_bar_fill.scale.x = 0.0
+	power_bar_layer.visible = false
+	power_bar_ui.position.y = 800  # back offscreen
+
+	# Back to fishing_idle
 	anim_state.travel("fishing_idle")
 	direction_line.start_loop()
 	current_state = "fishing_idle"
+
 
 # ---------------------------------------------------------
 # INPUT

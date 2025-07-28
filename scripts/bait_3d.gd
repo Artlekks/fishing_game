@@ -22,12 +22,9 @@ func _ready():
 
 func _on_reel_detector_body_entered(body: Node) -> void:
 	if body.name == "Killzone":
-		global_position = body.global_position  # Snap to Killzone center (or offset manually)
-		print("🎯 Bait entered Killzone — despawning.")
+		global_position = body.global_position + Vector3(0.3, 0.0, 0.0)  # offset if needed
 		emit_signal("bait_despawned")
 		queue_free()
-		
-		print("⚠ ENTERED:", body.name)
 
 
 func throw_to(end_pos: Vector3, height := 1.5, duration := 0.6):
