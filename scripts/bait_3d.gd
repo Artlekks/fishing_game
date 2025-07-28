@@ -22,9 +22,13 @@ func _ready():
 
 func _on_reel_detector_body_entered(body: Node) -> void:
 	if body.name == "Killzone":
-		print("✅ Bait entered Killzone — despawning")
+		global_position = body.global_position  # Snap to Killzone center (or offset manually)
+		print("🎯 Bait entered Killzone — despawning.")
 		emit_signal("bait_despawned")
 		queue_free()
+		
+		print("⚠ ENTERED:", body.name)
+
 
 func throw_to(end_pos: Vector3, height := 1.5, duration := 0.6):
 	_throw_start = global_position
@@ -58,19 +62,15 @@ func _process(delta):
 
 	elif reeling:
 		var direction = reeling_target - global_position
-		direction.y = 0
 		var distance = direction.length()
 
 		if distance > 0.01:
 			var move = direction.normalized() * reeling_speed * delta
-			if move.length() < distance:
-				global_position += move
-			else:
-				global_position = reeling_target
-				reeling = false
-				emit_signal("bait_despawned")
-				queue_free()
-		else:
-			reeling = false
+			global_position += move
+			
+		print("🎣 Bait pos:", global_position, "→ target:", reeling_target)
+		
+		if reeling and (global_position - reeling_target).length() < 0.1:
+			print("💥 Failsafe despawn")
 			emit_signal("bait_despawned")
 			queue_free()

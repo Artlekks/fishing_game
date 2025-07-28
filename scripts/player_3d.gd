@@ -14,6 +14,7 @@ extends Node3D
 @onready var bait_spawn = $BaitSpawn
 @onready var fish_zone = get_tree().get_root().get_node("World3D/FishZone/Center")
 @onready var direction_line = $DirectionLine
+@onready var bait_target = $BaitTarget
 
 # Bait
 var bait_scene := preload("res://scenes/bait_3d.tscn")
@@ -173,9 +174,9 @@ func _process(delta):
 	if holding_k:
 		if not is_reeling:
 			is_reeling = true
-			var target = global_position
-			target.y = bait_instance.global_position.y
-			bait_instance.reel_to(target)
+			bait_instance.reel_to(bait_target.global_position)
+
+
 
 		if left:
 			anim_state.travel("reeling_left")
