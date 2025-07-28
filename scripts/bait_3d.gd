@@ -3,57 +3,74 @@ extends Node3D
 signal bait_landed
 signal bait_despawned
 
-@export var reeling_speed := 1.5
-@export var killzone_radius := 0.5
+@export var reeling_speed := 0.8
 
-var reeling_target: Vector3
+# Throw arc state
+var _throwing := false
+var _throw_elapsed := 0.0
+var _throw_duration := 0.6
+var _throw_height := 1.5
+var _throw_start: Vector3
+var _throw_end: Vector3
+
+# Reeling state
 var reeling := false
+var reeling_target: Vector3
 
-func throw_to(end_pos: Vector3, height := 1.0, duration := 0.6):
-    var start = global_position
+func _ready():
+	$ReelDetector.body_entered.connect(_on_reel_detector_body_entered)
 
-    var tween = create_tween()
-    tween.tween_method(
-    func(t):
-        var pos = Vector3()
-        pos.x = lerp(start.x, end_pos.x, t)
-        pos.y = lerp(start.y, end_pos.y, t) + sin(t * PI) * height
-        pos.z = lerp(start.z, end_pos.z, t)
-        global_position = pos
-    , 0.0, 1.0, duration
-    )
+func _on_reel_detector_body_entered(body: Node) -> void:
+	if body.name == "Killzone":
+		print("✅ Bait entered Killzone — despawning")
+		emit_signal("bait_despawned")
+		queue_free()
 
-    await tween.finished
-    emit_signal("bait_landed")
+func throw_to(end_pos: Vector3, height := 1.5, duration := 0.6):
+	_throw_start = global_position
+	_throw_end = end_pos
+	_throw_duration = duration
+	_throw_height = height
+	_throw_elapsed = 0.0
+	_throwing = true
 
 func reel_to(target: Vector3):
-    reeling_target = target
-    reeling = true
+	reeling_target = target
+	reeling = true
 
 func stop_reeling():
-    reeling = false
+	reeling = false
 
 func _process(delta):
-    if reeling:
-        var direction = (reeling_target - global_position)
-        direction.y = 0  # flatten to horizontal plane
-        var distance = direction.length()
+	if _throwing:
+		_throw_elapsed += delta
+		var t = clamp(_throw_elapsed / _throw_duration, 0.0, 1.0)
 
-        if distance > 0.01:
-            var move = direction.normalized() * reeling_speed * delta
-            if move.length() < distance:
-                global_position += move
-            else:
-                global_position = reeling_target
-                reeling = false
-                _check_killzone()
-        else:
-            reeling = false
-            _check_killzone()
+		var pos = Vector3()
+		pos.x = lerp(_throw_start.x, _throw_end.x, t)
+		pos.y = lerp(_throw_start.y, _throw_end.y, t) + sin(t * PI) * _throw_height
+		pos.z = lerp(_throw_start.z, _throw_end.z, t)
+		global_position = pos
 
-func _check_killzone():
-    var player = get_tree().current_scene.get_node("GroundAnchor/Player3D")
-    var flat_dist = global_position.distance_to(player.global_position)
-    if flat_dist <= killzone_radius:
-        emit_signal("bait_despawned")
-        queue_free()
+		if t >= 1.0:
+			_throwing = false
+			emit_signal("bait_landed")
+
+	elif reeling:
+		var direction = reeling_target - global_position
+		direction.y = 0
+		var distance = direction.length()
+
+		if distance > 0.01:
+			var move = direction.normalized() * reeling_speed * delta
+			if move.length() < distance:
+				global_position += move
+			else:
+				global_position = reeling_target
+				reeling = false
+				emit_signal("bait_despawned")
+				queue_free()
+		else:
+			reeling = false
+			emit_signal("bait_despawned")
+			queue_free()

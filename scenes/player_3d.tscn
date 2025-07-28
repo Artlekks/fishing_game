@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=48 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="4_yevqy"]
 [ext_resource type="Script" uid="uid://dulpsesmj61fl" path="res://scenes/direction_line.gd" id="5_sxlqi"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="5_yevqy"]
+[ext_resource type="Script" uid="uid://xexkbrrdqbe6" path="res://scenes/killzone.gd" id="7_460ac"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
 length = 0.001
@@ -67,6 +68,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_4jfb6"]
 length = 0.5
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -148,6 +150,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_460ac"]
 length = 0.5
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -175,6 +178,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_ali1n"]
 length = 0.5
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -456,6 +460,8 @@ states/throw_line_idle/position = Vector2(694, 90)
 transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy"), "throw_line_finish", "throw_idle", SubResource("AnimationNodeStateMachineTransition_jwcha"), "throw_idle", "reeling_static", SubResource("AnimationNodeStateMachineTransition_ooxxp"), "reeling_static", "reeling_idle", SubResource("AnimationNodeStateMachineTransition_a83gf"), "reeling_idle", "reeling_idle_left", SubResource("AnimationNodeStateMachineTransition_jrod8"), "reeling_idle_left", "reeling_left", SubResource("AnimationNodeStateMachineTransition_ucsik"), "reeling_idle", "reeling_idle_right", SubResource("AnimationNodeStateMachineTransition_borun"), "reeling_idle_right", "reeling_right", SubResource("AnimationNodeStateMachineTransition_8eai5")]
 graph_offset = Vector2(132, 72)
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_sxlqi"]
+
 [node name="Player3D" type="Node3D"]
 script = ExtResource("1_reoop")
 
@@ -580,3 +586,14 @@ shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
+
+[node name="Killzone" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 16
+script = ExtResource("7_460ac")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Killzone"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+shape = SubResource("SphereShape3D_sxlqi")
+
+[connection signal="body_entered" from="Killzone" to="." method="_on_killzone_body_entered"]

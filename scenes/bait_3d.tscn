@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dik0kc3cv5egj"]
+[gd_scene load_steps=7 format=3 uid="uid://dik0kc3cv5egj"]
 
 [ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="1_5od1y"]
 [ext_resource type="Script" uid="uid://d4gcwwxgk4qj" path="res://scripts/bait_3d.gd" id="1_b07vr"]
@@ -25,6 +25,8 @@ animations = [{
 "speed": 8.0
 }]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_xb8r5"]
+
 [node name="Bait" type="Node3D"]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_b07vr")
@@ -35,3 +37,11 @@ billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_ni2xf")
 animation = &"bait_idle"
+
+[node name="ReelDetector" type="Area3D" parent="."]
+collision_layer = 16
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ReelDetector"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+shape = SubResource("SphereShape3D_xb8r5")
