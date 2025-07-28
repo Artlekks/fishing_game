@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=46 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
@@ -360,6 +360,24 @@ animation = &"fishing_idle"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ucsik"]
 animation = &"prep_fishing"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sxlqi"]
+animation = &"reeling_idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_460ac"]
+animation = &"reeling_idle_left"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ali1n"]
+animation = &"reeling_idle_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_aoiyr"]
+animation = &"reeling_left"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_60w1x"]
+animation = &"reeling_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0nu4v"]
+animation = &"reeling_static"
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_reoop"]
 animation = &"throw_idle"
 
@@ -387,13 +405,46 @@ advance_mode = 0
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yevqy"]
 advance_mode = 0
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jwcha"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ooxxp"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_a83gf"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jrod8"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ucsik"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_borun"]
+advance_mode = 0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8eai5"]
+advance_mode = 0
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_8eai5"]
-states/End/position = Vector2(1002, 172)
+states/End/position = Vector2(1124, 210)
 states/Start/position = Vector2(122, 90)
 states/fishing_idle/node = SubResource("AnimationNodeAnimation_jrod8")
 states/fishing_idle/position = Vector2(406, 90)
 states/prep_fishing/node = SubResource("AnimationNodeAnimation_ucsik")
 states/prep_fishing/position = Vector2(252, 90)
+states/reeling_idle/node = SubResource("AnimationNodeAnimation_sxlqi")
+states/reeling_idle/position = Vector2(1002, 215)
+states/reeling_idle_left/node = SubResource("AnimationNodeAnimation_460ac")
+states/reeling_idle_left/position = Vector2(906, 289)
+states/reeling_idle_right/node = SubResource("AnimationNodeAnimation_ali1n")
+states/reeling_idle_right/position = Vector2(1110, 289)
+states/reeling_left/node = SubResource("AnimationNodeAnimation_aoiyr")
+states/reeling_left/position = Vector2(906, 361)
+states/reeling_right/node = SubResource("AnimationNodeAnimation_60w1x")
+states/reeling_right/position = Vector2(1110, 361)
+states/reeling_static/node = SubResource("AnimationNodeAnimation_0nu4v")
+states/reeling_static/position = Vector2(1002, 153)
 states/throw_idle/node = SubResource("AnimationNodeAnimation_reoop")
 states/throw_idle/position = Vector2(1002, 90)
 states/throw_line/node = SubResource("AnimationNodeAnimation_2djwe")
@@ -402,8 +453,8 @@ states/throw_line_finish/node = SubResource("AnimationNodeAnimation_4jfb6")
 states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
-transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy")]
-graph_offset = Vector2(56, -2)
+transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy"), "throw_line_finish", "throw_idle", SubResource("AnimationNodeStateMachineTransition_jwcha"), "throw_idle", "reeling_static", SubResource("AnimationNodeStateMachineTransition_ooxxp"), "reeling_static", "reeling_idle", SubResource("AnimationNodeStateMachineTransition_a83gf"), "reeling_idle", "reeling_idle_left", SubResource("AnimationNodeStateMachineTransition_jrod8"), "reeling_idle_left", "reeling_left", SubResource("AnimationNodeStateMachineTransition_ucsik"), "reeling_idle", "reeling_idle_right", SubResource("AnimationNodeStateMachineTransition_borun"), "reeling_idle_right", "reeling_right", SubResource("AnimationNodeStateMachineTransition_8eai5")]
+graph_offset = Vector2(132, 72)
 
 [node name="Player3D" type="Node3D"]
 script = ExtResource("1_reoop")
@@ -419,7 +470,7 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"throw_line"
+animation = &"fishing_idle"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -462,6 +513,7 @@ script = ExtResource("5_sxlqi")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.5, 0.275, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -470,6 +522,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.725, 0.375, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -478,6 +531,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.95, 0.475, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -486,6 +540,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.2, 0.575, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -494,6 +549,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.425, 0.675, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -502,6 +558,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.65, 0.775, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -510,6 +567,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.875, 0.875, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")
@@ -518,6 +576,7 @@ texture = ExtResource("5_yevqy")
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 2.1, 0.975, 0)
 visible = false
 billboard = 1
+shaded = true
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("5_yevqy")

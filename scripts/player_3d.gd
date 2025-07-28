@@ -9,9 +9,12 @@ extends Node3D
 @onready var power_bar_fill = $power_bar_layer/power_bar_ui/PowerBarFill
 
 @onready var bait_spawn = $BaitSpawn
-@onready var fish_zone = get_tree().current_scene.get_node("FishZone/Center")
+@onready var fish_zone = get_tree().get_root().get_node("World3D/FishZone/Center")
 
 @onready var direction_line = $DirectionLine
+
+var is_reeling := false
+var is_bait_ready := false
 
 var power_bar_final_pos: Vector2
 var power := 0.0
@@ -154,11 +157,16 @@ func spawn_bait(power_value: float):
     bait_instance.bait_despawned.connect(_on_bait_despawned)
 
 func _on_bait_landed():
-    print("🪝 Bait landed — ready to reel.")
+    print("🪝 Bait landed — reeling ready.")
+    is_bait_ready = true
+    anim_state.travel("reeling_static")
+
 
 func _on_bait_despawned():
-    print("❌ Bait despawned.")
     bait_instance = null
+    is_bait_ready = false
+    is_reeling = false
+
 
 func play_and_wait(state_name: String) -> void:
     current_state = state_name
@@ -169,14 +177,48 @@ func play_and_wait(state_name: String) -> void:
         await get_tree().create_timer(anim.length).timeout
 
 func _process(delta):
+    # -- Power bar charging logic --
     if charging:
         power += POWER_SPEED * power_dir * delta
-
         if power > 1.0:
             power = 1.0
             power_dir = -1
         elif power < 0.0:
             power = 0.0
             power_dir = 1
-
         power_bar_fill.scale.x = power
+
+        # -- Reeling input + animation state --
+    if not is_bait_ready or bait_instance == null:
+        return
+
+    var holding_k = Input.is_action_pressed("throw_line")
+    var left = Input.is_action_pressed("reeling_left")
+    var right = Input.is_action_pressed("reeling_right")
+
+    if holding_k:
+        if not is_reeling:
+            is_reeling = true
+            var target = global_position
+            target.y = bait_instance.global_position.y
+            bait_instance.reel_to(target)
+
+        if left:
+            anim_state.travel("reeling_left")
+        elif right:
+            anim_state.travel("reeling_right")
+        else:
+            anim_state.travel("reeling_idle")
+
+    else:
+        if is_reeling:
+            is_reeling = false
+            bait_instance.stop_reeling()
+
+        # Turning while idle
+        if left:
+            anim_state.travel("reeling_idle_left")
+        elif right:
+            anim_state.travel("reeling_idle_right")
+        else:
+            anim_state.travel("reeling_static")
