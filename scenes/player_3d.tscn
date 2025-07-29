@@ -313,6 +313,20 @@ tracks/1/keys = {
 "update": 1,
 "values": ["throw_line_finish"]
 }
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.266667),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"spawn_bait"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_ooxxp"]
 length = 0.0714286
@@ -476,7 +490,7 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"fishing_idle"
+animation = &"throw_line_finish"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

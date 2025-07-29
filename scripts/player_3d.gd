@@ -21,6 +21,7 @@ var bait_scene := preload("res://scenes/bait_3d.tscn")
 var bait_instance: Node3D
 var is_reeling := false
 var is_bait_ready := false
+var locked_power := 0.0  # declare at the top
 
 # States
 var current_state := "prep_fishing"
@@ -127,13 +128,11 @@ func finish_throw():
 	current_state = "throw_line_finish"
 	transitioning = true
 	charging = false
-
-	var locked_power = power
-	spawn_bait(locked_power)
-
-	await play_and_wait("throw_line_finish")
+	locked_power = power  # just store it
+	await play_and_wait("throw_line_finish")  # animation will call spawn
 	print("▶ Throw complete.")
 	transitioning = false
+
 
 func spawn_bait(power_value: float):
 	print("▶ Spawning bait...")
@@ -168,6 +167,9 @@ func play_and_wait(state_name: String) -> void:
 	var anim = anim_player.get_animation(state_name)
 	if anim:
 		await get_tree().create_timer(anim.length).timeout
+
+func _on_throw_bait_from_anim():
+	spawn_bait(locked_power)
 
 # ---------------------------------------------------------
 # PROCESS LOOP

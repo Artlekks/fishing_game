@@ -64,9 +64,7 @@ func _process(delta):
 		if distance > 0.01:
 			var move = direction.normalized() * reeling_speed * delta
 			global_position += move
-			
-		print("🎣 Bait pos:", global_position, "→ target:", reeling_target)
-		
+					
 		if reeling and (global_position - reeling_target).length() < 0.1:
 			print("💥 Failsafe despawn")
 			emit_signal("bait_despawned")
