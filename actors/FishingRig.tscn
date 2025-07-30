@@ -1,12 +1,27 @@
 [gd_scene load_steps=48 format=3 uid="uid://c05klp7s2dqe8"]
 
-[ext_resource type="Script" uid="uid://jfwln7ll6oog" path="res://scripts/player_3d.gd" id="1_reoop"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 [ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="3_4jfb6"]
+[ext_resource type="PackedScene" uid="uid://cdacpta6ojrdb" path="res://actors/DirectionSelector.tscn" id="3_yye3u"]
+[ext_resource type="Script" uid="uid://bkfgyd8su4uiv" path="res://scripts/fishing_controller.gd" id="4_kb1vm"]
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="4_yevqy"]
-[ext_resource type="Script" uid="uid://dulpsesmj61fl" path="res://scenes/direction_line.gd" id="5_sxlqi"]
-[ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="5_yevqy"]
-[ext_resource type="Script" uid="uid://xexkbrrdqbe6" path="res://scenes/killzone.gd" id="7_460ac"]
+[ext_resource type="Script" uid="uid://xexkbrrdqbe6" path="res://zones/killzone.gd" id="7_460ac"]
+
+[sub_resource type="GDScript" id="GDScript_yye3u"]
+script/source = "extends Node3D
+
+@onready var fishing_manager = $FishingManager
+
+func _ready():
+	# Optional: call fishing manager setup if needed
+	fishing_manager._ready()
+
+func _process(delta):
+	fishing_manager._process(delta)
+
+func _unhandled_input(event: InputEvent):
+	fishing_manager.handle_input(event)
+"
 
 [sub_resource type="Animation" id="Animation_52vux"]
 length = 0.001
@@ -418,10 +433,12 @@ advance_mode = 0
 advance_mode = 0
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4jfb6"]
-advance_mode = 0
+switch_mode = 2
+advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yevqy"]
-advance_mode = 0
+switch_mode = 2
+advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jwcha"]
 advance_mode = 0
@@ -472,12 +489,12 @@ states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
 transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy"), "throw_line_finish", "throw_idle", SubResource("AnimationNodeStateMachineTransition_jwcha"), "throw_idle", "reeling_static", SubResource("AnimationNodeStateMachineTransition_ooxxp"), "reeling_static", "reeling_idle", SubResource("AnimationNodeStateMachineTransition_a83gf"), "reeling_idle", "reeling_idle_left", SubResource("AnimationNodeStateMachineTransition_jrod8"), "reeling_idle_left", "reeling_left", SubResource("AnimationNodeStateMachineTransition_ucsik"), "reeling_idle", "reeling_idle_right", SubResource("AnimationNodeStateMachineTransition_borun"), "reeling_idle_right", "reeling_right", SubResource("AnimationNodeStateMachineTransition_8eai5")]
-graph_offset = Vector2(132, 72)
+graph_offset = Vector2(344, 6)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_sxlqi"]
 
-[node name="Player3D" type="Node3D"]
-script = ExtResource("1_reoop")
+[node name="FishingRig" type="Node3D"]
+script = SubResource("GDScript_yye3u")
 
 [node name="BaitSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
@@ -490,7 +507,8 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"throw_line_finish"
+animation = &"prep_fishing"
+frame = 16
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -501,9 +519,17 @@ libraries = {
 tree_root = SubResource("AnimationNodeStateMachine_8eai5")
 anim_player = NodePath("../AnimationPlayer")
 
-[node name="power_bar_layer" type="CanvasLayer" parent="."]
+[node name="BaitTarget" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.831814, 0, -0.445473)
 
-[node name="power_bar_ui" type="Control" parent="power_bar_layer"]
+[node name="FishingController" type="Node" parent="."]
+script = ExtResource("4_kb1vm")
+
+[node name="DirectionSelector" parent="FishingController" instance=ExtResource("3_yye3u")]
+
+[node name="PowerMeter" type="CanvasLayer" parent="FishingController"]
+
+[node name="power_bar_ui" type="Control" parent="FishingController/PowerMeter"]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -518,91 +544,22 @@ grow_horizontal = 2
 grow_vertical = 0
 scale = Vector2(0.62, 0.62)
 
-[node name="PowerBarBG" type="Sprite2D" parent="power_bar_layer/power_bar_ui"]
+[node name="PowerBarBG" type="Sprite2D" parent="FishingController/PowerMeter/power_bar_ui"]
 texture = ExtResource("3_4jfb6")
 
-[node name="PowerBarFill" type="Sprite2D" parent="power_bar_layer/power_bar_ui"]
+[node name="PowerBarFill" type="Sprite2D" parent="FishingController/PowerMeter/power_bar_ui"]
 position = Vector2(-456, 0)
 texture = ExtResource("4_yevqy")
 offset = Vector2(353.5, 0)
 
-[node name="DirectionLine" type="Node3D" parent="."]
-script = ExtResource("5_sxlqi")
-
-[node name="dot_0" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.5, 0.275, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_1" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.725, 0.375, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_2" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.95, 0.475, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_3" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.2, 0.575, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_4" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.425, 0.675, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_5" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.65, 0.775, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_6" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.875, 0.875, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="dot_7" type="Sprite3D" parent="DirectionLine"]
-transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 2.1, 0.975, 0)
-visible = false
-billboard = 1
-alpha_cut = 1
-texture_filter = 0
-texture = ExtResource("5_yevqy")
-
-[node name="Killzone" type="Area3D" parent="."]
+[node name="Killzone" type="Area3D" parent="FishingController" node_paths=PackedStringArray("fishing_manager")]
 collision_layer = 2
 collision_mask = 16
 script = ExtResource("7_460ac")
+fishing_manager = NodePath("")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Killzone"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FishingController/Killzone"]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
 shape = SubResource("SphereShape3D_sxlqi")
 
-[node name="BaitTarget" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.831814, 0, -0.445473)
-
-[connection signal="body_entered" from="Killzone" to="." method="_on_killzone_body_entered"]
+[connection signal="body_entered" from="FishingController/Killzone" to="." method="_on_killzone_body_entered"]

@@ -16,32 +16,24 @@ func _ready():
 func start_loop():
 	looping = true
 	_hide_all_dots()
-	_start_loop()
+	call_deferred("_run_loop")
 
 func stop_loop():
 	looping = false
 	_hide_all_dots()
 
-func _start_loop() -> void:
-	call_deferred("_run_loop")
-
-func _run_loop() -> void:
+func _run_loop():
 	while looping:
 		for dot in dots:
 			if not looping:
-				return  # 🔴 Exit immediately if stopped
+				return
 			dot.visible = true
 			await get_tree().create_timer(build_delay).timeout
-
 		if not looping:
 			return
-
 		await get_tree().create_timer(hold_time).timeout
-
 		_hide_all_dots()
-
 		await get_tree().create_timer(fade_delay).timeout
-
 
 func _hide_all_dots():
 	for dot in dots:

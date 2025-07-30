@@ -1,14 +1,14 @@
 [gd_scene load_steps=7 format=3 uid="uid://dik0kc3cv5egj"]
 
-[ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="1_5od1y"]
-[ext_resource type="Script" uid="uid://d4gcwwxgk4qj" path="res://scripts/bait_3d.gd" id="1_b07vr"]
+[ext_resource type="Script" uid="uid://d4gcwwxgk4qj" path="res://scripts/bait_3d.gd" id="1_dnoeb"]
+[ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="2_y21r6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b07vr"]
-atlas = ExtResource("1_5od1y")
+atlas = ExtResource("2_y21r6")
 region = Rect2(0, 0, 80, 96)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bae6e"]
-atlas = ExtResource("1_5od1y")
+atlas = ExtResource("2_y21r6")
 region = Rect2(80, 0, 80, 96)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ni2xf"]
@@ -29,7 +29,7 @@ animations = [{
 
 [node name="Bait" type="Node3D"]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
-script = ExtResource("1_b07vr")
+script = ExtResource("1_dnoeb")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.7, 0, 0, 0, -3.0598e-08, 0.7, 0, -0.7, -3.0598e-08, 0, 0, 0)

@@ -15,10 +15,6 @@ run/main_scene="uid://do1idbq5tp58x"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/AS2P/plugin.cfg")
-
 [input]
 
 reeling_left={
