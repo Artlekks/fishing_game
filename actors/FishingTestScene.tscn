@@ -1,29 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://do1idbq5tp58x"]
+[gd_scene load_steps=5 format=3 uid="uid://do1idbq5tp58x"]
 
 [ext_resource type="Texture2D" uid="uid://3jmou6ohi7af" path="res://assets/backgrounds/Background_02.png" id="1_rndyl"]
 [ext_resource type="PackedScene" uid="uid://c05klp7s2dqe8" path="res://actors/FishingRig.tscn" id="2_b5o5q"]
-
-[sub_resource type="GDScript" id="GDScript_kncrg"]
-script/source = "extends Node3D
-
-@onready var player := $GroundAnchor/Player3D
-@onready var cam := $Pivot/Camera3D
-
-func _unhandled_input(event):
-	if event.is_action_pressed(\"reset_game\"):
-		reset_game()
-
-func reset_game():
-	print(\"🔁 World resetting...\")
-
-	# Fully reset player
-	player.call_deferred(\"_reset_game\")
-	
-func _ready():
-	# Optionally pass camera to player if billboard logic needs it
-	if player.has_method(\"set_camera\"):
-		player.set_camera(cam)
-"
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_g5kxi"]
 
@@ -34,7 +12,6 @@ disable_fog = true
 albedo_texture = ExtResource("1_rndyl")
 
 [node name="FishingTestScene" type="Node3D"]
-script = SubResource("GDScript_kncrg")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 3.8019, 3.80988)

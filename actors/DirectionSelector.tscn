@@ -5,10 +5,10 @@
 
 [node name="DirectionSelector" type="Node3D"]
 script = ExtResource("1_dtcks")
+dot_nodes = Array[NodePath]([NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")])
 
 [node name="dot_0" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.5, 0.275, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -16,7 +16,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_1" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.725, 0.375, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -24,7 +23,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_2" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 0.95, 0.475, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -32,7 +30,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_3" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.2, 0.575, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -40,7 +37,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_4" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.425, 0.675, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -48,7 +44,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_5" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.65, 0.775, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -56,7 +51,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_6" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 1.875, 0.875, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
@@ -64,7 +58,6 @@ texture = ExtResource("1_c1f4e")
 
 [node name="dot_7" type="Sprite3D" parent="."]
 transform = Transform3D(1.52, 0, 0, 0, 2, 0, 0, 0, 2, 2.1, 0.975, 0)
-visible = false
 billboard = 1
 alpha_cut = 1
 texture_filter = 0
