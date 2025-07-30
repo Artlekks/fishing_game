@@ -1,24 +1,30 @@
 extends Node3D
 
 @export var dot_nodes: Array[NodePath] = []
-var current_index := 4  # Start in the center (0–7 range)
+var current_index := 4  # Start centered
+var active := false
 
 func _ready():
 	_update_dot_visibility()
+	set_process(false)
 
 func show_selector():
+	active = true
 	visible = true
 	set_process(true)
 	_update_dot_visibility()
 
 func hide_selector():
+	active = false
 	visible = false
 	set_process(false)
 
-func _process(delta):
-	if Input.is_action_just_pressed("ui_left"):
+func _process(_delta):
+	if not active:
+		return
+	if Input.is_action_just_pressed("reeling_left"):
 		_move_left()
-	elif Input.is_action_just_pressed("ui_right"):
+	elif Input.is_action_just_pressed("reeling_right"):
 		_move_right()
 
 func _move_left():

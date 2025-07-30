@@ -5,65 +5,57 @@ enum State {
 	DIRECTION_SELECT,
 	POWER_CHARGE,
 	THROW_LINE,
-	BAIT_FLYING,
-	BAIT_IDLE,
-	BAIT_SINK,
-	REELING,
-	BITE_FIGHT,
-	CATCH_SUCCESS,
-	CATCH_FAIL,
-	RESET_TO_IDLE
+	THROW_WAIT,
+	BAIT_FLYING
 }
 
 var current_state = State.FISHING_IDLE
 
 func _ready():
-	print("🎣 FishingController ready.")
 	_enter_fishing_idle()
 
-func _process(delta):
+func _process(_delta):
 	match current_state:
 		State.FISHING_IDLE:
-			if Input.is_action_just_pressed("fish_action"):
+			if Input.is_action_just_pressed("throw_line"):
 				_enter_direction_select()
 
 		State.DIRECTION_SELECT:
-			if Input.is_action_just_pressed("fish_action"):
+			if Input.is_action_just_pressed("throw_line"):
 				_enter_power_charge()
 
 		State.POWER_CHARGE:
-			if Input.is_action_just_pressed("fish_action"):
+			if Input.is_action_just_pressed("throw_line"):
 				_enter_throw_line()
 
-		# Add other states as needed...
-
-# -- State Transitions --
+# -- States --
 
 func _enter_fishing_idle():
 	current_state = State.FISHING_IDLE
-	print("🐟 State: FISHING_IDLE")
-	# Optionally hide direction and power UI
+	$DirectionSelector.hide_selector()
+	# TODO: play fishing_idle anim
 
 func _enter_direction_select():
 	current_state = State.DIRECTION_SELECT
-	print("🎯 State: DIRECTION_SELECT")
-	if has_node("DirectionSelector"):
-		$DirectionSelector.show_selector()
+	$DirectionSelector.show_selector()
+	# TODO: play throw_line_start anim (rod pull-back)
 
 func _enter_power_charge():
 	current_state = State.POWER_CHARGE
-	print("⚡ State: POWER_CHARGE")
-	if has_node("DirectionSelector"):
-		$DirectionSelector.hide_selector()
-	if has_node("PowerMeter"):
-		$PowerMeter.start_charge()
+	$DirectionSelector.hide_selector()
+	$PowerMeter.start_charge()
+	# TODO: play throw_line_idle anim (hold pose)
 
 func _enter_throw_line():
 	current_state = State.THROW_LINE
-	print("🎣 State: THROW_LINE")
-	if has_node("PowerMeter"):
-		var power = $PowerMeter.get_power_value()
-		print("Power value:", power)
-		$PowerMeter.reset()
+	$PowerMeter.freeze()
+	var power = $PowerMeter.get_power_value()
+	var direction = $DirectionSelector.get_direction_vector()
+	print("Throw power:", power, " | direction:", direction)
+	# TODO: play throw_line_finish anim
+	# TODO: spawn bait with calculated force
+	_enter_throw_wait()
 
-	# TODO: Use power + direction to calculate bait trajectory
+func _enter_throw_wait():
+	current_state = State.THROW_WAIT
+	# Bait is flying; when it hits water, move to bait_idle
