@@ -1,10 +1,9 @@
-[gd_scene load_steps=48 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=47 format=3 uid="uid://c05klp7s2dqe8"]
 
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
-[ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="3_4jfb6"]
 [ext_resource type="PackedScene" uid="uid://cdacpta6ojrdb" path="res://actors/DirectionSelector.tscn" id="3_yye3u"]
-[ext_resource type="Script" uid="uid://bkfgyd8su4uiv" path="res://scripts/fishing_controller.gd" id="4_kb1vm"]
-[ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="4_yevqy"]
+[ext_resource type="PackedScene" uid="uid://c10e4ohc4jrv6" path="res://actors/PowerMeter.tscn" id="4_dfqbx"]
+[ext_resource type="Script" uid="uid://bkfgyd8su4uiv" path="res://systems/fishing_controller.gd" id="4_kb1vm"]
 [ext_resource type="Script" uid="uid://xexkbrrdqbe6" path="res://zones/killzone.gd" id="7_460ac"]
 
 [sub_resource type="GDScript" id="GDScript_yye3u"]
@@ -527,30 +526,7 @@ script = ExtResource("4_kb1vm")
 
 [node name="DirectionSelector" parent="FishingController" instance=ExtResource("3_yye3u")]
 
-[node name="PowerMeter" type="CanvasLayer" parent="FishingController"]
-
-[node name="power_bar_ui" type="Control" parent="FishingController/PowerMeter"]
-layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 22.205
-offset_top = -61.0
-offset_right = 62.205
-offset_bottom = -21.0
-grow_horizontal = 2
-grow_vertical = 0
-scale = Vector2(0.62, 0.62)
-
-[node name="PowerBarBG" type="Sprite2D" parent="FishingController/PowerMeter/power_bar_ui"]
-texture = ExtResource("3_4jfb6")
-
-[node name="PowerBarFill" type="Sprite2D" parent="FishingController/PowerMeter/power_bar_ui"]
-position = Vector2(-456, 0)
-texture = ExtResource("4_yevqy")
-offset = Vector2(353.5, 0)
+[node name="PowerMeter" parent="FishingController" instance=ExtResource("4_dfqbx")]
 
 [node name="Killzone" type="Area3D" parent="FishingController" node_paths=PackedStringArray("fishing_manager")]
 collision_layer = 2

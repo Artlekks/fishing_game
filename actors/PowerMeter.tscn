@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://c10e4ohc4jrv6"]
+
+[ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="1_1o4ho"]
+[ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="2_mbqoc"]
+
+[node name="PowerMeter" type="CanvasLayer"]
+
+[node name="power_bar_ui" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 22.205
+offset_top = -61.0
+offset_right = 62.205
+offset_bottom = -21.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(0.62, 0.62)
+
+[node name="PowerBarBG" type="Sprite2D" parent="power_bar_ui"]
+texture = ExtResource("1_1o4ho")
+
+[node name="PowerBarFill" type="Sprite2D" parent="power_bar_ui"]
+position = Vector2(-456, 0)
+texture = ExtResource("2_mbqoc")
+offset = Vector2(353.5, 0)
