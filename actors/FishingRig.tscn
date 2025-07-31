@@ -432,7 +432,7 @@ states/throw_line_finish/node = SubResource("AnimationNodeAnimation_4jfb6")
 states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
-graph_offset = Vector2(82, 34)
+graph_offset = Vector2(268, 64)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_sxlqi"]
 

@@ -1,5 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://dik0kc3cv5egj"]
+[gd_scene load_steps=7 format=3 uid="uid://dik0kc3cv5egj"]
 
+[ext_resource type="Script" uid="uid://dukigy8beeoqh" path="res://actors/bait_3d.gd" id="1_dnoeb"]
 [ext_resource type="Texture2D" uid="uid://dpil2mfcr2oym" path="res://assets/sprites/Bait-bait.png" id="2_y21r6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b07vr"]
@@ -28,6 +29,7 @@ animations = [{
 
 [node name="Bait" type="Node3D"]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
+script = ExtResource("1_dnoeb")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.7, 0, 0, 0, -3.0598e-08, 0.7, 0, -0.7, -3.0598e-08, 0, 0, 0)
