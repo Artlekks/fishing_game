@@ -43,9 +43,23 @@ func _process(_delta):
 				_enter_reeling_idle()
 
 		State.REELING:
-			if not Input.is_action_pressed("throw_line"):
-				print("K released → reeling_static")
-				_enter_reeling_static()
+			var pressing_k := Input.is_action_pressed("throw_line")
+			var pressing_a := Input.is_action_pressed("reeling_left")
+			var pressing_d := Input.is_action_pressed("reeling_right")
+
+			if pressing_k and pressing_a:
+				anim_tree["parameters/playback"].travel("reeling_left")
+			elif pressing_k and pressing_d:
+				anim_tree["parameters/playback"].travel("reeling_right")
+			elif pressing_a:
+				anim_tree["parameters/playback"].travel("reeling_idle_left")
+			elif pressing_d:
+				anim_tree["parameters/playback"].travel("reeling_idle_right")
+			elif pressing_k:
+				anim_tree["parameters/playback"].travel("reeling_idle")
+			else:
+				anim_tree["parameters/playback"].travel("reeling_static")
+
 
 
 # -------------------------
