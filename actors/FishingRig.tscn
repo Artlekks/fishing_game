@@ -1,10 +1,9 @@
-[gd_scene load_steps=46 format=3 uid="uid://c05klp7s2dqe8"]
+[gd_scene load_steps=33 format=3 uid="uid://c05klp7s2dqe8"]
 
+[ext_resource type="Script" uid="uid://bfctd7li5s1mr" path="res://actors/direction_selector.gd" id="2_71jng"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
-[ext_resource type="PackedScene" uid="uid://cdacpta6ojrdb" path="res://actors/DirectionSelector.tscn" id="3_yye3u"]
-[ext_resource type="PackedScene" uid="uid://c10e4ohc4jrv6" path="res://actors/PowerMeter.tscn" id="4_dfqbx"]
-[ext_resource type="Script" uid="uid://bkfgyd8su4uiv" path="res://systems/fishing_controller.gd" id="4_kb1vm"]
-[ext_resource type="Script" uid="uid://xexkbrrdqbe6" path="res://zones/killzone.gd" id="7_460ac"]
+[ext_resource type="Script" uid="uid://c1laipsebp7sv" path="res://actors/fishing_controller.gd" id="3_1m4j8"]
+[ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="4_1isk1"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
 length = 0.001
@@ -406,44 +405,6 @@ animation = &"throw_line_finish"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_yevqy"]
 animation = &"throw_line_idle"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_11qcf"]
-advance_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_reoop"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2djwe"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_4jfb6"]
-switch_mode = 2
-advance_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yevqy"]
-switch_mode = 2
-advance_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jwcha"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ooxxp"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_a83gf"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jrod8"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ucsik"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_borun"]
-advance_mode = 0
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8eai5"]
-advance_mode = 0
-
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_8eai5"]
 states/End/position = Vector2(1124, 210)
 states/Start/position = Vector2(122, 90)
@@ -471,8 +432,7 @@ states/throw_line_finish/node = SubResource("AnimationNodeAnimation_4jfb6")
 states/throw_line_finish/position = Vector2(854, 90)
 states/throw_line_idle/node = SubResource("AnimationNodeAnimation_yevqy")
 states/throw_line_idle/position = Vector2(694, 90)
-transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_11qcf"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_reoop"), "fishing_idle", "throw_line", SubResource("AnimationNodeStateMachineTransition_2djwe"), "throw_line", "throw_line_idle", SubResource("AnimationNodeStateMachineTransition_4jfb6"), "throw_line_idle", "throw_line_finish", SubResource("AnimationNodeStateMachineTransition_yevqy"), "throw_line_finish", "throw_idle", SubResource("AnimationNodeStateMachineTransition_jwcha"), "throw_idle", "reeling_static", SubResource("AnimationNodeStateMachineTransition_ooxxp"), "reeling_static", "reeling_idle", SubResource("AnimationNodeStateMachineTransition_a83gf"), "reeling_idle", "reeling_idle_left", SubResource("AnimationNodeStateMachineTransition_jrod8"), "reeling_idle_left", "reeling_left", SubResource("AnimationNodeStateMachineTransition_ucsik"), "reeling_idle", "reeling_idle_right", SubResource("AnimationNodeStateMachineTransition_borun"), "reeling_idle_right", "reeling_right", SubResource("AnimationNodeStateMachineTransition_8eai5")]
-graph_offset = Vector2(344, 6)
+graph_offset = Vector2(82, 34)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_sxlqi"]
 
@@ -498,30 +458,84 @@ libraries = {
 tree_root = SubResource("AnimationNodeStateMachine_8eai5")
 anim_player = NodePath("../AnimationPlayer")
 
-[node name="BaitSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="DirectionSelector" type="Node3D" parent="Node3D"]
+script = ExtResource("2_71jng")
+dot_nodes = Array[NodePath]([NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")])
+frame_hold_time = 0.16
+
+[node name="dot_0" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 0.5, 0.275, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_1" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 0.725, 0.375, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_2" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 0.95, 0.475, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_3" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 1.2, 0.575, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_4" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 1.425, 0.675, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_5" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 1.65, 0.775, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_6" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 1.875, 0.875, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="dot_7" type="Sprite3D" parent="Node3D/DirectionSelector"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 1, 2.1, 0.975, 0)
+billboard = 1
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_1isk1")
+
+[node name="FishingController" type="Node3D" parent="."]
+script = ExtResource("3_1m4j8")
 
 [node name="BaitTarget" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.831814, 0, -0.445473)
 
-[node name="FishingController" type="Node" parent="."]
-script = ExtResource("4_kb1vm")
+[node name="BaitSpawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296712, 1.35307, 0)
 
-[node name="DirectionSelector" parent="FishingController" instance=ExtResource("3_yye3u")]
-
-[node name="PowerMeter" parent="FishingController" instance=ExtResource("4_dfqbx")]
-
-[node name="ReelLogic" type="Node" parent="FishingController"]
-
-[node name="TensionMiniGame" type="Node" parent="FishingController"]
-
-[node name="Killzone" type="Area3D" parent="FishingController"]
+[node name="Killzone" type="Area3D" parent="."]
 collision_layer = 2
 collision_mask = 16
-script = ExtResource("7_460ac")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="FishingController/Killzone"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Killzone"]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
 shape = SubResource("SphereShape3D_sxlqi")
 
-[connection signal="body_entered" from="FishingController/Killzone" to="." method="_on_killzone_body_entered"]
+[connection signal="body_entered" from="Killzone" to="." method="_on_killzone_body_entered"]
