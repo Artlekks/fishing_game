@@ -38,9 +38,22 @@ func _process(_delta):
                 _enter_throw_finish()
 
         State.BAIT_IN_WATER:
-            if Input.is_action_pressed("throw_line"):
+            var pressing_a := Input.is_action_pressed("reeling_left")
+            var pressing_d := Input.is_action_pressed("reeling_right")
+            var pressing_k := Input.is_action_pressed("throw_line")
+
+            if pressing_k:
                 print("K held → reeling_idle")
                 _enter_reeling_idle()
+
+            # Let A or D animate reeling direction even when K not held
+            elif pressing_a:
+                anim_tree["parameters/playback"].travel("reeling_idle_left")
+            elif pressing_d:
+                anim_tree["parameters/playback"].travel("reeling_idle_right")
+            else:
+                anim_tree["parameters/playback"].travel("reeling_static")
+
 
 
         State.REELING:
@@ -65,6 +78,16 @@ func _process(_delta):
             # Bait motion control
             if current_bait:
                 current_bait.set("is_reeling_active", pressing_k)
+
+                # ✅ LIVE UPDATE REELING MODE
+                if pressing_k and pressing_a:
+                    current_bait.set("reeling_mode", "left")
+                elif pressing_k and pressing_d:
+                    current_bait.set("reeling_mode", "right")
+                elif pressing_k:
+                    current_bait.set("reeling_mode", "straight")
+
+
 
 # -------------------------
 # STATE TRANSITIONS

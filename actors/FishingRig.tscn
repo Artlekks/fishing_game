@@ -446,8 +446,7 @@ billboard = 1
 alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
-animation = &"prep_fishing"
-frame = 16
+animation = &""
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

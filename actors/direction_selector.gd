@@ -42,12 +42,16 @@ func stop_looping():
 func get_direction_vector() -> Vector3:
 	var from: Vector3 = global_transform.origin
 
+	# ✅ Clamp index to prevent out-of-bounds error
+	_frame = clamp(_frame, 0, dot_nodes.size() - 1)
+
 	var dot_node := get_node(dot_nodes[_frame]) as Node3D
 	var to: Vector3 = dot_node.global_transform.origin
 
 	var direction := (to - from).normalized()
 	direction.y = 0.0  # Keep flat on XZ plane
 	return direction
+
 
 
 func _set_all_dots_visible(state: bool):
