@@ -127,6 +127,8 @@ func _enter_throw_idle():
 
 func _enter_throw_finish():
     state = State.THROW_FINISH
+    power_meter.call("freeze")
+    power_meter.visible = true  # ✅ Show power meter again
     print("→ throw_line_finish")
     power_meter.call("freeze")
     anim_tree["parameters/playback"].travel("throw_line_finish")
@@ -165,6 +167,7 @@ func _enter_reeling_idle():
 
 func _on_reel_back_finished():
     print("✅ Reel complete")
+    power_meter.visible = false  # ✅ Hide after bait returns
     _enter_fishing_idle()
 
 
@@ -173,6 +176,10 @@ func _on_reel_back_finished():
 # -------------------------
 
 func _spawn_bait():
+    if current_bait and current_bait.is_inside_tree():
+        print("⚠️ Bait already exists, ignoring new throw.")
+        return
+
     var direction = direction_selector.get_direction_vector()
     var power = power_meter.call("get_power_value")
     print("🎯 Spawning bait — power:", power)
