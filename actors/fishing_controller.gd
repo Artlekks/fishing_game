@@ -44,23 +44,27 @@ func _process(_delta):
 
 
         State.REELING:
-               var pressing_k := Input.is_action_pressed("throw_line")
-               var pressing_a := Input.is_action_pressed("reeling_left")
-               var pressing_d := Input.is_action_pressed("reeling_right")
+            var pressing_k := Input.is_action_pressed("throw_line")
+            var pressing_a := Input.is_action_pressed("reeling_left")
+            var pressing_d := Input.is_action_pressed("reeling_right")
 
-               if pressing_k and pressing_a:
-                  anim_tree["parameters/playback"].travel("reeling_left")
-               elif pressing_k and pressing_d:
-                  anim_tree["parameters/playback"].travel("reeling_right")
-               elif pressing_a:
-                  anim_tree["parameters/playback"].travel("reeling_idle_left")
-               elif pressing_d:
-                  anim_tree["parameters/playback"].travel("reeling_idle_right")
-               elif pressing_k:
-                  anim_tree["parameters/playback"].travel("reeling_idle")
-               else:
-                  anim_tree["parameters/playback"].travel("reeling_static")
+            # Animation
+            if pressing_k and pressing_a:
+                anim_tree["parameters/playback"].travel("reeling_left")
+            elif pressing_k and pressing_d:
+                anim_tree["parameters/playback"].travel("reeling_right")
+            elif pressing_a:
+                anim_tree["parameters/playback"].travel("reeling_idle_left")
+            elif pressing_d:
+                anim_tree["parameters/playback"].travel("reeling_idle_right")
+            elif pressing_k:
+                anim_tree["parameters/playback"].travel("reeling_idle")
+            else:
+                anim_tree["parameters/playback"].travel("reeling_static")
 
+            # Bait motion control
+            if current_bait:
+                current_bait.set("is_reeling_active", pressing_k)
 
 # -------------------------
 # STATE TRANSITIONS
@@ -126,9 +130,14 @@ func _enter_reeling_idle():
         elif Input.is_action_pressed("reeling_right"):
             mode = "right"
 
-        current_bait.call("set_reel_speed", 1.5)  # slower reeling speed
+        var anim_fps := 8.0
+        var move_per_frame := 0.15  # tuned visually
+        var reel_speed := anim_fps * move_per_frame  # = 1.2 units/sec
+
+        current_bait.call("set_reel_speed", reel_speed)
         current_bait.call("start_reel_back", mode, $"../BaitTarget")
         current_bait.connect("reel_back_finished", Callable(self, "_on_reel_back_finished"))
+
 
 
 func _on_reel_back_finished():

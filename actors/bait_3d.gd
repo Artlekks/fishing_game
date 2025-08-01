@@ -18,6 +18,7 @@ var reeling_mode := "straight"  # "straight", "left", "right"
 var start_position: Vector3
 var reel_target: Node3D  # assigned by controller
 var reel_speed := 2.0  # default speed, slower by default
+var is_reeling_active := true  # controlled by controller
 
 func _ready():
 	visible = false
@@ -59,7 +60,7 @@ func _update_flight(delta):
 		is_flying = false
 
 func _update_reel(delta):
-	if reel_target == null:
+	if not is_reeling_active or reel_target == null:
 		return
 
 	var to_target = reel_target.global_transform.origin - global_transform.origin
@@ -78,6 +79,7 @@ func _update_reel(delta):
 		move_dir = _apply_curve(move_dir, 1)
 
 	global_translate(move_dir * reel_speed * delta)
+
 
 func _apply_curve(dir: Vector3, side: int) -> Vector3:
 	# Create curved direction by rotating around UP
