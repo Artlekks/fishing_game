@@ -42,6 +42,7 @@ func _process(_delta):
                 print("K held → reeling_idle")
                 _enter_reeling_idle()
 
+
         State.REELING:
                var pressing_k := Input.is_action_pressed("throw_line")
                var pressing_a := Input.is_action_pressed("reeling_left")
@@ -59,8 +60,6 @@ func _process(_delta):
                   anim_tree["parameters/playback"].travel("reeling_idle")
                else:
                   anim_tree["parameters/playback"].travel("reeling_static")
-
-
 
 
 # -------------------------
@@ -119,6 +118,23 @@ func _enter_reeling_static():
 func _enter_reeling_idle():
     state = State.REELING
     anim_tree["parameters/playback"].travel("reeling_idle")
+
+    if current_bait:
+        var mode := "straight"
+        if Input.is_action_pressed("reeling_left"):
+            mode = "left"
+        elif Input.is_action_pressed("reeling_right"):
+            mode = "right"
+
+        current_bait.call("set_reel_speed", 1.5)  # slower reeling speed
+        current_bait.call("start_reel_back", mode, $"../BaitTarget")
+        current_bait.connect("reel_back_finished", Callable(self, "_on_reel_back_finished"))
+
+
+func _on_reel_back_finished():
+    print("✅ Reel complete")
+    _enter_fishing_idle()
+
 
 # -------------------------
 # HELPERS
