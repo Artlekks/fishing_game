@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="2_mbqoc"]
 
 [node name="PowerMeter" type="CanvasLayer"]
+visible = false
 
 [node name="power_bar_ui" type="Control" parent="."]
 layout_mode = 3

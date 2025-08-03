@@ -1,6 +1,6 @@
-[gd_scene load_steps=33 format=3 uid="uid://pags0bwc1b1y"]
+[gd_scene load_steps=32 format=3 uid="uid://pags0bwc1b1y"]
 
-[ext_resource type="PackedScene" path="res://actors/PowerMeter.tscn" id="2_pcoth"]
+[ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="2_pcoth"]
 [ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="2_reoop"]
 
 [sub_resource type="Animation" id="Animation_52vux"]
@@ -439,8 +439,6 @@ states/throw_line_idle/position = Vector2(694, 90)
 transitions = ["Start", "prep_fishing", SubResource("AnimationNodeStateMachineTransition_ur2gg"), "prep_fishing", "fishing_idle", SubResource("AnimationNodeStateMachineTransition_pcoth")]
 graph_offset = Vector2(94, 10)
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_sxlqi"]
-
 [node name="FishingRig" type="Node3D"]
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
@@ -451,9 +449,7 @@ alpha_cut = 1
 texture_filter = 0
 sprite_frames = ExtResource("2_reoop")
 animation = &"prep_fishing"
-frame = 12
-
-[node name="DirectionSelector" type="Node3D" parent="AnimatedSprite3D"]
+frame = 16
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -470,13 +466,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.34238, 0, 0)
 [node name="BaitSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.6, 0)
 
-[node name="Killzone" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 16
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Killzone"]
-shape = SubResource("SphereShape3D_sxlqi")
-
 [node name="PowerMeter" parent="." instance=ExtResource("2_pcoth")]
-
-[connection signal="body_entered" from="Killzone" to="." method="_on_killzone_body_entered"]
