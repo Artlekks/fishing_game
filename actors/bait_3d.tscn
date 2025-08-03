@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://t7t8sxuekigk"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_i8hql"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_xb8r5"]
+
+[node name="Bait" type="Node3D"]
+transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-09, -0.25, 0, 0.1, -1.09278e-08, 0, 0, 0, 0.1, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_i8hql")
+
+[node name="ReelDetector" type="Area3D" parent="."]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+collision_layer = 16
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ReelDetector"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+shape = SubResource("SphereShape3D_xb8r5")
