@@ -322,4 +322,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Idle_E"
+animation = &"Idle_S"

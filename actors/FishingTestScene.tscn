@@ -8,15 +8,17 @@
 [sub_resource type="PlaneMesh" id="PlaneMesh_g5kxi"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yppe2"]
+transparency = 1
 shading_mode = 0
 disable_ambient_light = true
 disable_fog = true
 albedo_texture = ExtResource("1_yj5gx")
+texture_filter = 0
 
 [node name="FishingTestScene" type="Node3D"]
 
 [node name="WaterPlane" type="MeshInstance3D" parent="."]
-transform = Transform3D(5.33334, 0, 1.53113, 0, 1, 0, -3.4923, 0, 2.3383, -0.322187, -2.38419e-07, -0.659238)
+transform = Transform3D(6.05548, 0, 0.873761, 0, 1, 0, -1.99293, 0, 2.65491, -0.322187, -2.38419e-07, -0.659238)
 mesh = SubResource("PlaneMesh_g5kxi")
 surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 
@@ -32,12 +34,12 @@ visible = false
 
 [node name="CharacterBody3D" parent="." instance=ExtResource("4_1vxb6")]
 
-[node name="FollowCameraRig" type="Node3D" parent="."]
+[node name="CameraRig" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 2.6, 2.6)
 script = ExtResource("5_ou438")
 target_path = NodePath("../CharacterBody3D")
-position_offset = Vector3(0, 0, 0)
+offset = Vector3(0, 2.6, 2.6)
 
-[node name="Camera3D" type="Camera3D" parent="FollowCameraRig"]
-transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 0.402109, 3.07466, 1.75976)
-fov = 40.0
-size = 4.56
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+fov = 35.0
+size = 1.8

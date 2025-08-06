@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
 @export var step_distance: float = 0.15  # Units moved per animation frame
-@export var speed_scale: float = 1.0     # Multiplier for fine-tuning speed
+@export var speed_scale: float = 1.5     # Multiplier for fine-tuning speed
 
 @onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 @onready var frames: SpriteFrames = sprite.get_sprite_frames()
