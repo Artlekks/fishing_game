@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://0irppmggqe5u" path="res://assets/backgrounds/Marsh.png" id="1_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="3_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://sdh188exepwu" path="res://ExplorationPlayer.tscn" id="4_1vxb6"]
-[ext_resource type="Script" uid="uid://byfquvppe6i6n" path="res://scripts/fllow_camera_rig.gd" id="5_ou438"]
+[ext_resource type="Script" uid="uid://byfquvppe6i6n" path="res://scripts/follow_camera_rig.gd" id="5_ou438"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_g5kxi"]
 

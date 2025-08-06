@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
-@export var step_distance: float = 0.2  # units per animation frame
-@export var speed_scale: float = 1.0      # multiplier for fine-tuning movement speed
+@export var step_distance: float = 0.15  # Units moved per animation frame
+@export var speed_scale: float = 1.0     # Multiplier for fine-tuning speed
 
 @onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 @onready var frames: SpriteFrames = sprite.get_sprite_frames()
@@ -24,7 +24,7 @@ const DIR_LOOKUP := {
 	180: "S", 225: "SW", 270: "W", 315: "NW"
 }
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var input_vec := _get_input_vector()
 
 	if input_vec != Vector2.ZERO:
@@ -48,9 +48,11 @@ func _get_input_vector() -> Vector2:
 func _move_player(input_vec: Vector2) -> void:
 	var world_vec := _input_to_world_direction(input_vec)
 	var anim_name := "Walk_" + _get_anim_key(last_dir)
-	var fps: float = 5.0
+
+	var fps := 5.0  # Default fallback
 	if frames.has_animation(anim_name):
 		fps = frames.get_animation_speed(anim_name)
+
 	var speed := fps * step_distance * speed_scale
 
 	velocity.x = world_vec.x * speed
