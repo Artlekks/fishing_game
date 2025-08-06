@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=48 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://clh18t4rnxlsv" path="res://scripts/character_body_3d.gd" id="1_c0c5d"]
 [ext_resource type="Texture2D" uid="uid://v8tpljp30i36" path="res://assets/sprites/anim_Ryu_fishing-Walking_Right.png" id="2_6gvld"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="4_xtlf1"]
 [ext_resource type="Texture2D" uid="uid://xqfvokdcwo08" path="res://assets/sprites/anim_Ryu_fishing-Walking_Backward.png" id="5_jpo3w"]
 [ext_resource type="Texture2D" uid="uid://c8h78n43dabea" path="res://assets/sprites/anim_Ryu_fishing-Walking_Bottom_Right.png" id="5_xtlf1"]
+[ext_resource type="Texture2D" uid="uid://bnnpyo7ugjpxy" path="res://assets/sprites/Shadow.png" id="8_ajpwy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
 radius = 0.135514
@@ -310,6 +311,17 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajpwy"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+albedo_texture = ExtResource("8_ajpwy")
+proximity_fade_distance = 0.01
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ajpwy"]
+load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s3tc.ctex"
+
 [node name="CharacterBody3D" type="CharacterBody3D"]
 script = ExtResource("1_c0c5d")
 
@@ -319,7 +331,16 @@ shape = SubResource("CapsuleShape3D_jpo3w")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+offset = Vector2(-2, 0)
 billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Idle_S"
+
+[node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
+transform = Transform3D(1.15, 0, 0, 0, -5.02681e-08, 1, 0, -1.15, -4.37114e-08, 0.01, -0.1, 0.03)
+sorting_offset = -0.1
+material_override = SubResource("StandardMaterial3D_ajpwy")
+alpha_cut = 2
+texture_filter = 0
+texture = SubResource("CompressedTexture2D_ajpwy")
