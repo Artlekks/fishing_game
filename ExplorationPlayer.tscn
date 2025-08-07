@@ -1425,7 +1425,7 @@ sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Idle_S"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
-transform = Transform3D(1.15, 0, 0, 0, -5.02681e-08, 1, 0, -1.15, -4.37114e-08, 0.01, -0.1, 0.03)
+transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, -0.1, 0)
 sorting_offset = -0.1
 material_override = SubResource("StandardMaterial3D_ajpwy")
 alpha_cut = 2
