@@ -11,5 +11,3 @@ script = ExtResource("1_kjwxy")
 shape = SubResource("SphereShape3D_mxd7y")
 
 [node name="Marker3D" type="Marker3D" parent="."]
-
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
