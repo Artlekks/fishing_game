@@ -1,4 +1,4 @@
-[gd_scene load_steps=202 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=204 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://clh18t4rnxlsv" path="res://scripts/character_body_3d.gd" id="1_c0c5d"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_8vgkq"]
 [ext_resource type="Texture2D" uid="uid://by5ac2yvwvb0v" path="res://assets/sprites/anim_Ryu_fishing-Turn_180.png" id="2_ak2we"]
 [ext_resource type="Texture2D" uid="uid://bha4biyf0le2h" path="res://assets/sprites/anim_Ryu_fishing-Catch.png" id="2_fw2ok"]
+[ext_resource type="Script" uid="uid://dtmyflxyvmqbf" path="res://scripts/fishing_state_controller.gd" id="2_jdonv"]
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="3_r57kr"]
 [ext_resource type="Texture2D" uid="uid://ga65n7hqvcqw" path="res://assets/sprites/anim_Ryu_fishing-Walking_Forward.png" id="3_sd3ct"]
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="4_xtlf1"]
@@ -24,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://ic3a7718cj1u" path="res://assets/sprites/anim_Ryu_fishing-Bite.png" id="9_7vjmx"]
 [ext_resource type="Texture2D" uid="uid://cbtwx6me6af4d" path="res://assets/sprites/anim_Ryu_fishing-Big_Bite.png" id="10_fw2ok"]
 [ext_resource type="Texture2D" uid="uid://dtnxootnm3x1w" path="res://assets/sprites/anim_Ryu_fishing-Broken_Rod.png" id="11_7vjmx"]
+[ext_resource type="Script" uid="uid://co8eb3vfmwuo3" path="res://scripts/fishing_animation_controller.gd" id="24_u8h60"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
 radius = 0.135514
@@ -803,9 +805,9 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ab8qf")
 }],
-"loop": false,
+"loop": true,
 "name": &"Fishing_Idle",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1010,9 +1012,9 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ek33w")
 }],
-"loop": false,
+"loop": true,
 "name": &"Prep_Throw_Idle",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1412,6 +1414,9 @@ load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s
 [node name="CharacterBody3D" type="CharacterBody3D"]
 script = ExtResource("1_c0c5d")
 
+[node name="FishingStateMachine" type="Node" parent="."]
+script = ExtResource("2_jdonv")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
@@ -1422,7 +1427,8 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Idle_S"
+animation = &"Reel_Right_Idle"
+script = ExtResource("24_u8h60")
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, -0.1, 0)
