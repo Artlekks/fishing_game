@@ -85,6 +85,9 @@ func handle_input():
 			if Input.is_action_pressed("fish") and Input.is_action_pressed("ui_left"):
 				emit_anim("Reel_Left")
 				current_state = State.FISHING_REEL_LEFT
+			elif Input.is_action_pressed("ui_right"):
+				emit_anim("Reel_Right_Idle")
+				current_state = State.FISHING_REEL_RIGHT_IDLE
 
 		State.FISHING_REEL_LEFT:
 			if Input.is_action_pressed("fish"):
@@ -100,11 +103,13 @@ func handle_input():
 				emit_anim("Reel_Left_Idle")
 				current_state = State.FISHING_REEL_LEFT_IDLE
 
-
 		State.FISHING_REEL_RIGHT_IDLE:
 			if Input.is_action_pressed("fish") and Input.is_action_pressed("ui_right"):
 				emit_anim("Reel_Right")
 				current_state = State.FISHING_REEL_RIGHT
+			elif Input.is_action_pressed("ui_left"):
+				emit_anim("Reel_Left_Idle")
+				current_state = State.FISHING_REEL_LEFT_IDLE
 
 		State.FISHING_REEL_RIGHT:
 			if Input.is_action_pressed("fish"):
@@ -119,7 +124,6 @@ func handle_input():
 			else:
 				emit_anim("Reel_Right_Idle")
 				current_state = State.FISHING_REEL_RIGHT_IDLE
-
 
 
 func emit_anim(anim_name: String) -> void:
