@@ -44,7 +44,12 @@ size = 1.8
 script = ExtResource("5_1a8ak")
 camera = NodePath(".")
 
-[node name="FishZone" parent="." groups=["fish_zones"] instance=ExtResource("5_b0l47")]
+[node name="FishZone" parent="." instance=ExtResource("5_b0l47")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.37698, 0.100434, -0.0151702)
 collision_layer = 3
 collision_mask = 3
+
+[node name="WaterFacing" parent="FishZone" index="1"]
+transform = Transform3D(-0.459254, 0, 0.888305, 0, 1, 0, -0.888305, 0, -0.459254, 0, 0, 0)
+
+[editable path="FishZone"]

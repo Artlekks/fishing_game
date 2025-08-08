@@ -4,10 +4,12 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_mxd7y"]
 
-[node name="FishZone" type="Area3D"]
+[node name="FishZone" type="Area3D" groups=["fish_zone"]]
 script = ExtResource("1_kjwxy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_mxd7y")
 
-[node name="Marker3D" type="Marker3D" parent="."]
+[node name="WaterFacing" type="Marker3D" parent="."]
+
+[node name="CameraAnchor" type="Marker3D" parent="."]
