@@ -1435,7 +1435,7 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Cancel_Fishing"
+animation = &"Reel_Idle"
 script = ExtResource("24_u8h60")
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]

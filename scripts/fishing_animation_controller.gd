@@ -1,27 +1,25 @@
-extends Node
+# fishing_animation_controller.gd
+extends AnimatedSprite3D
 
-@onready var sprite: AnimatedSprite3D = get_parent().get_node("AnimatedSprite3D")
-@onready var frames: SpriteFrames = sprite.sprite_frames
-@onready var fsm: Node = get_parent().get_node("FishingStateMachine")
+@onready var fsm: Node = get_parent().get_node_or_null("FishingStateMachine")
 
-func _ready():
-	# Validate sprite and FSM connection
-	if not sprite:
-		push_error("AnimatedSprite3D not found.")
-		return
-
-	if not frames:
-		push_error("SpriteFrames resource not found.")
-		return
-
-	if not fsm or not fsm.has_signal("animation_change"):
-		push_error("FishingStateMachine node missing or 'animation_change' signal not found.")
-		return
-
-	fsm.animation_change.connect(_on_animation_change)
-
-func _on_animation_change(anim_name: String) -> void:
-	if frames.has_animation(anim_name):
-		sprite.play(anim_name)
+func _ready() -> void:
+	if fsm and fsm.has_signal("animation_change"):
+		fsm.animation_change.connect(_on_animation_change)
 	else:
-		push_warning("Animation '%s' not found in SpriteFrames." % anim_name)
+		push_error("FishingStateMachine not found or signal missing.")
+
+	# Forward the name of the clip that just finished.
+	if not is_connected("animation_finished", Callable(self, "_on_anim_finished")):
+		animation_finished.connect(_on_anim_finished)
+
+func _on_animation_change(anim_name: StringName) -> void:
+	if sprite_frames and sprite_frames.has_animation(anim_name):
+		play(anim_name)
+	else:
+		push_warning("Animation '%s' not found." % anim_name)
+
+func _on_anim_finished() -> void:
+	# AnimatedSprite3D exposes the current clip via `animation`
+	if fsm and fsm.has_method("on_animation_finished"):
+		fsm.call("on_animation_finished", animation as StringName)
