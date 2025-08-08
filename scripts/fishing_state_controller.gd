@@ -20,18 +20,25 @@ enum State {
 var current_state: State = State.FISHING_NONE
 var _enabled: bool = false
 
+# --- public API used by the controller ---
+
 func set_enabled(enabled: bool) -> void:
 	_enabled = enabled
-	if not _enabled and current_state != State.FISHING_NONE:
-		emit_anim("Cancel_Fishing")
+	if not _enabled:
 		current_state = State.FISHING_NONE
+
+func start_sequence() -> void:
+	# Called by controller on K
+	_enabled = true
+	emit_anim("Prep_Fishing")
+	current_state = State.FISHING_PREP
 
 func force_cancel() -> void:
 	emit_anim("Cancel_Fishing")
 	current_state = State.FISHING_NONE
+	_enabled = false
 
-func reset_to_none() -> void:
-	current_state = State.FISHING_NONE
+# --- per-frame ---
 
 func _process(_delta: float) -> void:
 	if not _enabled:
@@ -40,11 +47,6 @@ func _process(_delta: float) -> void:
 
 func handle_input() -> void:
 	match current_state:
-		State.FISHING_NONE:
-			if Input.is_action_just_pressed("fish"):
-				emit_anim("Prep_Fishing")
-				current_state = State.FISHING_PREP
-
 		State.FISHING_PREP:
 			if Input.is_action_just_released("fish"):
 				emit_anim("Fishing_Idle")
@@ -109,7 +111,7 @@ func handle_input() -> void:
 					emit_anim("Reel_Right")
 					current_state = State.FISHING_REEL_RIGHT
 				elif Input.is_action_pressed("ui_left"):
-					emit_anim("Reel")
+					emit_anim("Reel") # smooth return to center pull
 					current_state = State.FISHING_REEL
 				else:
 					emit_anim("Reel")

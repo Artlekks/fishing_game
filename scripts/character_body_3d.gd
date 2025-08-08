@@ -11,6 +11,7 @@ var last_dir: String = "S"
 var last_anim: String = "Idle"
 var flip: bool = false
 var original_offset: Vector2
+var movement_enabled: bool = true
 
 const FLIP_DIRS := ["NW", "W", "SW"]
 
@@ -27,10 +28,19 @@ const DIR_LOOKUP := {
 
 func _ready() -> void:
 	original_offset = sprite.offset
+func set_movement_enabled(enabled: bool) -> void:
+	movement_enabled = enabled
+	if not enabled:
+		velocity = Vector3.ZERO
 
 func _physics_process(_delta: float) -> void:
-	var input_vec := _get_input_vector()
+	# hard gate while fishing
+	if not movement_enabled:
+		velocity = Vector3.ZERO
+		move_and_slide()
+		return
 
+	var input_vec := _get_input_vector()
 	if input_vec != Vector2.ZERO:
 		_update_direction(input_vec)
 		_move_player(input_vec)
@@ -42,6 +52,8 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 func _get_input_vector() -> Vector2:
+	if not movement_enabled:
+		return Vector2.ZERO
 	return Vector2(
 		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
 		Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")
