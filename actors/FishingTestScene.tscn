@@ -34,20 +34,16 @@ surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 
 [node name="CharacterBody3D" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
 
-[node name="FishingModeController" parent="CharacterBody3D" index="1"]
-fishing_camera_path = NodePath("../../CameraRig_Fishing")
-
 [node name="CameraRig_Exploration" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 2.6, 2.6)
 script = ExtResource("5_ou438")
 target_path = NodePath("../CharacterBody3D")
 offset = Vector3(0, 2.6, 2.6)
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig_Exploration" node_paths=PackedStringArray("camera")]
+[node name="Camera3D" type="Camera3D" parent="CameraRig_Exploration"]
 fov = 35.0
 size = 1.8
 script = ExtResource("5_1a8ak")
-camera = NodePath(".")
 
 [node name="CameraRig_Fishing" type="Node3D" parent="." groups=["camera_rig_fishing"]]
 script = ExtResource("7_x75a5")
