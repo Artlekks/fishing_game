@@ -54,4 +54,4 @@ func enter_fishing(player: Node3D, water_forward: Vector3, anchor: Node3D = null
 	enter_fishing_view(player, water_forward, anchor)
 
 func exit_fishing() -> void:
-	exit_fishing_view()
+	exit_fishing_view() 
