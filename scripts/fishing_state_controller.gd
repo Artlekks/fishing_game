@@ -116,81 +116,99 @@ func handle_input() -> void:
 		# --- REEL CORE -------------------------------------------------------------
 
 		State.FISHING_REEL_IDLE:
-			# Hold K + optional arrows
-			if Input.is_action_pressed("fish"):
+			# Start (or continue) reeling when K is pressed
+			if Input.is_action_just_pressed("fish") or Input.is_action_pressed("fish"):
 				if Input.is_action_pressed("ui_left"):
-					emit_anim("Reel_Left");  current_state = State.FISHING_REEL_LEFT
+					emit_anim("Reel_Left")
+					current_state = State.FISHING_REEL_LEFT
 				elif Input.is_action_pressed("ui_right"):
-					emit_anim("Reel_Right"); current_state = State.FISHING_REEL_RIGHT
+					emit_anim("Reel_Right")
+					current_state = State.FISHING_REEL_RIGHT
 				else:
-					emit_anim("Reel");       current_state = State.FISHING_REEL
-			else:
-				# No K → stay in Reel_Idle unless you actively hold an arrow
-				if Input.is_action_pressed("ui_left"):
-					emit_anim("Reel_Left_Idle");  current_state = State.FISHING_REEL_LEFT_IDLE
-				elif Input.is_action_pressed("ui_right"):
-					emit_anim("Reel_Right_Idle"); current_state = State.FISHING_REEL_RIGHT_IDLE
-				# else remain in Reel_Idle
-
-		State.FISHING_REEL:
-			# While holding K, arrows modulate; releasing arrows returns to center Reel
-			if Input.is_action_pressed("fish"):
-				if Input.is_action_pressed("ui_left"):
-					emit_anim("Reel_Left");  current_state = State.FISHING_REEL_LEFT
-				elif Input.is_action_pressed("ui_right"):
-					emit_anim("Reel_Right"); current_state = State.FISHING_REEL_RIGHT
-				else:
-					emit_anim("Reel")  # maintain center pull
-			else:
-				emit_anim("Reel_Idle"); current_state = State.FISHING_REEL_IDLE
-
-		# --- LEFT IDLE: ONLY WHILE HELD -------------------------------------------
+					emit_anim("Reel")
+					current_state = State.FISHING_REEL
+			# Side idles while NOT holding K
+			elif Input.is_action_just_pressed("ui_left"):
+				emit_anim("Reel_Left_Idle")
+				current_state = State.FISHING_REEL_LEFT_IDLE
+			elif Input.is_action_just_pressed("ui_right"):
+				emit_anim("Reel_Right_Idle")
+				current_state = State.FISHING_REEL_RIGHT_IDLE
 
 		State.FISHING_REEL_LEFT_IDLE:
-			# Arrow must be held to stay here
-			if Input.is_action_pressed("ui_left"):
-				emit_anim("Reel_Left_Idle")  # keep playing (if looped)
-			elif Input.is_action_pressed("ui_right"):
-				emit_anim("Reel_Right_Idle"); current_state = State.FISHING_REEL_RIGHT_IDLE
-			else:
-				emit_anim("Reel_Idle"); current_state = State.FISHING_REEL_IDLE
-
-		# --- RIGHT IDLE: ONLY WHILE HELD ------------------------------------------
+			# Re-pressing K should re-enter a reel immediately
+			if Input.is_action_just_pressed("fish") or Input.is_action_pressed("fish"):
+				if Input.is_action_pressed("ui_left"):
+					emit_anim("Reel_Left")
+					current_state = State.FISHING_REEL_LEFT
+				elif Input.is_action_pressed("ui_right"):
+					emit_anim("Reel_Right")
+					current_state = State.FISHING_REEL_RIGHT
+				else:
+					emit_anim("Reel")
+					current_state = State.FISHING_REEL
+			# Switch idle facing with arrows while NOT holding K
+			elif Input.is_action_just_pressed("ui_right"):
+				emit_anim("Reel_Right_Idle")
+				current_state = State.FISHING_REEL_RIGHT_IDLE
 
 		State.FISHING_REEL_RIGHT_IDLE:
-			if Input.is_action_pressed("ui_right"):
-				emit_anim("Reel_Right_Idle")
-			elif Input.is_action_pressed("ui_left"):
-				emit_anim("Reel_Left_Idle");  current_state = State.FISHING_REEL_LEFT_IDLE
-			else:
-				emit_anim("Reel_Idle"); current_state = State.FISHING_REEL_IDLE
+			if Input.is_action_just_pressed("fish") or Input.is_action_pressed("fish"):
+				if Input.is_action_pressed("ui_right"):
+					emit_anim("Reel_Right")
+					current_state = State.FISHING_REEL_RIGHT
+				elif Input.is_action_pressed("ui_left"):
+					emit_anim("Reel_Left")
+					current_state = State.FISHING_REEL_LEFT
+				else:
+					emit_anim("Reel")
+					current_state = State.FISHING_REEL
+			elif Input.is_action_just_pressed("ui_left"):
+				emit_anim("Reel_Left_Idle")
+				current_state = State.FISHING_REEL_LEFT_IDLE
 
-		# --- LEFT PULL (with K): ONLY WHILE HELD ----------------------------------
+		State.FISHING_REEL:
+			# Hold K: keep playing the correct loop
+			if Input.is_action_pressed("fish"):
+				if Input.is_action_pressed("ui_left"):
+					emit_anim("Reel_Left")
+					current_state = State.FISHING_REEL_LEFT
+				elif Input.is_action_pressed("ui_right"):
+					emit_anim("Reel_Right")
+					current_state = State.FISHING_REEL_RIGHT
+				else:
+					emit_anim("Reel")  # keep looping center reel
+			else:
+				emit_anim("Reel_Idle")
+				current_state = State.FISHING_REEL_IDLE
 
 		State.FISHING_REEL_LEFT:
 			if Input.is_action_pressed("fish"):
-				if Input.is_action_pressed("ui_left"):
-					emit_anim("Reel_Left")  # sustain
-				elif Input.is_action_pressed("ui_right"):
-					emit_anim("Reel_Right"); current_state = State.FISHING_REEL_RIGHT
+				if Input.is_action_pressed("ui_right"):
+					emit_anim("Reel_Right")
+					current_state = State.FISHING_REEL_RIGHT
+				elif Input.is_action_pressed("ui_left"):
+					emit_anim("Reel_Left")  # keep looping
 				else:
-					emit_anim("Reel");       current_state = State.FISHING_REEL
+					emit_anim("Reel")
+					current_state = State.FISHING_REEL
 			else:
-				emit_anim("Reel_Left_Idle"); current_state = State.FISHING_REEL_LEFT_IDLE
-
-		# --- RIGHT PULL (with K): ONLY WHILE HELD ---------------------------------
+				emit_anim("Reel_Left_Idle")
+				current_state = State.FISHING_REEL_LEFT_IDLE
 
 		State.FISHING_REEL_RIGHT:
 			if Input.is_action_pressed("fish"):
-				if Input.is_action_pressed("ui_right"):
-					emit_anim("Reel_Right")  # sustain
-				elif Input.is_action_pressed("ui_left"):
-					emit_anim("Reel_Left");  current_state = State.FISHING_REEL_LEFT
+				if Input.is_action_pressed("ui_left"):
+					emit_anim("Reel_Left")
+					current_state = State.FISHING_REEL_LEFT
+				elif Input.is_action_pressed("ui_right"):
+					emit_anim("Reel_Right")  # keep looping
 				else:
-					emit_anim("Reel");       current_state = State.FISHING_REEL
+					emit_anim("Reel")
+					current_state = State.FISHING_REEL
 			else:
-				emit_anim("Reel_Right_Idle"); current_state = State.FISHING_REEL_RIGHT_IDLE
-
+				emit_anim("Reel_Right_Idle")
+				current_state = State.FISHING_REEL_RIGHT_IDLE
 
 func emit_anim(anim_name: StringName) -> void:
 	emit_signal("animation_change", anim_name)

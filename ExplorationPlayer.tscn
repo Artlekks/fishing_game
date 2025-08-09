@@ -1,4 +1,4 @@
-[gd_scene load_steps=206 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=207 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://clh18t4rnxlsv" path="res://scripts/character_body_3d.gd" id="1_c0c5d"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -72,6 +72,10 @@ region = Rect2(1536, 0, 192, 160)
 [sub_resource type="AtlasTexture" id="AtlasTexture_ryjgb"]
 atlas = ExtResource("2_3qlfy")
 region = Rect2(1728, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o63wu"]
+atlas = ExtResource("2_ak2we")
+region = Rect2(576, 0, 192, 160)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ku1ks"]
 atlas = ExtResource("2_fw2ok")
@@ -757,6 +761,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ryjgb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o63wu")
 }],
 "loop": false,
 "name": &"Cancel_Fishing",
@@ -1435,7 +1442,9 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Reel_Idle"
+animation = &"Cancel_Fishing"
+frame = 10
+frame_progress = 1.0
 script = ExtResource("24_u8h60")
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]

@@ -42,11 +42,18 @@ func _on_zone_entered(zone: Node) -> void:
 	if debug_prints: print("[FishingMode] ENTER ZONE:", zone.name)
 
 func _on_zone_exited(zone: Node) -> void:
-	if zone != _current_zone: return
+	if zone != _current_zone:
+		return
 	_in_zone = false
 	_current_zone = null
-	_end_silent()
-	if debug_prints: print("[FishingMode] EXIT ZONE")
+
+	# Only end if we were in fishing mode
+	if _in_fishing:
+		_end_silent()
+
+	if debug_prints:
+		print("[FishingMode] EXIT ZONE")
+
 
 # --- Internals -------------------------------------------------------------
 
@@ -108,18 +115,24 @@ func _cancel_fishing() -> void:
 	if debug_prints: print("[FishingMode] CANCEL (I)")
 
 func _end_silent() -> void:
+	if not _in_fishing:
+		# Not in fishing → do not touch camera or FSM
+		return
+
 	_in_fishing = false
 
 	if facing_root and facing_root.has_method("stop_align"):
 		facing_root.call("stop_align")
 	_set_player_movement(true)
 
+	# Silent FSM reset — no animations
 	if fsm:
 		if fsm.has_method("soft_reset"):
 			fsm.call("soft_reset")
 		elif fsm.has_method("set_enabled"):
 			fsm.call("set_enabled", false)
 
+	# Blend back and resume follow
 	var cam := get_viewport().get_camera_3d()
 	if cam:
 		if cam.has_method("exit_fishing_view"):
@@ -131,6 +144,7 @@ func _end_silent() -> void:
 		_rig.call("set_follow_enabled", true)
 
 	_set_fishing_enabled(false)
+
 
 # --- Helpers ---------------------------------------------------------------
 
