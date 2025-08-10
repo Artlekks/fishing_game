@@ -34,6 +34,11 @@ surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 
 [node name="CharacterBody3D" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
 
+[node name="FishingModeController" parent="CharacterBody3D" index="1"]
+camera_rig_path = NodePath("../../CameraRig_Exploration")
+exploration_camera_path = NodePath("../../CameraRig_Exploration/Camera3D")
+exit_time_override = 2.0
+
 [node name="CameraRig_Exploration" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 2.6, 2.6)
 script = ExtResource("5_ou438")
@@ -48,10 +53,13 @@ back_distance = 2.0
 height = 1.8
 side_offset = 2.8
 look_ahead = 3.2
+enter_time = 0.6
+exit_time = 0.6
 
 [node name="CameraRig_Fishing" type="Node3D" parent="." groups=["camera_rig_fishing"]]
 script = ExtResource("7_x75a5")
-camera_path = NodePath("OrbitPivot/PitchPivot/Camera3D")
+resume_blend_time = 10.0
+target_path = NodePath("../CharacterBody3D")
 
 [node name="OrbitPivot" type="Node3D" parent="CameraRig_Fishing"]
 
