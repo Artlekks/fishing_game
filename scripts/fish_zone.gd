@@ -9,12 +9,10 @@ var _inside: bool = false
 @onready var camera_anchor: Node3D = $CameraAnchor      # optional
 
 func _ready() -> void:
-	# Single connection style; no duplicates.
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
-	# Make sure the area actually monitors
 	monitoring = true
 	monitorable = true
+	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("player"):
@@ -32,8 +30,12 @@ func is_player_inside() -> bool:
 	return _inside
 
 func get_water_forward() -> Vector3:
-	# Safe fallback if the child is missing
-	return (water_facing.global_transform.basis.z if water_facing else Vector3.FORWARD).normalized()
+	var f := (water_facing.global_transform.basis.z if water_facing else Vector3.FORWARD)
+	return f.normalized()
 
 func get_camera_anchor() -> Node3D:
 	return camera_anchor
+
+func get_stance_point(default_pos: Vector3) -> Vector3:
+	# Stable base point used by the fishing camera for consistent framing
+	return camera_anchor.global_position if camera_anchor else default_pos

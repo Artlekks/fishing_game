@@ -1,122 +1,66 @@
+# fishing_camera_rig.gd
 extends Node3D
-## CameraRig_Fishing — BoFIV-style fishing camera.
-## - Faces the zone's water direction
-## - Offsets so the player sits bottom-left
-## - Copies render settings from the exploration camera (no "gray screen")
-## - Optional tween; safe debug toggles
 
-signal camera_settled()
+@export var camera_path: NodePath
+@export var back_distance: float = 9.0
+@export var height: float = 6.0
+@export var side_offset: float = 6.0        # desired lateral offset (+), we flip it to bottom-left
+@export var side_ratio_cap: float = 0.45     # <-- NEW: max lateral as fraction of back_distance
+@export var look_ahead: float = 3.0
+@export var blend_time: float = 0.35
 
-# --- Composition / Pose ---
-@export var back_distance: float = 8.0     # pull back from base (anchor or player)
-@export var height: float = 3.0            # raise camera
-@export var side_offset: float = 2.0       # + moves cam to player's right (player appears further left)
-@export var pitch_deg: float = -15.0       # look-down angle
-
-# --- Timing ---
-@export var enter_time: float = 0.35
-@export var exit_time: float = 0.25
-
-# --- Debug / Safety ---
-@export var debug_force_current: bool = true   # force camera current immediately (handy while tuning)
-@export var debug_no_tween: bool = true        # skip tween while tuning
-@export var debug_force_all_layers: bool = true  # turn on all cull layers to avoid gray screens
-
-@onready var orbit: Node3D  = get_node_or_null("OrbitPivot") as Node3D
-@onready var pitch: Node3D  = get_node_or_null("OrbitPivot/PitchPivot") as Node3D
-@onready var cam:   Camera3D = get_node_or_null("OrbitPivot/PitchPivot/Camera3D") as Camera3D
-
+var cam: Camera3D
 var _tween: Tween
-var _mode := "idle"
 
 func _ready() -> void:
-	if cam:
-		cam.current = false
-		# sane defaults in case the camera was created blank
-		cam.near = max(0.01, cam.near)
-		cam.far  = max(200.0, cam.far)
-	if orbit == null: orbit = self
-	if pitch == null: pitch = self
+    # Resolve the Camera3D
+    if camera_path != NodePath("") and has_node(camera_path):
+        cam = get_node(camera_path) as Camera3D
+    else:
+        for c in get_children():
+            if c is Camera3D:
+                cam = c
+                break
+    if cam == null:
+        push_error("FishingCameraRig: Camera3D child not found. Set 'camera_path' or add a Camera3D as a child.")
+        set_process(false)
 
-# Public API
-func enter_fishing(player: Node3D, water_forward: Vector3, anchor: Node3D) -> void:
-	if cam == null:
-		push_error("Fishing camera missing Camera3D child.")
-		return
+func enter_fishing(player: Node3D, water_forward: Vector3, _anchor: Node3D = null, stance_point: Vector3 = Vector3()) -> void:
+    if cam == null:
+        return
 
-	# Inherit render settings from whatever camera is active (prevents gray/black screens)
-	_inherit_from(get_viewport().get_camera_3d())
+    var P: Vector3 = stance_point
+    if P == Vector3.ZERO:
+        P = player.global_position
 
-	var fwd   := water_forward.normalized()
-	if fwd == Vector3.ZERO:
-		fwd = -global_basis.z
-	var right := fwd.cross(Vector3.UP).normalized()
-	var up    := Vector3.UP
+    var fwd: Vector3 = water_forward.normalized()
+    if fwd == Vector3.ZERO:
+        fwd = -global_transform.basis.z.normalized()
+    var right: Vector3 = fwd.cross(Vector3.UP).normalized()
 
-	# Use anchor as base if provided, then APPLY OFFSETS
-	var base_pos: Vector3 = (anchor.global_position) if anchor != null else player.global_position
+    # --- lateral safety: cap sideways push relative to distance ---
+    var desired_side: float = abs(side_offset)
+    var max_side: float = max(0.0, back_distance * side_ratio_cap)   # e.g. 45% of back distance
+    var side_mag: float = min(desired_side, max_side)
+    # always bottom-left framing (negative along 'right')
+    var lateral := right * (-side_mag)
 
-	var target_pos: Vector3 = (
-		base_pos
-		- fwd * back_distance
-		+ up * height
-		+ right * side_offset
-	)
+    var cam_pos: Vector3 = P - fwd * back_distance + Vector3.UP * height + lateral
+    var look_point: Vector3 = P + fwd * look_ahead
 
-	var yaw_deg := rad_to_deg(atan2(fwd.x, fwd.z))
+    if _tween and _tween.is_running():
+        _tween.kill()
+    _tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    _tween.tween_property(self, "global_position", cam_pos, blend_time)
+    _tween.tween_callback(Callable(self, "_look_at_safely").bind(look_point))
 
-
-	# Debug: show where we’re going
-	print("[FishCam] base=", base_pos, " target=", target_pos, " yaw=", yaw_deg)
-
-	if _tween and _tween.is_running(): _tween.kill()
-
-	if debug_no_tween:
-		global_position = target_pos
-		orbit.rotation_degrees.y = yaw_deg
-		pitch.rotation_degrees.x = pitch_deg
-		if debug_force_current: cam.current = true
-		print("[FishCam] current=", cam.is_current(), " cull=0x%X" % cam.cull_mask)
-		_mode = "fishing"
-		emit_signal("camera_settled")
-		return
-
-	_mode = "transition_in"
-	_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(self, "global_position", target_pos, enter_time)
-	_tween.parallel().tween_property(orbit, "rotation_degrees:y", yaw_deg, enter_time)
-	_tween.parallel().tween_property(pitch, "rotation_degrees:x", pitch_deg, enter_time)
-	_tween.finished.connect(func ():
-		_mode = "fishing"
-		cam.make_current()
-		emit_signal("camera_settled")
-	)
+    cam.make_current()
 
 func exit_fishing() -> void:
-	if _tween and _tween.is_running(): _tween.kill()
-	_mode = "transition_out"
-	# small ease; controller will restore exploration camera
-	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(pitch, "rotation_degrees:x", 0.0, exit_time)
-	t.finished.connect(func ():
-		_mode = "idle"
-		if cam: cam.current = false
-	)
+    pass
 
-# --- Helpers ---------------------------------------------------------------
-
-func _inherit_from(src: Camera3D) -> void:
-	if src == null or cam == null:
-		return
-	# copy critical visibility/look settings
-	cam.cull_mask    = src.cull_mask
-	cam.environment  = src.environment
-	cam.keep_aspect  = src.keep_aspect
-	cam.fov          = src.fov
-	cam.near         = src.near if src.near > 0.0 else cam.near
-	cam.far          = max(cam.far, src.far)
-
-
-	# Safety for debugging: see everything
-	if debug_force_all_layers:
-		cam.cull_mask = 0xFFFFF  # all 20 layers
+func _look_at_safely(target: Vector3) -> void:
+    var to := (target - global_position)
+    if to.length() < 0.001:
+        return
+    look_at(target, Vector3.UP, true)

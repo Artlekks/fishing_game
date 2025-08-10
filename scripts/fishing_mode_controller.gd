@@ -1,13 +1,17 @@
 extends Node
-## FishingModeController — BoFIV flow using the SAME exploration camera.
+## FishingModeController — BoFIV flow on the SAME exploration camera.
+## - K inside a FishZone -> snap to stance, lock flip, align to water, camera blends.
+## - I cancels -> unlock flip, restore movement, camera resumes follow.
 
 @export var fish_zone_group: StringName = &"fish_zone"
 @export var debug_prints: bool = true
-@export var camera_rig_path: NodePath = ^""   # path to your CameraRig; if empty we try a "camera_rig" group
+@export var camera_rig_path: NodePath = ^""       # your follow rig (has set_follow_enabled(bool))
+@export var stance_tween_time: float = 0.25       # feet snap time along StandA->StandB
 
 @onready var player: Node3D       = get_parent() as Node3D
 @onready var facing_root: Node3D  = player.get_node_or_null("FacingRoot") as Node3D
 @onready var fsm: Node            = player.get_node_or_null("FishingStateMachine")
+@onready var anim_ctrl: Node      = player.get_node_or_null("AnimatedSprite3D")  # fishing_animation_controller.gd
 
 var _current_zone: Node = null
 var _in_zone := false
@@ -17,16 +21,18 @@ var _rig: Node = null
 func _ready() -> void:
 	set_process_unhandled_input(true)
 
+	# Wire all zones present at load
 	for z in get_tree().get_nodes_in_group(fish_zone_group):
 		if not z.is_connected("player_entered_fish_zone", Callable(self, "_on_zone_entered")):
 			z.player_entered_fish_zone.connect(_on_zone_entered)
 		if not z.is_connected("player_exited_fish_zone", Callable(self, "_on_zone_exited")):
 			z.player_exited_fish_zone.connect(_on_zone_exited)
 
+	# Follow rig (to pause/resume follow)
 	if camera_rig_path != NodePath("") and has_node(camera_rig_path):
 		_rig = get_node(camera_rig_path)
 	else:
-		_rig = get_tree().get_first_node_in_group("camera_rig")  # put your CameraRig in this group once
+		_rig = get_tree().get_first_node_in_group("camera_rig")
 
 	_set_fishing_enabled(false)
 
@@ -46,67 +52,79 @@ func _on_zone_exited(zone: Node) -> void:
 		return
 	_in_zone = false
 	_current_zone = null
-
-	# Only end if we were in fishing mode
 	if _in_fishing:
 		_end_silent()
+	if debug_prints: print("[FishingMode] EXIT ZONE")
 
-	if debug_prints:
-		print("[FishingMode] EXIT ZONE")
-
-
-# --- Internals -------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 func _start_fishing() -> void:
-	if _current_zone == null: return
+	if _current_zone == null:
+		return
 	_in_fishing = true
 	_set_fishing_enabled(true)
 
-	# Stop follow BEFORE we snapshot camera pose (prevents jump)
+	# Pause follow BEFORE sampling camera
 	if _rig and _rig.has_method("set_follow_enabled"):
 		_rig.call("set_follow_enabled", false)
-	await get_tree().process_frame  # let the camera settle one frame
+	await get_tree().process_frame
 
-	var water_forward: Vector3 = _current_zone.call("get_water_forward")
-	var anchor := _current_zone.get_node_or_null("CameraAnchor") as Node3D
+	# Direction & stance
+	var water_forward: Vector3 = _get_zone_forward(_current_zone)
+	var stance_point: Vector3 = _get_zone_stance(_current_zone, player.global_position)
+
+	# Lock out mirroring and start turning toward water
+	if anim_ctrl and anim_ctrl.has_method("set_fishing_flip_locked"):
+		anim_ctrl.call("set_fishing_flip_locked", true)
+	if facing_root and facing_root.has_method("align_to_forward"):
+		facing_root.call("align_to_forward", water_forward)
+
+	# Snap feet to stance line (short tween)
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(player, "global_position", stance_point, stance_tween_time)
+
+	# Tell the active Camera3D to enter fishing view (same camera, different framing)
 	var cam := get_viewport().get_camera_3d()
-
-	# Blend same camera
+	var anchor := _current_zone.get_node_or_null("CameraAnchor") as Node3D
 	if cam:
 		if cam.has_method("enter_fishing_view"):
 			cam.call("enter_fishing_view", player, water_forward, anchor)
-		elif cam.has_method("enter_fishing"): # compat
+		elif cam.has_method("enter_fishing"):
 			cam.call("enter_fishing", player, water_forward, anchor)
 
-	# Lock facing & block movement
-	if facing_root and facing_root.has_method("align_to_forward"):
-		facing_root.call("align_to_forward", water_forward)
-	_set_player_movement(false)
 
-	# Kick FSM (plays Prep_Fishing → Fishing_Idle)
+	# Movement off; FSM kicks (Prep_Fishing -> Fishing_Idle)
+	_set_player_movement(false)
 	if fsm and fsm.has_method("start_sequence"):
 		fsm.call("start_sequence")
 
 	if debug_prints: print("[FishingMode] START (K)")
 
 func _cancel_fishing() -> void:
-	if not _in_fishing: return
+	if not _in_fishing:
+		return
 	_in_fishing = false
 
+	# Unlock + stop facing alignment
+	if anim_ctrl and anim_ctrl.has_method("set_fishing_flip_locked"):
+		anim_ctrl.call("set_fishing_flip_locked", false)
 	if facing_root and facing_root.has_method("stop_align"):
 		facing_root.call("stop_align")
+
+	# Player regains control
 	_set_player_movement(true)
 
+	# Cancel FSM with animation
 	if fsm and fsm.has_method("force_cancel"):
 		fsm.call("force_cancel")
 
+	# Camera exits fishing view; resume follow
 	var cam := get_viewport().get_camera_3d()
 	if cam:
 		if cam.has_method("exit_fishing_view"):
 			cam.call("exit_fishing_view")
-		elif cam.has_method("exit_fishing"): # compat
+		elif cam.has_method("exit_fishing"):
 			cam.call("exit_fishing")
-
 	if _rig and _rig.has_method("set_follow_enabled"):
 		_rig.call("set_follow_enabled", true)
 
@@ -115,38 +133,40 @@ func _cancel_fishing() -> void:
 	if debug_prints: print("[FishingMode] CANCEL (I)")
 
 func _end_silent() -> void:
+	# Only if we were actually in fishing mode
 	if not _in_fishing:
-		# Not in fishing → do not touch camera or FSM
 		return
-
 	_in_fishing = false
 
+	# Unlock + stop facing alignment
+	if anim_ctrl and anim_ctrl.has_method("set_fishing_flip_locked"):
+		anim_ctrl.call("set_fishing_flip_locked", false)
 	if facing_root and facing_root.has_method("stop_align"):
 		facing_root.call("stop_align")
+
+	# Restore control
 	_set_player_movement(true)
 
-	# Silent FSM reset — no animations
+	# Silent FSM reset (no cancel animation)
 	if fsm:
 		if fsm.has_method("soft_reset"):
 			fsm.call("soft_reset")
 		elif fsm.has_method("set_enabled"):
 			fsm.call("set_enabled", false)
 
-	# Blend back and resume follow
+	# Camera exits fishing view; resume follow
 	var cam := get_viewport().get_camera_3d()
 	if cam:
 		if cam.has_method("exit_fishing_view"):
 			cam.call("exit_fishing_view")
 		elif cam.has_method("exit_fishing"):
 			cam.call("exit_fishing")
-
 	if _rig and _rig.has_method("set_follow_enabled"):
 		_rig.call("set_follow_enabled", true)
 
 	_set_fishing_enabled(false)
 
-
-# --- Helpers ---------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 func _set_fishing_enabled(enabled: bool) -> void:
 	if fsm and fsm.has_method("set_enabled"):
@@ -155,3 +175,16 @@ func _set_fishing_enabled(enabled: bool) -> void:
 func _set_player_movement(enabled: bool) -> void:
 	if player and player.has_method("set_movement_enabled"):
 		player.call("set_movement_enabled", enabled)
+
+func _get_zone_forward(zone: Node) -> Vector3:
+	if zone and zone.has_method("get_water_forward"):
+		var v := zone.call("get_water_forward") as Vector3
+		return v.normalized()
+	return -player.global_transform.basis.z.normalized()
+
+func _get_zone_stance(zone: Node, player_pos: Vector3) -> Vector3:
+	if zone and zone.has_method("get_stance_point"):
+		return zone.call("get_stance_point", player_pos) as Vector3
+	return player_pos
+
+# Tiny reflection helper: does enter_fishing_view accept 4 args?
