@@ -58,8 +58,7 @@ exit_time = 0.6
 
 [node name="CameraRig_Fishing" type="Node3D" parent="." groups=["camera_rig_fishing"]]
 script = ExtResource("7_x75a5")
-resume_blend_time = 10.0
-target_path = NodePath("../CharacterBody3D")
+camera_path = NodePath("OrbitPivot/PitchPivot/Camera3D")
 
 [node name="OrbitPivot" type="Node3D" parent="CameraRig_Fishing"]
 
@@ -85,6 +84,15 @@ collision_mask = 3
 [node name="WaterFacing" parent="FishZone2" index="1"]
 transform = Transform3D(0.872547, 0, 0.48853, 0, 1, 0, -0.48853, 0, 0.872547, 0, 0, 0)
 
+[node name="FishZone3" parent="." instance=ExtResource("5_b0l47")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.48702, 0.100434, 1.49055)
+collision_layer = 3
+collision_mask = 3
+
+[node name="WaterFacing" parent="FishZone3" index="1"]
+transform = Transform3D(0.215537, 0, -0.976496, 0, 1, 0, 0.976496, 0, 0.215537, 0, 0, 0)
+
 [editable path="CharacterBody3D"]
 [editable path="FishZone"]
 [editable path="FishZone2"]
+[editable path="FishZone3"]
