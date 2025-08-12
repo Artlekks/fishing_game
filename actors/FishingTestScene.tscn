@@ -4,11 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://0irppmggqe5u" path="res://assets/backgrounds/Marsh.png" id="1_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="3_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://sdh188exepwu" path="res://ExplorationPlayer.tscn" id="4_1vxb6"]
-[ext_resource type="Script" uid="uid://3flpxssh18bf" path="res://scripts/FishingCameraController.gd" id="5_1a8ak"]
+[ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="5_1a8ak"]
 [ext_resource type="PackedScene" uid="uid://cervguyak73k0" path="res://actors/FishZone.tscn" id="5_b0l47"]
-[ext_resource type="Script" uid="uid://byfquvppe6i6n" path="res://scripts/follow_camera_rig.gd" id="5_ou438"]
-[ext_resource type="Script" uid="uid://b6ixbjuea2w78" path="res://scripts/fishing_camera_rig.gd" id="7_x75a5"]
-[ext_resource type="Script" uid="uid://cju6a5qtadmpg" path="res://scripts/fishing_view_blender.gd" id="8_fbfnt"]
+[ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="6_x75a5"]
+[ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="7_fbfnt"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_g5kxi"]
 
@@ -19,6 +18,12 @@ disable_ambient_light = true
 disable_fog = true
 albedo_texture = ExtResource("1_yj5gx")
 texture_filter = 0
+
+[sub_resource type="Resource" id="Resource_twt30"]
+script = ExtResource("7_fbfnt")
+duration = 1.0
+transition = 0
+ease = 2
 
 [node name="FishingTestScene" type="Node3D"]
 script = ExtResource("1_1a8ak")
@@ -34,65 +39,58 @@ surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 
 [node name="CharacterBody3D" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
 
-[node name="FishingModeController" parent="CharacterBody3D" index="1"]
-camera_rig_path = NodePath("../../CameraRig_Exploration")
-exploration_camera_path = NodePath("../../CameraRig_Exploration/Camera3D")
-exit_time_override = 2.0
-
-[node name="CameraRig_Exploration" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 2.6, 2.6)
-script = ExtResource("5_ou438")
-target_path = NodePath("../CharacterBody3D")
-offset = Vector3(0, 2.6, 2.6)
-
-[node name="Camera3D" type="Camera3D" parent="CameraRig_Exploration"]
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.782188, 0.188111, -0.593967, 0, 0.953332, 0.301923, 0.623043, -0.236161, 0.745685, -0.833393, 1.405, 2.31773)
 fov = 35.0
-size = 1.8
+
+[node name="PhantomCameraHost" type="Node" parent="Camera3D"]
+process_priority = 300
+process_physics_priority = 300
 script = ExtResource("5_1a8ak")
-back_distance = 2.0
-height = 1.8
-side_offset = 2.8
-look_ahead = 3.2
-enter_time = 0.6
-exit_time = 0.6
+metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
-[node name="CameraRig_Fishing" type="Node3D" parent="." groups=["camera_rig_fishing"]]
-script = ExtResource("7_x75a5")
-camera_path = NodePath("OrbitPivot/PitchPivot/Camera3D")
+[node name="Cameras" type="Node3D" parent="."]
 
-[node name="OrbitPivot" type="Node3D" parent="CameraRig_Fishing"]
+[node name="PCam_Exploration" type="Node3D" parent="Cameras" node_paths=PackedStringArray("follow_target", "look_at_target")]
+transform = Transform3D(0.999989, 0, 0, 0, 0.529991, 0.847989, 0, -0.847985, 0.529993, 0, 3.2, 2)
+top_level = true
+script = ExtResource("6_x75a5")
+priority = 10
+follow_mode = 2
+follow_target = NodePath("../../CharacterBody3D")
+look_at_mode = 2
+look_at_target = NodePath("../../CharacterBody3D")
+tween_resource = SubResource("Resource_twt30")
+inactive_update_mode = 1
+follow_offset = Vector3(0, 3.2, 2)
+metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 
-[node name="PitchPivot" type="Node3D" parent="CameraRig_Fishing/OrbitPivot"]
+[node name="FishZone" parent="." groups=["fizh_zone"] instance=ExtResource("5_b0l47")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45764, 0, -0.0191386)
+exploration_pcam_path = NodePath("../Cameras/PCam_Exploration")
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig_Fishing/OrbitPivot/PitchPivot"]
-fov = 35.0
-script = ExtResource("8_fbfnt")
+[node name="WaterFacing" parent="FishZone" index="0"]
+transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 0, 0, 0)
 
-[node name="FishZone" parent="." instance=ExtResource("5_b0l47")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.37698, 0.100434, -0.0151702)
-collision_layer = 3
-collision_mask = 3
+[node name="PCam_Fishing" parent="FishZone/WaterFacing/CamPivot" index="0" node_paths=PackedStringArray("follow_target", "look_at_target")]
+transform = Transform3D(0.782117, 0.188099, -0.593929, 0, 0.953272, 0.301904, 0.622987, -0.236146, 0.745637, -0.833393, 1.405, 2.31773)
+top_level = true
+priority = 100
+follow_mode = 2
+follow_target = NodePath("../../../LookDriver")
+look_at_mode = 2
+look_at_target = NodePath("../../../../CharacterBody3D")
+follow_offset = Vector3(1.64, 1.405, 1.33)
+look_at_offset = Vector3(2.57, -0.325, -1.955)
 
-[node name="WaterFacing" parent="FishZone" index="1"]
-transform = Transform3D(-0.459254, 0, 0.888305, 0, 1, 0, -0.888305, 0, -0.459254, 0, 0, 0)
+[node name="CollisionShape3D" parent="FishZone" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
-[node name="FishZone2" parent="." instance=ExtResource("5_b0l47")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5838, 0.100434, 0.0827292)
-collision_layer = 3
-collision_mask = 3
+[node name="LookTarget" parent="FishZone" index="3"]
+transform = Transform3D(0.740183, 0, -0.672406, 0, 1, 0, 0.672406, 0, 0.740183, -1.39427, 0, 1.32697)
 
-[node name="WaterFacing" parent="FishZone2" index="1"]
-transform = Transform3D(0.872547, 0, 0.48853, 0, 1, 0, -0.48853, 0, 0.872547, 0, 0, 0)
-
-[node name="FishZone3" parent="." instance=ExtResource("5_b0l47")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.48702, 0.100434, 1.49055)
-collision_layer = 3
-collision_mask = 3
-
-[node name="WaterFacing" parent="FishZone3" index="1"]
-transform = Transform3D(0.215537, 0, -0.976496, 0, 1, 0, 0.976496, 0, 0.215537, 0, 0, 0)
+[node name="LookDriver" parent="FishZone" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.01575, 0, 1.00687)
 
 [editable path="CharacterBody3D"]
 [editable path="FishZone"]
-[editable path="FishZone2"]
-[editable path="FishZone3"]
