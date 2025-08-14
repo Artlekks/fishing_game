@@ -1,4 +1,4 @@
-[gd_scene load_steps=207 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=206 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://clh18t4rnxlsv" path="res://scripts/character_body_3d.gd" id="1_c0c5d"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://by5ac2yvwvb0v" path="res://assets/sprites/anim_Ryu_fishing-Turn_180.png" id="2_ak2we"]
 [ext_resource type="Texture2D" uid="uid://bha4biyf0le2h" path="res://assets/sprites/anim_Ryu_fishing-Catch.png" id="2_fw2ok"]
 [ext_resource type="Script" uid="uid://dtmyflxyvmqbf" path="res://scripts/fishing_state_controller.gd" id="2_jdonv"]
-[ext_resource type="Script" uid="uid://hwqyons5we44" path="res://scripts/player_facing_controller.gd" id="2_yhyju"]
 [ext_resource type="Script" uid="uid://do2odl7ypej08" path="res://scripts/fishing_mode_controller.gd" id="3_mmolh"]
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="3_r57kr"]
 [ext_resource type="Texture2D" uid="uid://ga65n7hqvcqw" path="res://assets/sprites/anim_Ryu_fishing-Walking_Forward.png" id="3_sd3ct"]
@@ -1422,9 +1421,6 @@ load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 script = ExtResource("1_c0c5d")
-
-[node name="FacingRoot" type="Node3D" parent="."]
-script = ExtResource("2_yhyju")
 
 [node name="FishingModeController" type="Node" parent="."]
 script = ExtResource("3_mmolh")
