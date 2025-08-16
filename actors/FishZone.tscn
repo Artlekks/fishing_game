@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://cervguyak73k0"]
+[gd_scene load_steps=3 format=3 uid="uid://cervguyak73k0"]
+
+[ext_resource type="Script" uid="uid://duiloslw7alif" path="res://scripts/axis_gizmo.gd" id="1_kjwxy"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_mxd7y"]
 radius = 1.65525
@@ -6,6 +8,9 @@ radius = 1.65525
 [node name="FishZone" type="Area3D" groups=["fish_zone"]]
 
 [node name="WaterFacing" type="Node3D" parent="."]
+
+[node name="AxisGizmo_Water" type="Node3D" parent="WaterFacing"]
+script = ExtResource("1_kjwxy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_mxd7y")
