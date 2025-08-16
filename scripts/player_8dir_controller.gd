@@ -6,12 +6,16 @@ extends CharacterBody3D
 @export var snap_to_8_directions: bool = true
 
 # -------- Fishing gating --------
-@export var water_facing: Node3D                           # assign your WaterFacing
+@export var water_facing: Node3D                           # assign WaterFacing
 @export_range(1.0, 179.0, 1.0) var half_angle_deg: float = 60.0
 
 # Accept ANY camera node (Camera3D or PhantomCamera3D)
 @export var exploration_camera: Node = null                # assign PCam_Exploration
 @export var fishing_camera: Node = null                    # assign PCam_Fishing
+
+# --- Fishing cam orbit ---
+@export var fishcam_align_time: float = 0.35               # seconds for the orbit align
+@export var fishcam_ease_out: bool = true                  # ease out tween
 
 @onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 @onready var frames: SpriteFrames = sprite.sprite_frames
@@ -25,6 +29,11 @@ var in_fishing_mode: bool = false
 const FLIP_DIRS := {"W": true, "NW": true, "SW": true}
 const MIRROR_MAP := {"W": "E", "NW": "NE", "SW": "SE"}
 const DIRS := ["S","SE","E","NE","N","NW","W","SW"]
+
+# cached fishing-cam geometry (kept constant)
+var _fishcam_radius: float = 0.0
+var _fishcam_height: float = 0.0
+var _fishcam_tween: Tween = null
 
 func _ready() -> void:
     original_offset = sprite.offset
@@ -54,7 +63,6 @@ func _physics_process(delta: float) -> void:
 
     if movement_enabled and iv.length_squared() > 0.0:
         var dir := Vector3(iv.x, 0.0, iv.y)
-
         var yaw := atan2(dir.x, dir.z)  # 0 → +Z
         if snap_to_8_directions:
             var step := PI / 4.0
@@ -75,6 +83,13 @@ func _physics_process(delta: float) -> void:
 
     move_and_slide()
 
+func _process(_delta: float) -> void:
+    # Keep the fishing camera centered on the player while in fishing mode
+    if in_fishing_mode and fishing_camera != null:
+        var cam_node := fishing_camera as Node3D
+        if cam_node:
+            cam_node.look_at(global_transform.origin, Vector3.UP)
+
 func _yaw_to_dir(yaw: float) -> String:
     var step := PI / 4.0
     var idx := int(round(yaw / step))
@@ -84,7 +99,6 @@ func _yaw_to_dir(yaw: float) -> String:
 func _play_8dir_animation(base: String, dir: String) -> void:
     if dir == null or dir == "":
         dir = "S"
-
     var flip: bool = FLIP_DIRS.has(dir)
     var token: String = MIRROR_MAP.get(dir, dir) if flip else dir
     var anim := "%s_%s" % [base, token]
@@ -127,12 +141,20 @@ func _enter_fishing() -> void:
     set_movement_enabled(false)
     velocity = Vector3.ZERO
     move_and_slide()
+
     _activate_cam(fishing_camera)
     _deactivate_cam(exploration_camera)
+
+    _cache_fishcam_geometry()
+    _align_fishcam_to_player_axis()
 
 func _exit_fishing() -> void:
     in_fishing_mode = false
     set_movement_enabled(true)
+
+    if _fishcam_tween and _fishcam_tween.is_running():
+        _fishcam_tween.kill()
+
     _activate_cam(exploration_camera)
     _deactivate_cam(fishing_camera)
 
@@ -152,7 +174,7 @@ func _activate_cam(n: Node) -> void:
     elif _has_prop(n, "active"):
         n.set("active", true)
     if _has_prop(n, "priority"):
-        n.set("priority", 1000)  # give active cam a high priority
+        n.set("priority", 1000)
 
 func _deactivate_cam(n: Node) -> void:
     if n == null: return
@@ -175,3 +197,36 @@ func _has_prop(o: Object, name: String) -> bool:
         if p.name == name:
             return true
     return false
+
+# ---------- Orbit logic (keep distance & height; rotate to player yaw) ----------
+
+func _cache_fishcam_geometry() -> void:
+    if fishing_camera == null: return
+    var cam := fishing_camera as Node3D
+    if cam == null: return
+
+    var offset: Vector3 = cam.global_position - global_position
+    _fishcam_height = offset.y
+    var xz := Vector2(offset.x, offset.z)
+    _fishcam_radius = max(0.01, xz.length())
+
+func _align_fishcam_to_player_axis() -> void:
+    if fishing_camera == null: return
+    var cam := fishing_camera as Node3D
+    if cam == null: return
+
+    # Desired position: behind player along -forward, same radius & height
+    var fwd: Vector3 = global_transform.basis.z.normalized()
+    var target_xz: Vector3 = (-fwd) * _fishcam_radius
+    var target_pos: Vector3 = global_position + Vector3(target_xz.x, _fishcam_height, target_xz.z)
+
+    # Smooth tween of global_position to target
+    if _fishcam_tween and _fishcam_tween.is_running():
+        _fishcam_tween.kill()
+
+    _fishcam_tween = create_tween()
+    if fishcam_ease_out:
+        _fishcam_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+    _fishcam_tween.tween_property(cam, "global_position", target_pos, fishcam_align_time)
+    # look_at is handled in _process to keep the player centered during the tween
