@@ -28,6 +28,7 @@ ease = 2
 
 [node name="WaterPlane" type="MeshInstance3D" parent="."]
 transform = Transform3D(6.05548, 0, 0.873761, 0, 1, 0, -1.99293, 0, 2.65491, -0.322187, -2.38419e-07, -0.659238)
+sorting_offset = -1.0
 mesh = SubResource("PlaneMesh_g5kxi")
 surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 
@@ -36,6 +37,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_yppe2")
 [node name="PowerMeter" parent="." instance=ExtResource("3_yj5gx")]
 
 [node name="CharacterBody3D" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
+
+[node name="AnimatedSprite3D" parent="CharacterBody3D" index="2"]
+render_priority = 2
+
+[node name="ShadowSprite3D" parent="CharacterBody3D/AnimatedSprite3D" index="0"]
+render_priority = 1
 
 [node name="Camera3D" type="Camera3D" parent="."]
 physics_interpolation_mode = 1
