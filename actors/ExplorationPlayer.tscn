@@ -1451,3 +1451,5 @@ texture = SubResource("CompressedTexture2D_ajpwy")
 
 [node name="AxisGizmo" type="Node3D" parent="."]
 script = ExtResource("27_yhyju")
+
+[node name="CamFocus" type="Node3D" parent="."]
