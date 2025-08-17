@@ -50,8 +50,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_m77w1")
 water_facing = NodePath("../FishZone/WaterFacing")
 exploration_camera = NodePath("../Cameras/PCam_Exploration")
 
-[node name="AnimatedSprite3D" parent="CharacterBody3D" index="2"]
+[node name="AnimatedSprite3D" parent="CharacterBody3D" index="2" node_paths=PackedStringArray("controller", "sprite")]
 render_priority = 2
+controller = NodePath("../FishingStateMachine/FishingStateController")
+sprite = NodePath(".")
 
 [node name="ShadowSprite3D" parent="CharacterBody3D/AnimatedSprite3D" index="0"]
 render_priority = 1
@@ -87,6 +89,15 @@ metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 [node name="Cam_Fishing" type="Camera3D" parent="Cameras"]
 fov = 35.0
 
+[node name="FishingCameraController" type="Node" parent="." node_paths=PackedStringArray("player", "cam_focus", "cam_exploration", "cam_fishing", "fishing_state")]
+script = ExtResource("9_fbfnt")
+player = NodePath("../CharacterBody3D")
+cam_focus = NodePath("../CharacterBody3D/CamFocus")
+cam_exploration = NodePath("../Cameras/PCam_Exploration")
+cam_fishing = NodePath("../Cameras/Cam_Fishing")
+align_time = 0.7
+fishing_state = NodePath("../CharacterBody3D/FishingStateMachine/FishingStateController")
+
 [node name="FishZone" parent="." groups=["fizh_zone"] instance=ExtResource("5_b0l47")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.66059, 0, 0.323252)
 
@@ -95,14 +106,6 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 
 [node name="CollisionShape3D" parent="FishZone" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
-
-[node name="FishingCameraController" type="Node" parent="." node_paths=PackedStringArray("player", "cam_focus", "cam_exploration", "cam_fishing")]
-script = ExtResource("9_fbfnt")
-player = NodePath("../CharacterBody3D")
-cam_focus = NodePath("../CharacterBody3D/CamFocus")
-cam_exploration = NodePath("../Cameras/PCam_Exploration")
-cam_fishing = NodePath("../Cameras/Cam_Fishing")
-align_time = 0.7
 
 [editable path="Background"]
 [editable path="CharacterBody3D"]
