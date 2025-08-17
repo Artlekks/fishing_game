@@ -2,31 +2,34 @@ extends Node
 
 @export var player: Node3D
 @export var cam_focus: Node3D
-@export var cam_exploration: Node3D     # can be PhantomCamera3D
+@export var cam_exploration: Node3D     # PhantomCamera3D OR Camera3D
 @export var cam_fishing: Camera3D       # plain Camera3D
 
-@export var align_time: float = 0.25    # seconds to rotate to behind
+@export var align_time: float = 0.25
 @export var exploration_priority: int = 100
 @export var print_debug: bool = false
 
 var _in_fishing: bool = false
+
+# spherical orbit about cam_focus
 var _radius: float = 6.0
-var _elev_phi: float = 0.0          # radians
-var _theta: float = 0.0             # current azimuth
+var _elev_phi: float = 0.0              # radians
+var _theta: float = 0.0                 # current azimuth
+
+# alignment state (used both for enter and exit)
 var _theta_start: float = 0.0
 var _theta_goal: float = 0.0
 var _t_elapsed: float = 0.0
+var _aligning: bool = false
+var _align_to_exploration: bool = false  # false = aligning to fishing, true = aligning back to exploration
 
 func _ready() -> void:
 	if player == null or cam_focus == null or cam_exploration == null or cam_fishing == null:
 		push_error("Assign player, cam_focus, cam_exploration, cam_fishing.")
 		return
 
-	# Exploration starts active
 	_make_exploration_current()
 	cam_fishing.current = false
-
-	# Sample initial orbit from exploration view so distances match
 	_sample_from_exploration()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -36,37 +39,66 @@ func _unhandled_input(event: InputEvent) -> void:
 		_exit_fishing_mode()
 
 func _process(delta: float) -> void:
-	if _in_fishing:
-		# advance angle during align
-		if _t_elapsed < align_time:
+	# We drive the fishing camera whenever it is current OR we are in the middle of an exit align.
+	var driving_fish_cam := cam_fishing.current or (_aligning and _align_to_exploration)
+
+	if driving_fish_cam:
+		if _aligning:
 			_t_elapsed += delta
 			if _t_elapsed > align_time:
 				_t_elapsed = align_time
+
 			var t: float = 0.0
 			if align_time > 0.0:
 				t = _t_elapsed / align_time
+			# ease-out so it lands softly
+			t = _ease_out(t)
+
 			_theta = _theta_start + _shortest_delta(_theta_start, _theta_goal) * t
 
-		# rebuild pos from spherical coords and aim at focus
+			# when finished, finalize state/switch cams if needed
+			if _t_elapsed >= align_time:
+				_aligning = false
+				if _align_to_exploration:
+					_make_exploration_current()
+					cam_fishing.current = false
+					_in_fishing = false
+					if print_debug:
+						await get_tree().process_frame
+						_print_distances("EXIT")
+				else:
+					# finished entering; remain in fishing mode
+					pass
+
 		_set_fish_pos_from_angles(_theta, _elev_phi, _radius)
 		cam_fishing.look_at(cam_focus.global_position, Vector3.UP)
 
 # ---------------- enter / exit ----------------
 
 func _enter_fishing_mode() -> void:
-	if _in_fishing:
+	# ignore if already aligning toward fishing
+	if _in_fishing and not _align_to_exploration:
 		return
+
 	_in_fishing = true
+	_aligning = true
+	_align_to_exploration = false
 
-	# 1) resample from exploration so start pose matches exactly
-	_sample_from_exploration()
+	# start from exploration pose to avoid any pop
+	var pivot: Vector3 = cam_focus.global_position
+	var rel: Vector3 = cam_exploration.global_position - pivot
 
-	# 2) prepose the fishing camera to exploration view to avoid any pop
-	_set_fish_pos_from_angles(_theta, _elev_phi, _radius)
-	cam_fishing.look_at(cam_focus.global_position, Vector3.UP)
+	_radius = rel.length()
+	if _radius < 0.01:
+		_radius = 6.0
 
-	# 3) compute goal azimuth = behind the player
-	# player forward is +Z, so behind is -basis.z
+	var xz_len: float = Vector2(rel.x, rel.z).length()
+	if xz_len < 0.0001:
+		xz_len = 0.0001
+	_elev_phi = atan2(rel.y, xz_len)
+	_theta = atan2(rel.x, rel.z)
+
+	# compute goal = behind player (player +Z means camera on -Z side)
 	var fwd_plus_z: Vector3 = player.global_transform.basis.z
 	var behind: Vector3 = -fwd_plus_z
 	var behind_xz := Vector2(behind.x, behind.z)
@@ -77,7 +109,9 @@ func _enter_fishing_mode() -> void:
 	_theta_start = _theta
 	_t_elapsed = 0.0
 
-	# 4) make fishing camera current after prepose
+	# prepose and make current
+	_set_fish_pos_from_angles(_theta, _elev_phi, _radius)
+	cam_fishing.look_at(cam_focus.global_position, Vector3.UP)
 	cam_fishing.current = true
 
 	if print_debug:
@@ -85,15 +119,29 @@ func _enter_fishing_mode() -> void:
 		_print_distances("ENTER")
 
 func _exit_fishing_mode() -> void:
-	if not _in_fishing:
+	# If we are not in fishing and not aligning from fishing, ignore.
+	if not _in_fishing and not ( _aligning and not _align_to_exploration ):
 		return
-	_in_fishing = false
-	_make_exploration_current()
-	cam_fishing.current = false
 
-	if print_debug:
-		await get_tree().process_frame
-		_print_distances("EXIT")
+	# Target = current exploration view
+	var pivot: Vector3 = cam_focus.global_position
+	var rel: Vector3 = cam_exploration.global_position - pivot
+
+	var xz_len: float = Vector2(rel.x, rel.z).length()
+	if xz_len < 0.0001:
+		xz_len = 0.0001
+	var theta_target: float = atan2(rel.x, rel.z)
+
+	# start aligning back using same align_time
+	_aligning = true
+	_align_to_exploration = true
+	_theta_start = _theta
+	_theta_goal = theta_target
+	_t_elapsed = 0.0
+
+	# keep fishing cam current during the exit align to avoid any pop
+	if not cam_fishing.current:
+		cam_fishing.current = true
 
 # ---------------- orbit math ----------------
 
@@ -129,10 +177,14 @@ func _shortest_delta(a: float, b: float) -> float:
 		d += TAU
 	return d - PI
 
+func _ease_out(t: float) -> float:
+	# cubic ease-out
+	return 1.0 - pow(1.0 - t, 3.0)
+
 func _make_exploration_current() -> void:
-	# Works whether exploration cam is Phantom or Camera3D
 	if cam_exploration is Camera3D:
 		(cam_exploration as Camera3D).current = true
+	# Support Phantom priority knobs if present
 	if _has_prop(cam_exploration, "priority_override"):
 		cam_exploration.set("priority_override", true)
 	if _has_prop(cam_exploration, "priority"):
