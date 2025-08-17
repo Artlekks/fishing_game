@@ -1,4 +1,4 @@
-[gd_scene load_steps=207 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=209 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -28,10 +28,12 @@
 [ext_resource type="Texture2D" uid="uid://dtnxootnm3x1w" path="res://assets/sprites/anim_Ryu_fishing-Broken_Rod.png" id="11_7vjmx"]
 [ext_resource type="Script" uid="uid://co8eb3vfmwuo3" path="res://scripts/fishing_animation_controller.gd" id="24_u8h60"]
 [ext_resource type="Script" uid="uid://duiloslw7alif" path="res://scripts/axis_gizmo.gd" id="27_yhyju"]
+[ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="29_xy7eu"]
+[ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
-radius = 0.135514
-height = 0.510391
+radius = 0.113141
+height = 0.450552
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v4ops"]
 atlas = ExtResource("2_3qlfy")
@@ -1421,6 +1423,7 @@ proximity_fade_distance = 0.01
 load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s3tc.ctex"
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
+collision_layer = 2
 script = ExtResource("1_jdonv")
 move_speed = 1.0
 
@@ -1442,9 +1445,7 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Cancel_Fishing"
-frame = 10
-frame_progress = 1.0
+animation = &"Fishing_Idle"
 script = ExtResource("24_u8h60")
 controller = NodePath("../FishingStateMachine/FishingStateController")
 sprite = NodePath(".")
@@ -1461,3 +1462,55 @@ texture = SubResource("CompressedTexture2D_ajpwy")
 script = ExtResource("27_yhyju")
 
 [node name="CamFocus" type="Node3D" parent="."]
+
+[node name="DirectionSelector" type="Node3D" parent="." node_paths=PackedStringArray("dots")]
+script = ExtResource("29_xy7eu")
+dots = [NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")]
+
+[node name="dot_0" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.22, 0.1, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_1" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.3, 0.14, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_2" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.38, 0.18, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_3" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.46, 0.22, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_4" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.54, 0.26, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_5" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.62, 0.3, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_6" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.7, 0.34, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
+
+[node name="dot_7" type="Sprite3D" parent="DirectionSelector"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.78, 0.38, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("30_yrl0g")
