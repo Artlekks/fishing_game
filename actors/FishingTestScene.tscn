@@ -50,10 +50,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_m77w1")
 water_facing = NodePath("../FishZone/WaterFacing")
 exploration_camera = NodePath("../Cameras/PCam_Exploration")
 
-[node name="AnimatedSprite3D" parent="CharacterBody3D" index="2" node_paths=PackedStringArray("controller", "sprite")]
+[node name="AnimatedSprite3D" parent="CharacterBody3D" index="2"]
 render_priority = 2
-controller = NodePath("../FishingStateMachine/FishingStateController")
-sprite = NodePath(".")
 
 [node name="ShadowSprite3D" parent="CharacterBody3D/AnimatedSprite3D" index="0"]
 render_priority = 1

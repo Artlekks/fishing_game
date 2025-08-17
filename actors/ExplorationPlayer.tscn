@@ -1436,7 +1436,7 @@ script = ExtResource("2_jdonv")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
 
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="." node_paths=PackedStringArray("controller", "sprite")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 billboard = 1
 texture_filter = 0
@@ -1446,6 +1446,8 @@ animation = &"Cancel_Fishing"
 frame = 10
 frame_progress = 1.0
 script = ExtResource("24_u8h60")
+controller = NodePath("../FishingStateMachine/FishingStateController")
+sprite = NodePath(".")
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, -0.1, 0)
