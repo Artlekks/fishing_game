@@ -63,6 +63,9 @@ render_priority = 2
 [node name="ShadowSprite3D" parent="CharacterBody3D/AnimatedSprite3D" index="0"]
 render_priority = 1
 
+[node name="AxisGizmo" parent="CharacterBody3D" index="3"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+
 [node name="Camera3D" type="Camera3D" parent="."]
 physics_interpolation_mode = 1
 transform = Transform3D(1, 0, 0, 0, 0.529999, 0.847998, 0, -0.847998, 0.529999, 0, 3.2, 2.27153)

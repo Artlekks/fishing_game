@@ -131,6 +131,9 @@ func _exit_fishing_mode() -> void:
 	# If we are not in fishing and not aligning from fishing, ignore.
 	if not _in_fishing and not ( _aligning and not _align_to_exploration ):
 		return
+		
+	if direction_selector != null:
+		direction_selector.call("hide_for_fishing")
 
 	# Target = current exploration view
 	var pivot: Vector3 = cam_focus.global_position

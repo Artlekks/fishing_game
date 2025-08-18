@@ -1,14 +1,14 @@
 extends Node3D
 
-@export var dots: Array[Node3D] = []        # assign dot_0 .. dot_7 directly
-@export var frame_hold_time: float = 0.10    # seconds between steps
-@export var pause_frames: int = 6            # hold after all dots lit
-@export var blank_frames: int = 0            # optional gap before restart
+@export var dots: Array[Node3D] = []          # assign dot_0 .. dot_7 in order
+@export var frame_hold_time: float = 0.10     # seconds between steps
+@export var pause_frames: int = 6             # hold after all dots lit
+@export var blank_frames: int = 0             # optional gap before restart
 
 var _timer: float = 0.0
-var _index: int = -1                         # -1 = none lit yet
+var _index: int = -1                          # -1 = none lit yet
 var _active: bool = false
-var _phase: String = "grow"                  # "grow" -> "pause" -> "blank"
+var _phase: String = "grow"                   # "grow" -> "pause" -> "blank"
 
 func _ready() -> void:
 	_set_all(false)
@@ -26,7 +26,8 @@ func _process(delta: float) -> void:
 		_index += 1
 		if _index < dots.size():
 			var d := dots[_index]
-			if d: d.visible = true            # new dot turns on; previous stay on
+			if d != null:
+				d.visible = true                   # new dot turns on; previous stay on
 			if _index == dots.size() - 1:
 				_phase = "pause"
 				_index = pause_frames
@@ -48,6 +49,19 @@ func _process(delta: float) -> void:
 		if _index <= 0:
 			_restart_cycle()
 
+# --------------------------------------------------------------------
+# Public API used by your bridge
+
+func show_for_fishing(player: Node3D) -> void:
+	_lock_to_player_neg_z(player)   # ALWAYS align to player's local -Z
+	start_looping()
+
+func hide_for_fishing() -> void:
+	stop_looping()
+
+# --------------------------------------------------------------------
+# Internals
+
 func start_looping() -> void:
 	_active = true
 	_restart_cycle()
@@ -56,54 +70,22 @@ func stop_looping() -> void:
 	_active = false
 	_set_all(false)
 
-func set_yaw_from_direction(dir: Vector3) -> void:
-	# Align to desired XZ direction (e.g., player's forward)
-	var d := dir
-	d.y = 0.0
-	if d.length() == 0.0:
-		return
-	d = d.normalized()
-	rotation.y = atan2(d.x, d.z)  # yaw
-
-func get_direction_vector() -> Vector3:
-	var forward := -global_transform.basis.z
-	forward.y = 0.0
-	return forward.normalized()
-
-func lock_to_player_axis(player: Node3D) -> void:
-	# Capture player forward at lock time
-	var fwd: Vector3 = player.global_transform.basis.z
-	fwd.y = 0.0
-	if fwd.length() == 0.0:
-		return
-	fwd = fwd.normalized()
-	rotation.y = atan2(fwd.x, fwd.z)  # yaw only
-
-# direction_selector.gd  (add this function)
-func lock_to_player_neg_x(player: Node3D) -> void:
-	var dir := -player.global_transform.basis.x   # player's -X in world
+# Align this node so its LOCAL +Z points along the PLAYER'S local -Z in WORLD space.
+func _lock_to_player_neg_z(player: Node3D) -> void:
+	var dir := -player.global_transform.basis.z
 	dir.y = 0.0
 	if dir.length() < 0.0001:
 		return
 	dir = dir.normalized()
 
 	var up := Vector3.UP
-	var right := up.cross(dir).normalized()       # world right perpendicular to dir
+	var right := up.cross(dir).normalized()
 
-	# Build a world-space basis whose columns are X,Y,Z = right, up, dir
+	# Local axes become: X = right, Y = up, Z = dir (dots are along local +Z)
 	var t := global_transform
 	t.basis = Basis(right, up, dir)
-	global_transform = t                           # world yaw now correct
+	global_transform = t
 
-func lock_to_world_dir(dir: Vector3) -> void:
-	# Yaw so that local +Z points along 'dir' in world space
-	var d := dir
-	d.y = 0.0
-	if d.length() == 0.0:
-		return
-	d = d.normalized()
-	rotation.y = atan2(d.x, d.z)  # yaw
-	
 func _restart_cycle() -> void:
 	_set_all(false)
 	_index = -1
@@ -112,5 +94,5 @@ func _restart_cycle() -> void:
 
 func _set_all(state: bool) -> void:
 	for d in dots:
-		if d:
+		if d != null:
 			d.visible = state

@@ -48,56 +48,26 @@ func _process(_delta: float) -> void:
 
 func _on_controller_animation_change(anim_name: StringName) -> void:
 	var anim := String(anim_name)
+
+	# Force no flip for fishing anims (keep your existing helper if you use it)
 	_force_no_flip_if_fishing(anim)
-# Direction line visibility control
+
+	# DirectionSelector visibility + alignment
 	if direction_selector != null:
 		if anim == "Fishing_Idle":
 			if player != null:
-				direction_selector.call("lock_to_player_neg_x", player)
-			direction_selector.call("start_looping")
+				direction_selector.call("show_for_fishing", player)
 		elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-			direction_selector.call("stop_looping")
-			
-	if direction_selector != null:
-		if anim == "Prep_Fishing":
-			# lock once, before we go into Fishing_Idle
-			if player != null:
-				direction_selector.call("lock_to_player_axis", player)
+			direction_selector.call("hide_for_fishing")
 
-		elif anim == "Fishing_Idle":
-			direction_selector.call("start_looping")
 
-		elif anim == "Prep_Throw":
-			direction_selector.call("stop_looping")
-# --- DirectionSelector visibility ---
-	if anim == "Fishing_Idle":
-		_dir_show()
-	elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-		_dir_hide()
-	if direction_selector != null:
-		if anim == "Fishing_Idle":
-			direction_selector.call("start_looping")
-			if player != null:
-				var fwd: Vector3 = player.global_transform.basis.z
-				fwd.y = 0.0
-				direction_selector.call("set_yaw_from_direction", fwd)
-		elif anim == "Prep_Throw":
-			direction_selector.call("stop_looping")
+	# Play the animation on the sprite (your existing code)
 	var frames := sprite.sprite_frames
 	if frames != null and frames.has_animation(anim):
 		sprite.play(anim)
 	else:
-		push_error("AnimatedSprite3D is missing animation: " + anim)
+		push_error("AnimatedSprite3D missing animation: " + anim)
 
-	# --- Direction line control (lock to screen-right) ---
-	if direction_selector != null:
-		if anim == "Fishing_Idle":
-			if fishing_camera != null:
-				var cam_right: Vector3 = fishing_camera.global_transform.basis.x
-				direction_selector.call("lock_to_world_dir", cam_right)  # lock to screen-right
-			direction_selector.call("start_looping")
-		elif anim == "Prep_Throw":
-			direction_selector.call("stop_looping")
 
 	# … existing code that plays sprite animations, etc.
 func _on_sprite_animation_finished() -> void:
@@ -113,12 +83,3 @@ func _force_no_flip_if_fishing(anim: String) -> void:
 		if s.x < 0.0:
 			s.x = -s.x
 			sprite.scale = s
-
-func _dir_show() -> void:
-	if direction_selector != null:
-		direction_selector.call("lock_to_world_dir", Vector3.LEFT) # or your lock method
-		direction_selector.call("start_looping")
-
-func _dir_hide() -> void:
-	if direction_selector != null:
-		direction_selector.call("stop_looping")
