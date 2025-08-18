@@ -32,7 +32,7 @@
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
-radius = 0.113141
+radius = 0.0838186
 height = 0.450552
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v4ops"]
