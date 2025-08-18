@@ -10,6 +10,9 @@ extends Node
 @export var print_debug: bool = false
 @export var fishing_state: Node = null   # optional: a node with fishing_state_controller.gd
 @export var direction_selector: Node3D = null
+@export var gate_by_zone: bool = true            # turn gating on/off
+@export var zone_facing_ref: Node3D              # a node whose +Z points toward water
+@export var cone_half_angle_deg: float = 45.0    # 90° total; tweak in Inspector
 
 var _in_fishing: bool = false
 
@@ -36,9 +39,11 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("enter_fishing"):
-		_enter_fishing_mode()
+		if _is_facing_water():
+			_enter_fishing_mode()
 	elif event.is_action_pressed("exit_fishing"):
 		_exit_fishing_mode()
+
 
 func _process(delta: float) -> void:
 	# We drive the fishing camera whenever it is current OR we are in the middle of an exit align.
@@ -76,6 +81,29 @@ func _process(delta: float) -> void:
 		cam_fishing.look_at(cam_focus.global_position, Vector3.UP)
 
 # ---------------- enter / exit ----------------
+func _is_facing_water() -> bool:
+	# Compatible defaults: if not wired, do nothing special.
+	if not gate_by_zone or zone_facing_ref == null or player == null:
+		return true
+
+	# Player forward (+Z) on XZ plane
+	var pfwd: Vector3 = player.global_transform.basis.z
+	pfwd.y = 0.0
+	if pfwd.length() == 0.0:
+		return false
+	pfwd = pfwd.normalized()
+
+	# Allowed direction: zone_facing_ref +Z on XZ plane
+	var zdir: Vector3 = zone_facing_ref.global_transform.basis.z
+	zdir.y = 0.0
+	if zdir.length() == 0.0:
+		return false
+	zdir = zdir.normalized()
+
+	# Compare dot to cos(limit) with a tiny tolerance for borderline diagonals
+	var dot: float = clampf(pfwd.dot(zdir), -1.0, 1.0)
+	var cos_limit: float = cos(deg_to_rad(cone_half_angle_deg))
+	return dot >= cos_limit - 0.001
 
 func _enter_fishing_mode() -> void:
 	# ignore if already aligning toward fishing

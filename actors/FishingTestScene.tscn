@@ -113,7 +113,7 @@ metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 [node name="Cam_Fishing" type="Camera3D" parent="Cameras"]
 fov = 35.0
 
-[node name="FishingCameraController" type="Node" parent="." node_paths=PackedStringArray("player", "cam_focus", "cam_exploration", "cam_fishing", "fishing_state", "direction_selector")]
+[node name="FishingCameraController" type="Node" parent="." node_paths=PackedStringArray("player", "cam_focus", "cam_exploration", "cam_fishing", "fishing_state", "direction_selector", "zone_facing_ref")]
 script = ExtResource("9_fbfnt")
 player = NodePath("../CharacterBody3D")
 cam_focus = NodePath("../CharacterBody3D/CamFocus")
@@ -122,6 +122,8 @@ cam_fishing = NodePath("../Cameras/Cam_Fishing")
 align_time = 0.7
 fishing_state = NodePath("../CharacterBody3D/FishingStateMachine/FishingStateController")
 direction_selector = NodePath("../CharacterBody3D/DirectionSelector")
+zone_facing_ref = NodePath("../FishZone/WaterFacing")
+cone_half_angle_deg = 70.0
 
 [node name="FishZone" parent="." groups=["fizh_zone"] instance=ExtResource("5_b0l47")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.66059, 0, 0.323252)
