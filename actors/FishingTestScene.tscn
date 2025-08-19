@@ -82,6 +82,34 @@ render_priority = 1
 [node name="AxisGizmo" parent="CharacterBody3D" index="3"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
+[node name="DirectionSelector" parent="CharacterBody3D" index="5"]
+player_path = NodePath("..")
+local_offset = Vector3(0, 0, 0)
+
+[node name="dot_0" parent="CharacterBody3D/DirectionSelector" index="0"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.22, 0.1, 0)
+
+[node name="dot_1" parent="CharacterBody3D/DirectionSelector" index="1"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.3, 0.16, 0)
+
+[node name="dot_2" parent="CharacterBody3D/DirectionSelector" index="2"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.38, 0.22, 0)
+
+[node name="dot_3" parent="CharacterBody3D/DirectionSelector" index="3"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.46, 0.28, 0)
+
+[node name="dot_4" parent="CharacterBody3D/DirectionSelector" index="4"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.54, 0.34, 0)
+
+[node name="dot_5" parent="CharacterBody3D/DirectionSelector" index="5"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.62, 0.4, 0)
+
+[node name="dot_6" parent="CharacterBody3D/DirectionSelector" index="6"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.7, 0.46, 0)
+
+[node name="dot_7" parent="CharacterBody3D/DirectionSelector" index="7"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
+
 [node name="Camera3D" type="Camera3D" parent="."]
 physics_interpolation_mode = 1
 transform = Transform3D(1, 0, 0, 0, 0.529999, 0.847998, 0, -0.847998, 0.529999, 0, 3.2, 2.27153)

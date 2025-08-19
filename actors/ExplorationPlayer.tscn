@@ -1474,43 +1474,43 @@ texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_1" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.3, 0.14, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.3, 0.16, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_2" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.38, 0.18, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.38, 0.22, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_3" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.46, 0.22, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.46, 0.28, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_4" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.54, 0.26, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.54, 0.34, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_5" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.62, 0.3, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.62, 0.4, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_6" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.7, 0.34, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.7, 0.46, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
 [node name="dot_7" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.78, 0.38, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.78, 0.52, 0)
 billboard = 1
 texture_filter = 0
 texture = ExtResource("30_yrl0g")

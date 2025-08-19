@@ -1,19 +1,31 @@
 extends Node3D
 
-@export var dots: Array[Node3D] = []          # assign dot_0 .. dot_7 in order
-@export var frame_hold_time: float = 0.10     # seconds between steps
-@export var pause_frames: int = 6             # hold after all dots lit
-@export var blank_frames: int = 0             # optional gap before restart
+@export var player_path: NodePath                      # set this to your player root
+@export var dots: Array[Node3D] = []                   # assign dot_0..dot_7 in order
+@export var frame_hold_time: float = 0.10              # seconds between steps
+@export var pause_frames: int = 6
+@export var blank_frames: int = 0
+
+@export var local_offset: Vector3 = Vector3(0.0, 0.8, 0.6)
+# ^ position of the selector relative to the player (tweak to place it near the rod tip)
 
 var _timer: float = 0.0
-var _index: int = -1                          # -1 = none lit yet
+var _index: int = -1
 var _active: bool = false
-var _phase: String = "grow"                   # "grow" -> "pause" -> "blank"
+var _phase: String = "grow"                            # "grow" -> "pause" -> "blank"
+var _player: Node3D
+var _mat_always_on_top: StandardMaterial3D
 
 func _ready() -> void:
+	_player = get_node_or_null(player_path) as Node3D
+	_apply_overlay_material_to_dots()
 	_set_all(false)
 
 func _process(delta: float) -> void:
+	if _active and is_instance_valid(_player):
+		_update_pose_to_player()
+
+	# animation loop
 	if not _active:
 		return
 
@@ -26,8 +38,8 @@ func _process(delta: float) -> void:
 		_index += 1
 		if _index < dots.size():
 			var d := dots[_index]
-			if d != null:
-				d.visible = true                   # new dot turns on; previous stay on
+			if d:
+				d.visible = true
 			if _index == dots.size() - 1:
 				_phase = "pause"
 				_index = pause_frames
@@ -50,41 +62,27 @@ func _process(delta: float) -> void:
 			_restart_cycle()
 
 # --------------------------------------------------------------------
-# Public API used by your bridge
+# Public API
 
-func show_for_fishing(player: Node3D) -> void:
-	_lock_to_player_neg_z(player)   # ALWAYS align to player's local -Z
-	start_looping()
-
-func hide_for_fishing() -> void:
-	stop_looping()
-
-# --------------------------------------------------------------------
-# Internals
-
-func start_looping() -> void:
+func show_for_fishing(p: Node3D = null) -> void:
+	if p != null:
+		_player = p
 	_active = true
 	_restart_cycle()
+	_set_all(false)
+
+func start_looping(p: Node3D = null) -> void:
+	show_for_fishing(p)
 
 func stop_looping() -> void:
+	hide_for_fishing()
+
+func hide_for_fishing() -> void:
 	_active = false
 	_set_all(false)
 
-# Align this node so its LOCAL +Z points along the PLAYER'S local -Z in WORLD space.
-func _lock_to_player_neg_z(player: Node3D) -> void:
-	var dir := -player.global_transform.basis.z
-	dir.y = 0.0
-	if dir.length() < 0.0001:
-		return
-	dir = dir.normalized()
-
-	var up := Vector3.UP
-	var right := up.cross(dir).normalized()
-
-	# Local axes become: X = right, Y = up, Z = dir (dots are along local +Z)
-	var t := global_transform
-	t.basis = Basis(right, up, dir)
-	global_transform = t
+# --------------------------------------------------------------------
+# Internals
 
 func _restart_cycle() -> void:
 	_set_all(false)
@@ -94,5 +92,45 @@ func _restart_cycle() -> void:
 
 func _set_all(state: bool) -> void:
 	for d in dots:
-		if d != null:
+		if d:
 			d.visible = state
+
+func _apply_overlay_material_to_dots() -> void:
+	for d in dots:
+		if d == null:
+			continue
+
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.disable_depth_test = true
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.render_priority = 127
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST  # crisp pixels
+
+		if d is Sprite3D:
+			var spr := d as Sprite3D
+			# Put the sprite's texture into the material so it doesn't turn white.
+			mat.albedo_texture = spr.texture
+			spr.material_override = mat
+		elif d is GeometryInstance3D:
+			(d as GeometryInstance3D).material_override = mat
+
+
+func _update_pose_to_player() -> void:
+	# 1) Set world position from player's transform + local offset
+	var world_from_player := _player.global_transform
+	var world_pos := world_from_player * local_offset
+	global_position = world_pos
+
+	# 2) Compute a stable horizontal facing direction from player:
+	#    we align our LOCAL +Z to the player's LOCAL -Z projected on XZ plane.
+	var dir := -_player.global_transform.basis.z
+	dir.y = 0.0
+	if dir.length() < 1e-6:
+		return
+	dir = dir.normalized()
+
+	# 3) Use looking_at: in Godot, -Z looks at the target. We want +Z forward,
+	#    so look_at then rotate 180° around Y to flip -Z -> +Z.
+	look_at(global_position + dir, Vector3.UP)
+	rotate_y(PI)

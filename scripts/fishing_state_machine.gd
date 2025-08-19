@@ -53,12 +53,11 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 	_force_no_flip_if_fishing(anim)
 
 	# DirectionSelector visibility + alignment
-	if direction_selector != null:
-		if anim == "Fishing_Idle":
-			if player != null:
-				direction_selector.call("show_for_fishing", player)
-		elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-			direction_selector.call("hide_for_fishing")
+	if anim == "Fishing_Idle":
+		direction_selector.call("show_for_fishing")
+
+	elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
+		direction_selector.call("hide_for_fishing")
 
 
 	# Play the animation on the sprite (your existing code)
