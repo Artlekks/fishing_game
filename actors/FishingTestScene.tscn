@@ -62,6 +62,8 @@ shape = SubResource("ConcavePolygonShape3D_bj8je")
 
 [node name="PowerMeter" parent="." groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
 cycle_duration = 1.25
+target_3d_path = NodePath("../CharacterBody3D")
+camera_3d_path = NodePath("../Cameras/Cam_Fishing")
 
 [node name="CharacterBody3D" parent="." node_paths=PackedStringArray("water_facing", "exploration_camera") groups=["player"] instance=ExtResource("4_1vxb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.27153)

@@ -6,7 +6,6 @@
 
 [node name="PowerMeter" type="CanvasLayer"]
 script = ExtResource("1_mbqoc")
-root_path = NodePath("Root")
 bg_path = NodePath("Root/PowerBarBG")
 fill_path = NodePath("Root/PowerBarFill")
 label_path = NodePath("Root/DistanceLabel")
