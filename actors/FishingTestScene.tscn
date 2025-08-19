@@ -60,7 +60,8 @@ shape = SubResource("ConcavePolygonShape3D_bj8je")
 
 [node name="GroundAnchor" type="Node3D" parent="."]
 
-[node name="PowerMeter" parent="." instance=ExtResource("3_yj5gx")]
+[node name="PowerMeter" parent="." groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
+cycle_duration = 1.25
 
 [node name="CharacterBody3D" parent="." node_paths=PackedStringArray("water_facing", "exploration_camera") groups=["player"] instance=ExtResource("4_1vxb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.27153)
@@ -163,5 +164,6 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
 [editable path="River_001"]
+[editable path="PowerMeter"]
 [editable path="CharacterBody3D"]
 [editable path="FishZone"]

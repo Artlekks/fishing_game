@@ -45,6 +45,22 @@ func _process(_delta: float) -> void:
 	# Safety net: if some other script flips the sprite while a fishing anim is playing, force it back.
 	if enforce_every_frame:
 		_force_no_flip_if_fishing(sprite.animation)
+# --- PowerMeter access helpers ---
+var _pm_cache: Node = null
+func _pm() -> Node:
+	if _pm_cache == null or not is_instance_valid(_pm_cache):
+		_pm_cache = get_tree().get_first_node_in_group("hud_power_meter")
+	return _pm_cache
+
+# --- PowerMeter helpers (HUD) ---
+func _pm_start() -> void:
+	var n := get_tree().get_first_node_in_group("hud_power_meter")
+	if n: n.call("start")
+
+func _pm_cancel() -> void:
+	var n := get_tree().get_first_node_in_group("hud_power_meter")
+	if n: n.call("cancel")
+
 
 func _on_controller_animation_change(anim_name: StringName) -> void:
 	var anim := String(anim_name)
@@ -58,7 +74,19 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 
 	elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
 		direction_selector.call("hide_for_fishing")
+	
+	# Power bar visibility (appears only during Prep_Throw / Prep_Throw_Idle)
+	if anim == "Prep_Throw":
+		_pm_start()
+	elif anim == "Cancel_Fishing" or anim == "Throw":
+		# Safety: hide if we exit/throw without confirming
+		_pm_cancel()
 
+	# PowerMeter visibility (HUD)
+	if anim == "Prep_Throw":
+		_pm_start()
+	elif anim == "Throw" or anim == "Cancel_Fishing":
+		_pm_cancel()
 
 	# Play the animation on the sprite (your existing code)
 	var frames := sprite.sprite_frames

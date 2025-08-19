@@ -21,6 +21,13 @@ enum State {
 var current_state: State = State.FISHING_NONE
 var _enabled: bool = false
 var _intro_lock: bool = false  # true while Prep_Fishing (and Throw) are playing
+var throw_power: float = 0.0    # 0..100 from the PowerMeter
+
+func _pm_capture_power() -> float:
+	var n := get_tree().get_first_node_in_group("hud_power_meter")
+	if n:
+		return n.call("capture_power") as float
+	return 0.0
 
 # -------- public API (called by controller) --------
 func set_enabled(enabled: bool) -> void:
@@ -45,6 +52,7 @@ func soft_reset() -> void:
 	current_state = State.FISHING_NONE
 	_enabled = false
 	_intro_lock = false
+
 
 # -------- animation-finished based transitions --------
 func on_animation_finished(anim_name: StringName) -> void:
@@ -105,6 +113,8 @@ func handle_input() -> void:
 
 		State.FISHING_PRE_THROW_IDLE:
 			if Input.is_action_just_pressed("fish"):
+				# <<< add this line
+				throw_power = _pm_capture_power()   # 0..100, also hides the HUD meter
 				_intro_lock = true
 				emit_anim("Throw")
 				current_state = State.FISHING_THROW
