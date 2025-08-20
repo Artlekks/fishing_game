@@ -32,8 +32,6 @@ ease = 2
 
 [node name="FishingTestScene" type="Node3D"]
 
-[node name="Node3D" type="Node3D" parent="."]
-
 [node name="River_001" parent="." instance=ExtResource("1_twt30")]
 transform = Transform3D(0.15863, 0, 0.052207, 0, 0.167, 0, -0.052207, 0, 0.15863, -0.322187, -0.244163, -0.659238)
 
