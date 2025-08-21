@@ -1,6 +1,7 @@
-[gd_scene load_steps=13 format=3 uid="uid://y0r5beh0g8ei"]
+[gd_scene load_steps=14 format=3 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://7udgt1a7s7pi" path="res://assets/models/fbx/River_001.blend" id="1_twt30"]
+[ext_resource type="Script" uid="uid://3iuydgk81j6y" path="res://scripts/player_movement_v4.gd" id="3_x75a5"]
 [ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="3_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://sdh188exepwu" path="res://actors/ExplorationPlayer.tscn" id="4_1vxb6"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="5_1a8ak"]
@@ -62,7 +63,10 @@ shape = SubResource("ConcavePolygonShape3D_bj8je")
 [node name="Player" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.27153)
 collision_mask = 9
+script = ExtResource("3_x75a5")
 speed = 0.9
+start_facing_octant = 2
+input_deadzone = 0.001
 
 [node name="AnimatedSprite3D" parent="Player" index="3"]
 render_priority = 2
@@ -70,7 +74,7 @@ animation = &"Walk_N"
 
 [node name="ShadowSprite3D" parent="Player/AnimatedSprite3D" index="0"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0.07)
-sorting_offset = 0.0
+sorting_offset = 2.0
 billboard = 1
 double_sided = false
 
