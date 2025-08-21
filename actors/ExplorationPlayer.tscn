@@ -1,5 +1,6 @@
-[gd_scene load_steps=203 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=204 format=3 uid="uid://sdh188exepwu"]
 
+[ext_resource type="Script" uid="uid://v5q5nmkd4emj" path="res://scripts/character_movement.gd" id="1_l7l51"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
 [ext_resource type="Texture2D" uid="uid://v8tpljp30i36" path="res://assets/sprites/anim_Ryu_fishing-Walking_Right.png" id="2_6gvld"]
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_8vgkq"]
@@ -1418,6 +1419,7 @@ load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 collision_layer = 2
+script = ExtResource("1_l7l51")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
