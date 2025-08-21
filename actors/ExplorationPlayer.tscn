@@ -1,6 +1,6 @@
 [gd_scene load_steps=204 format=3 uid="uid://sdh188exepwu"]
 
-[ext_resource type="Script" uid="uid://v5q5nmkd4emj" path="res://scripts/character_movement.gd" id="1_l7l51"]
+[ext_resource type="Script" uid="uid://dqnoycgjd887n" path="res://scripts/player_movement_v2.gd" id="1_l7l51"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
 [ext_resource type="Texture2D" uid="uid://v8tpljp30i36" path="res://assets/sprites/anim_Ryu_fishing-Walking_Right.png" id="2_6gvld"]
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_8vgkq"]
@@ -1438,8 +1438,8 @@ sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Prep_Throw"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
-transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, -0.1, 0)
-sorting_offset = -0.1
+transform = Transform3D(1.2, 0, 0, 0, -5.24537e-08, 1.2, 0, -1.2, -5.24537e-08, 0, 0, 0.07)
+sorting_offset = 0.5
 material_override = SubResource("StandardMaterial3D_ajpwy")
 alpha_cut = 2
 texture_filter = 0

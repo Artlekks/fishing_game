@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bnnpyo7ugjpxy"
-path.s3tc="res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s3tc.ctex"
+path="res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/Shadow.png"
-dest_files=["res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s3tc.ctex"]
+dest_files=["res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

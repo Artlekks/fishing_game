@@ -62,14 +62,17 @@ shape = SubResource("ConcavePolygonShape3D_bj8je")
 [node name="Player" parent="." groups=["player"] instance=ExtResource("4_1vxb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.27153)
 collision_mask = 9
-speed = 1
+speed = 0.9
 
 [node name="AnimatedSprite3D" parent="Player" index="3"]
 render_priority = 2
+animation = &"Walk_N"
 
 [node name="ShadowSprite3D" parent="Player/AnimatedSprite3D" index="0"]
-transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, 0, 0.035)
-render_priority = 1
+transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0.07)
+sorting_offset = 0.0
+billboard = 1
+double_sided = false
 
 [node name="AxisGizmo" parent="Player" index="4"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
