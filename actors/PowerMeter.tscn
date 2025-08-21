@@ -1,14 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b75bwnobhjxa0"]
+[gd_scene load_steps=3 format=3 uid="uid://b75bwnobhjxa0"]
 
 [ext_resource type="Texture2D" uid="uid://ckeh0me0ykn06" path="res://assets/sprites/Power Bar-powerbar.png" id="1_1o4ho"]
-[ext_resource type="Script" uid="uid://bjp7npt0kfu4x" path="res://scripts/power_meter.gd" id="1_mbqoc"]
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="2_mbqoc"]
 
 [node name="PowerMeter" type="CanvasLayer"]
-script = ExtResource("1_mbqoc")
-bg_path = NodePath("Root/PowerBarBG")
-fill_path = NodePath("Root/PowerBarFill")
-label_path = NodePath("Root/DistanceLabel")
 
 [node name="Root" type="Control" parent="."]
 layout_mode = 3
