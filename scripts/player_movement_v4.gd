@@ -14,7 +14,7 @@ extends CharacterBody3D
 # --- Input actions (StringName to avoid repeated hashing) ---
 const ACT_LEFT:  StringName = &"move_left"
 const ACT_RIGHT: StringName = &"move_right"
-const ACT_FWD:   StringName = &"move_forward"
+const ACT_FWD:   StringName = &"amove_forward"
 const ACT_BACK:  StringName = &"move_back"
 
 # --- Visual state (read-only to physics) ---
