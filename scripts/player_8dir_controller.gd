@@ -45,13 +45,13 @@ func set_movement_enabled(enabled: bool) -> void:
 	if not enabled:
 		velocity = Vector3.ZERO
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("enter_fishing"):
-		if _can_enter_fishing():
-			_enter_fishing()
-	elif event.is_action_pressed("exit_fishing"):
-		if in_fishing_mode:
-			_exit_fishing()
+# func _unhandled_input(event: InputEvent) -> void:
+	#if event.is_action_pressed("enter_fishing"):
+		#if _can_enter_fishing():
+			#_enter_fishing()
+	#elif event.is_action_pressed("exit_fishing"):
+		#if in_fishing_mode:
+			#_exit_fishing()
 
 func _physics_process(delta: float) -> void:
 	if in_fishing_mode:
@@ -136,7 +136,7 @@ func _can_enter_fishing() -> bool:
 
 	return angle_deg <= half_angle_deg
 
-func _enter_fishing() -> void:
+# func _enter_fishing() -> void:
 	in_fishing_mode = true
 	set_movement_enabled(false)
 	velocity = Vector3.ZERO
@@ -148,7 +148,7 @@ func _enter_fishing() -> void:
 	_cache_fishcam_geometry()
 	_align_fishcam_to_player_axis()
 
-func _exit_fishing() -> void:
+# func _exit_fishing() -> void:
 	in_fishing_mode = false
 	set_movement_enabled(true)
 

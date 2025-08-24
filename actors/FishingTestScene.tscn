@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://y0r5beh0g8ei"]
+[gd_scene load_steps=13 format=3 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://7udgt1a7s7pi" path="res://assets/models/fbx/River_001.blend" id="1_twt30"]
 [ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="3_yj5gx"]
@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" uid="uid://cervguyak73k0" path="res://actors/FishZone.tscn" id="5_b0l47"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="6_x75a5"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="7_fbfnt"]
-[ext_resource type="Script" uid="uid://7hqptmotblom" path="res://scripts/fishing_camera_controller.gd" id="9_fbfnt"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_emtsy"]
 load_path = "res://.godot/imported/River_001_Marsh.png-54e431c76ac6170cdd7a3d7452eb9fa0.s3tc.ctex"
@@ -66,11 +65,6 @@ collision_mask = 9
 water_facing = NodePath("../Zones/FishZone/WaterFacing")
 exploration_camera = NodePath("../CameraRig/Cameras/PCam_Exploration")
 
-[node name="FishingStateMachine" parent="Player" index="0" node_paths=PackedStringArray("direction_selector", "player", "fishing_camera")]
-direction_selector = NodePath("../DirectionSelector")
-player = NodePath("..")
-fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
-
 [node name="AnimatedSprite3D" parent="Player" index="2"]
 render_priority = 2
 
@@ -81,8 +75,7 @@ render_priority = 1
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
 [node name="DirectionSelector" parent="Player" index="5"]
-player_path = NodePath("..")
-local_offset = Vector3(0, 0, 0)
+visible = false
 
 [node name="dot_0" parent="Player/DirectionSelector" index="0"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.22, 0.1, 0)
@@ -109,11 +102,11 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.7, 0.46, 0)
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
 
 [node name="UI" type="Node3D" parent="."]
+visible = false
 
 [node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
-cycle_duration = 1.25
-target_3d_path = NodePath("../../Player")
-camera_3d_path = NodePath("../../CameraRig/Cameras/Cam_Fishing")
+visible = false
+script = null
 
 [node name="CameraRig" type="Node3D" parent="."]
 
@@ -148,17 +141,7 @@ metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 [node name="Cam_Fishing" type="Camera3D" parent="CameraRig/Cameras"]
 fov = 35.0
 
-[node name="FishingCameraController" type="Node" parent="CameraRig" node_paths=PackedStringArray("player", "cam_focus", "cam_exploration", "cam_fishing", "fishing_state", "direction_selector", "zone_facing_ref")]
-script = ExtResource("9_fbfnt")
-player = NodePath("../../Player")
-cam_focus = NodePath("../../Player/CamFocus")
-cam_exploration = NodePath("../Cameras/PCam_Exploration")
-cam_fishing = NodePath("../Cameras/Cam_Fishing")
-align_time = 0.7
-fishing_state = NodePath("../../Player/FishingStateMachine/FishingStateController")
-direction_selector = NodePath("../../Player/DirectionSelector")
-zone_facing_ref = NodePath("../../Zones/FishZone/WaterFacing")
-cone_half_angle_deg = 70.0
+[node name="FishingCameraController" type="Node" parent="CameraRig"]
 
 [node name="Zones" type="Node3D" parent="."]
 
