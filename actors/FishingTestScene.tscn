@@ -142,6 +142,11 @@ exploration_camera = NodePath("../CameraRig/Cameras/PCam_Exploration")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 movement_controller = NodePath("..")
 
+[node name="SpriteOrbitStepper" parent="Player" index="1" node_paths=PackedStringArray("sprite", "camera_controller")]
+sprite = NodePath("../AnimatedSprite3D")
+camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
+debug_log = true
+
 [node name="AnimatedSprite3D" parent="Player" index="5"]
 render_priority = 2
 

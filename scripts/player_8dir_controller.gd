@@ -16,6 +16,7 @@ extends CharacterBody3D
 # --- Fishing cam orbit ---
 @export var fishcam_align_time: float = 0.35               # seconds for the orbit align
 @export var fishcam_ease_out: bool = true                  # ease out tween
+@export var camera_controller: Node = null
 
 @onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 @onready var frames: SpriteFrames = sprite.sprite_frames
@@ -25,6 +26,7 @@ var last_dir: String = "S"
 var last_anim: String = ""
 var movement_enabled: bool = true
 var in_fishing_mode: bool = false
+var _anim_lock: bool = false
 
 const FLIP_DIRS := {"W": true, "NW": true, "SW": true}
 const MIRROR_MAP := {"W": "E", "NW": "NE", "SW": "SE"}
@@ -39,20 +41,23 @@ func _ready() -> void:
 	original_offset = sprite.offset
 	_activate_cam(exploration_camera)
 	_deactivate_cam(fishing_camera)
+	
+	if camera_controller != null:
+			camera_controller.connect("align_started", Callable(self, "_on_cam_align_started"))
+			camera_controller.connect("entered_fishing_view", Callable(self, "_on_cam_align_finished"))
+			camera_controller.connect("exited_to_exploration_view", Callable(self, "_on_cam_align_finished"))
 
 func set_movement_enabled(enabled: bool) -> void:
 	movement_enabled = enabled
 	if not enabled:
 		velocity = Vector3.ZERO
 
-# func _unhandled_input(event: InputEvent) -> void:
-	#if event.is_action_pressed("enter_fishing"):
-		#if _can_enter_fishing():
-			#_enter_fishing()
-	#elif event.is_action_pressed("exit_fishing"):
-		#if in_fishing_mode:
-			#_exit_fishing()
+func _on_cam_align_started(_to_fishing: bool) -> void:
+	_anim_lock = true
 
+func _on_cam_align_finished() -> void:
+	_anim_lock = false
+	
 func _physics_process(_delta: float) -> void:
 	if in_fishing_mode:
 		velocity = Vector3.ZERO
@@ -117,6 +122,9 @@ func _play_8dir_animation(base: String, dir: String) -> void:
 
 	sprite.flip_h = flip
 	sprite.offset = Vector2(-original_offset.x, original_offset.y) if flip else original_offset
+
+	if _anim_lock:
+		return
 
 	if frames != null and frames.has_animation(anim) and anim != last_anim:
 		sprite.play(anim)

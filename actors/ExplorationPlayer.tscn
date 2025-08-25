@@ -226,7 +226,7 @@ region = Rect2(4032, 0, 192, 160)
 atlas = ExtResource("2_ak2we")
 region = Rect2(768, 0, 192, 160)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_45a2y"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_t1pps"]
 atlas = ExtResource("2_ak2we")
 region = Rect2(576, 0, 192, 160)
 
@@ -920,7 +920,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_45a2y")
+"texture": SubResource("AtlasTexture_t1pps")
 }],
 "loop": true,
 "name": &"Idle_NE",
@@ -1482,7 +1482,7 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Cancel_Fishing"
+animation = &"Idle_NE"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0)
