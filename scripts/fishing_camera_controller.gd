@@ -40,6 +40,9 @@ var _t_elapsed: float = 0.0
 # cached exploration yaw for perfectly symmetric exit
 var _exp_theta: float = 0.0
 
+# direction memory for arc consistency
+var _enter_direction: int = 0   # -1 (CCW), 0 (none), +1 (CW)
+
 # ---------------- Lifecycle ----------------
 func _ready() -> void:
 	# Basic contract checks (fail early in editor)
@@ -78,7 +81,17 @@ func _process(delta: float) -> void:
 			# cubic ease-out
 			t = 1.0 - pow(1.0 - t, 3.0)
 
-		_theta = _theta_start + _shortest_delta(_theta_start, _theta_goal) * t
+		var raw_delta: float = fmod(_theta_goal - _theta_start + PI, TAU) - PI
+		# enforce direction we stored on enter
+		if raw_delta * _enter_direction < 0.0:
+			raw_delta += TAU * _enter_direction
+			
+		var dir_for_this_align: int = _enter_direction
+		if _align_to_exploration:
+			dir_for_this_align = -_enter_direction   # exit must retrace the entry arc in reverse
+		var d_theta: float = _delta_with_dir(_theta_start, _theta_goal, dir_for_this_align)
+		_theta = _theta_start + d_theta * t
+
 
 		if _t_elapsed >= align_time:
 			_aligning = false
@@ -138,12 +151,25 @@ func _enter_fishing() -> void:
 	else:
 		back2 = back2.normalized()
 
+	align_started.emit(true)
+
+	# existing:
 	_theta_goal = atan2(back2.x, back2.y)
 	_theta_start = _theta
 	_t_elapsed = 0.0
 	_aligning = true
 	_align_to_exploration = false
-	align_started.emit(true)
+	
+	# NEW: remember which way we are rotating on ENTER
+	var d_enter: float = _shortest_delta(_theta_start, _theta_goal)
+	_enter_direction = _dir_sign(d_enter)
+	
+	# compute delta
+	var delta: float = fmod(_theta_goal - _theta + PI, TAU) - PI
+	if delta >= 0.0:
+		_enter_direction = 1.0   # clockwise
+	else:
+		_enter_direction = -1.0  # counter-clockwise
 
 	# Place fish cam at exploration yaw to avoid pop, then make it current.
 	_set_pos_from_angles(_theta, _elev_phi, _radius)
@@ -196,6 +222,31 @@ func _set_pos_from_angles(theta: float, phi: float, r: float) -> void:
 	fishing_camera.global_position = Vector3(P.x + x, P.y + y, P.z + z)
 
 # ---------------- Utils ----------------
+
+func _dir_sign(x: float) -> int:
+	if x > 0.0:
+		return 1
+	elif x < 0.0:
+		return -1
+	return 0
+
+# delta from 'from_theta' to 'to_theta' but forced to travel in 'desired_dir' (+1 or -1)
+func _delta_with_dir(from_theta: float, to_theta: float, desired_dir: int) -> float:
+	var raw_delta: float = _shortest_delta(from_theta, to_theta)  # in (-PI, PI]
+	if desired_dir == 0 or raw_delta == 0.0:
+		return raw_delta
+
+	# if raw already goes in the desired direction, use it
+	if (raw_delta > 0.0 and desired_dir > 0) or (raw_delta < 0.0 and desired_dir < 0):
+		return raw_delta
+
+	# otherwise, take the long way around in the requested direction
+	var dir_sign: float = 1.0
+	if desired_dir < 0:
+		dir_sign = -1.0
+	return raw_delta + TAU * dir_sign
+
+
 func _shortest_delta(a: float, b: float) -> float:
 	var d: float = fmod(b - a + PI, TAU)
 	if d < 0.0:
