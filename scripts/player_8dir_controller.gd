@@ -53,7 +53,7 @@ func set_movement_enabled(enabled: bool) -> void:
 		#if in_fishing_mode:
 			#_exit_fishing()
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if in_fishing_mode:
 		velocity = Vector3.ZERO
 		move_and_slide()
@@ -92,9 +92,10 @@ func _process(_delta: float) -> void:
 
 func _yaw_to_dir(yaw: float) -> String:
 	var step := PI / 4.0
-	var idx := int(round(yaw / step))
-	idx = int(posmod(idx, 8))
+	var idx: int = int(round(yaw / step))
+	idx = wrapi(idx, 0, 8)   # instead of posmod() on floats
 	return DIRS[idx]
+
 
 func _play_8dir_animation(base: String, dir: String) -> void:
 	if dir == null or dir == "":
@@ -132,8 +133,7 @@ func _can_enter_fishing() -> bool:
 	var water_fwd: Vector3 = water_facing.global_transform.basis.z.normalized()
 
 	var d: float = clampf(player_fwd.dot(water_fwd), -1.0, 1.0)
-	var angle_deg: float = rad_to_deg(acos(d))  # 0 = perfectly aligned
-
+	var angle_deg: float = rad_to_deg(acos(d))
 	return angle_deg <= half_angle_deg
 
 # func _enter_fishing() -> void:
@@ -192,9 +192,9 @@ func _deactivate_cam(n: Node) -> void:
 	if _has_prop(n, "priority"):
 		n.set("priority", 0)
 
-func _has_prop(o: Object, name: String) -> bool:
+func _has_prop(o: Object, prop_name: String) -> bool:
 	for p in o.get_property_list():
-		if p.name == name:
+		if p.name == prop_name:
 			return true
 	return false
 

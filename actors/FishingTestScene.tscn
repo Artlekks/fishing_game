@@ -224,7 +224,6 @@ fishing_camera = NodePath("../Cam_Fishing")
 water_facing = NodePath("../../../Zones/FishZone/WaterFacing")
 cone_half_angle_deg = 60.0
 align_time = 1.0
-print_debug = true
 
 [node name="Zones" type="Node3D" parent="."]
 

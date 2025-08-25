@@ -1,59 +1,56 @@
-# fishing_camera_controller.gd — v2 (camera-only, modular)
+# fishing_camera_controller.gd — v2.1 (camera-only, modular, warning-free)
 extends Node
 
-# ---------------- Public API & Wiring ----------------
-@export var player: Node3D                        # CharacterBody3D (forward = +Z)
-@export var pivot: Node3D                         # orbit pivot; typically CamFocus (or player)
-@export var exploration_camera: Node              # Camera3D or Phantom-like (must be Node3D)
-@export var fishing_camera: Camera3D              # Camera3D we physically move
-@export var water_facing: Node3D = null           # optional: +Z points toward water
+# ---- Wiring ----
+@export var player: Node3D
+@export var pivot: Node3D
+@export var exploration_camera: Node          # Camera3D or Phantom (must be a Node3D)
+@export var fishing_camera: Camera3D
+@export var water_facing: Node3D = null       # optional: +Z toward water
 
-# Gating
+# ---- Gating ----
 @export var gate_by_zone: bool = true
-@export_range(1.0, 179.0, 1.0) var cone_half_angle_deg: float = 45.0  # 90° total
+@export_range(1.0, 179.0, 1.0) var cone_half_angle_deg: float = 45.0
 
-# Motion
-@export var align_time: float = 0.35              # same time for enter/exit
-@export var ease_out: bool = true                 # cubic ease-out
-@export var print_debug: bool = false
+# ---- Motion ----
+@export var align_time: float = 0.35
+@export var ease_out: bool = true
+@export var debug_log: bool = false
 
-# Signals so other systems can react without being hard-wired
-signal entered_fishing_view         # after enter tween finishes
-signal exited_to_exploration_view   # after exit tween finishes
+# ---- Signals (no coupling to other systems) ----
+signal entered_fishing_view
+signal exited_to_exploration_view
 signal align_started(to_fishing: bool)
 
-# ---------------- Internal State ----------------
+# ---- Internal state ----
 var _in_fishing: bool = false
 var _aligning: bool = false
 var _align_to_exploration: bool = false
 
-# spherical orbit params (about pivot)
+# spherical orbit
 var _radius: float = 6.0
 var _elev_phi: float = 0.0
 var _theta: float = 0.0
 
-# tween state (manual interpolation = deterministic)
+# tween state
 var _theta_start: float = 0.0
 var _theta_goal: float = 0.0
 var _t_elapsed: float = 0.0
 
-# cached exploration yaw for perfectly symmetric exit
+# exploration yaw cached at ENTER (for symmetric EXIT)
 var _exp_theta: float = 0.0
 
-# direction memory for arc consistency
-var _enter_direction: int = 0   # -1 (CCW), 0 (none), +1 (CW)
+# remember ENTER arc direction: +1 (CW), -1 (CCW)
+var _enter_direction: int = 0
 
-# ---------------- Lifecycle ----------------
 func _ready() -> void:
-	# Basic contract checks (fail early in editor)
 	if player == null or pivot == null or exploration_camera == null or fishing_camera == null:
 		push_error("FishingCameraController: assign player, pivot, exploration_camera, fishing_camera.")
 		set_process(false)
 		return
-
 	_make_exploration_current()
 	fishing_camera.current = false
-	_sample_from_exploration()  # init radius/elev/theta
+	_sample_from_exploration()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("enter_fishing"):
@@ -64,7 +61,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			_exit_fishing()
 
 func _process(delta: float) -> void:
-	# Drive fishing cam while it is current, or while aligning back.
 	var driving: bool = fishing_camera.current or (_aligning and _align_to_exploration)
 	if not driving:
 		return
@@ -78,20 +74,14 @@ func _process(delta: float) -> void:
 		if align_time > 0.0:
 			t = _t_elapsed / align_time
 		if ease_out:
-			# cubic ease-out
-			t = 1.0 - pow(1.0 - t, 3.0)
+			t = 1.0 - pow(1.0 - t, 3.0)  # cubic ease-out
 
-		var raw_delta: float = fmod(_theta_goal - _theta_start + PI, TAU) - PI
-		# enforce direction we stored on enter
-		if raw_delta * _enter_direction < 0.0:
-			raw_delta += TAU * _enter_direction
-			
 		var dir_for_this_align: int = _enter_direction
 		if _align_to_exploration:
-			dir_for_this_align = -_enter_direction   # exit must retrace the entry arc in reverse
+			dir_for_this_align = -_enter_direction  # exit = reverse the enter arc
+
 		var d_theta: float = _delta_with_dir(_theta_start, _theta_goal, dir_for_this_align)
 		_theta = _theta_start + d_theta * t
-
 
 		if _t_elapsed >= align_time:
 			_aligning = false
@@ -100,24 +90,23 @@ func _process(delta: float) -> void:
 				fishing_camera.current = false
 				_in_fishing = false
 				exited_to_exploration_view.emit()
-				if print_debug: print("[FCC] EXIT done (theta=", _theta, ")")
+				if debug_log: print("[FCC] EXIT done (theta=", _theta, ")")
 			else:
 				_in_fishing = true
 				entered_fishing_view.emit()
-				if print_debug: print("[FCC] ENTER done (theta=", _theta, ")")
+				if debug_log: print("[FCC] ENTER done (theta=", _theta, ")")
 
-	# Keep the target centered
 	_set_pos_from_angles(_theta, _elev_phi, _radius)
 	fishing_camera.look_at(pivot.global_position, Vector3.UP)
 
-# ---------------- Public-ish helpers ----------------
+# ---- Public toggles (optional) ----
 func set_gate_enabled(enabled: bool) -> void:
 	gate_by_zone = enabled
 
 func set_water_facing(node: Node3D) -> void:
 	water_facing = node
 
-# ---------------- Gating (optional) ----------------
+# ---- Gating ----
 func _can_enter_fishing() -> bool:
 	if not gate_by_zone:
 		return true
@@ -135,15 +124,13 @@ func _can_enter_fishing() -> bool:
 	wfwd = wfwd.normalized()
 
 	var dot: float = clampf(pfwd.dot(wfwd), -1.0, 1.0)
-	var ang_deg: float = rad_to_deg(acos(dot))  # 0 = perfectly aligned
+	var ang_deg: float = rad_to_deg(acos(dot))
 	return ang_deg <= cone_half_angle_deg
 
-# ---------------- Enter / Exit ----------------
+# ---- Enter / Exit ----
 func _enter_fishing() -> void:
-	# Cache exploration pose so exit is perfectly symmetric.
-	_sample_from_exploration()
+	_sample_from_exploration()  # sets _theta and caches _exp_theta
 
-	# Goal = camera behind player (–player +Z) so player +Z faces forward.
 	var fwd: Vector3 = player.global_transform.basis.z
 	var back2: Vector2 = Vector2(-fwd.x, -fwd.z)
 	if back2.length() == 0.0:
@@ -151,48 +138,37 @@ func _enter_fishing() -> void:
 	else:
 		back2 = back2.normalized()
 
-	align_started.emit(true)
-
-	# existing:
 	_theta_goal = atan2(back2.x, back2.y)
 	_theta_start = _theta
 	_t_elapsed = 0.0
 	_aligning = true
 	_align_to_exploration = false
-	
-	# NEW: remember which way we are rotating on ENTER
+	align_started.emit(true)
+
+	# record enter direction (sign of the shortest delta)
 	var d_enter: float = _shortest_delta(_theta_start, _theta_goal)
 	_enter_direction = _dir_sign(d_enter)
-	
-	# compute delta
-	var delta: float = fmod(_theta_goal - _theta + PI, TAU) - PI
-	if delta >= 0.0:
-		_enter_direction = 1.0   # clockwise
-	else:
-		_enter_direction = -1.0  # counter-clockwise
 
-	# Place fish cam at exploration yaw to avoid pop, then make it current.
 	_set_pos_from_angles(_theta, _elev_phi, _radius)
 	fishing_camera.look_at(pivot.global_position, Vector3.UP)
 	fishing_camera.current = true
 
-	if print_debug: print("[FCC] ENTER → yaw_target:", _theta_goal)
+	if debug_log: print("[FCC] ENTER → yaw_target:", _theta_goal, " dir:", _enter_direction)
 
 func _exit_fishing() -> void:
 	_aligning = true
 	_align_to_exploration = true
 	_theta_start = _theta
-	_theta_goal = _exp_theta            # exact exploration yaw from enter
+	_theta_goal = _exp_theta
 	_t_elapsed = 0.0
 	align_started.emit(false)
 
-	# Keep fish cam current until we land, then switch.
 	if not fishing_camera.current:
 		fishing_camera.current = true
 
-	if print_debug: print("[FCC] EXIT → yaw_target:", _theta_goal)
+	if debug_log: print("[FCC] EXIT → yaw_target:", _theta_goal)
 
-# ---------------- Orbit Math ----------------
+# ---- Orbit math ----
 func _sample_from_exploration() -> void:
 	var rel: Vector3 = _exploration_rel()
 	var xz_len: float = Vector2(rel.x, rel.z).length()
@@ -221,8 +197,7 @@ func _set_pos_from_angles(theta: float, phi: float, r: float) -> void:
 	var y: float = sin(phi) * r
 	fishing_camera.global_position = Vector3(P.x + x, P.y + y, P.z + z)
 
-# ---------------- Utils ----------------
-
+# ---- Direction helpers ----
 func _dir_sign(x: float) -> int:
 	if x > 0.0:
 		return 1
@@ -230,23 +205,21 @@ func _dir_sign(x: float) -> int:
 		return -1
 	return 0
 
-# delta from 'from_theta' to 'to_theta' but forced to travel in 'desired_dir' (+1 or -1)
+# delta from A to B, forced to travel in desired_dir (+1 or -1)
 func _delta_with_dir(from_theta: float, to_theta: float, desired_dir: int) -> float:
-	var raw_delta: float = _shortest_delta(from_theta, to_theta)  # in (-PI, PI]
+	var raw_delta: float = _shortest_delta(from_theta, to_theta)  # (-PI, PI]
 	if desired_dir == 0 or raw_delta == 0.0:
 		return raw_delta
-
-	# if raw already goes in the desired direction, use it
+	# if shortest already goes in desired direction, keep it
 	if (raw_delta > 0.0 and desired_dir > 0) or (raw_delta < 0.0 and desired_dir < 0):
 		return raw_delta
-
-	# otherwise, take the long way around in the requested direction
+	# otherwise, take the long way around in requested direction
 	var dir_sign: float = 1.0
 	if desired_dir < 0:
 		dir_sign = -1.0
 	return raw_delta + TAU * dir_sign
 
-
+# ---- Utils ----
 func _shortest_delta(a: float, b: float) -> float:
 	var d: float = fmod(b - a + PI, TAU)
 	if d < 0.0:
