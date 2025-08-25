@@ -1,4 +1,4 @@
-[gd_scene load_steps=205 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=207 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_8vgkq"]
 [ext_resource type="Texture2D" uid="uid://by5ac2yvwvb0v" path="res://assets/sprites/anim_Ryu_fishing-Turn_180.png" id="2_ak2we"]
 [ext_resource type="Texture2D" uid="uid://bha4biyf0le2h" path="res://assets/sprites/anim_Ryu_fishing-Catch.png" id="2_fw2ok"]
+[ext_resource type="Script" uid="uid://dtwagkkkckfp0" path="res://scripts/sprite_orbit_stepper.gd" id="2_woub5"]
+[ext_resource type="Script" uid="uid://d2wydfwha8pwy" path="res://scripts/fishing_movement_lock.gd" id="2_y37r7"]
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="3_r57kr"]
 [ext_resource type="Texture2D" uid="uid://ga65n7hqvcqw" path="res://assets/sprites/anim_Ryu_fishing-Walking_Forward.png" id="3_sd3ct"]
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="4_xtlf1"]
@@ -1422,6 +1424,12 @@ load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s
 collision_layer = 2
 script = ExtResource("1_jdonv")
 move_speed = 1.0
+
+[node name="FishingMovementLock" type="Node" parent="."]
+script = ExtResource("2_y37r7")
+
+[node name="SpriteOrbitStepper" type="Node" parent="."]
+script = ExtResource("2_woub5")
 
 [node name="FishingStateMachine" type="Node" parent="."]
 

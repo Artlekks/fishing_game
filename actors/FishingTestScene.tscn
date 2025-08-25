@@ -138,16 +138,20 @@ collision_mask = 9
 water_facing = NodePath("../Zones/FishZone/WaterFacing")
 exploration_camera = NodePath("../CameraRig/Cameras/PCam_Exploration")
 
-[node name="AnimatedSprite3D" parent="Player" index="3"]
+[node name="FishingMovementLock" parent="Player" index="0" node_paths=PackedStringArray("camera_controller", "movement_controller")]
+camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
+movement_controller = NodePath("..")
+
+[node name="AnimatedSprite3D" parent="Player" index="5"]
 render_priority = 2
 
 [node name="ShadowSprite3D" parent="Player/AnimatedSprite3D" index="0"]
 render_priority = 1
 
-[node name="AxisGizmo" parent="Player" index="4"]
+[node name="AxisGizmo" parent="Player" index="6"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
-[node name="DirectionSelector" parent="Player" index="6"]
+[node name="DirectionSelector" parent="Player" index="8"]
 visible = false
 
 [node name="dot_0" parent="Player/DirectionSelector" index="0"]
