@@ -224,3 +224,11 @@ func emit_anim(anim_name: StringName) -> void:
 	emit_signal("animation_change", anim_name)
 	
 	
+
+
+func _on_fishing_camera_controller_entered_fishing_view() -> void:
+	pass # Replace with function body.
+
+
+func _on_fishing_camera_controller_exited_to_exploration_view() -> void:
+	pass # Replace with function body.

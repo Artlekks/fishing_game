@@ -70,11 +70,13 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 
 	# DirectionSelector visibility + alignment
 	if anim == "Fishing_Idle":
-		direction_selector.call("show_for_fishing")
+		if direction_selector and direction_selector.has_method("show_for_fishing"):
+			direction_selector.call("show_for_fishing")
 
 	elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-		direction_selector.call("hide_for_fishing")
-	
+		if direction_selector and direction_selector.has_method("hide_for_fishing"):
+			direction_selector.call("hide_for_fishing")
+
 	# Power bar visibility (appears only during Prep_Throw / Prep_Throw_Idle)
 	if anim == "Prep_Throw":
 		_pm_start()

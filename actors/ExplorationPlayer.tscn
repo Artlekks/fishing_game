@@ -1,4 +1,4 @@
-[gd_scene load_steps=232 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=234 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" uid="uid://d2wydfwha8pwy" path="res://scripts/fishing_movement_lock.gd" id="2_y37r7"]
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="3_r57kr"]
 [ext_resource type="Texture2D" uid="uid://ga65n7hqvcqw" path="res://assets/sprites/anim_Ryu_fishing-Walking_Forward.png" id="3_sd3ct"]
+[ext_resource type="Script" uid="uid://lou8w0dn0v0w" path="res://scripts/fishing_state_machine.gd" id="4_07bsd"]
+[ext_resource type="Script" uid="uid://dtmyflxyvmqbf" path="res://scripts/fishing_state_controller.gd" id="4_ejpxr"]
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="4_xtlf1"]
 [ext_resource type="Texture2D" uid="uid://cfsk2abqasr47" path="res://assets/sprites/anim_Ryu_fishing-Throw.png" id="5_41s07"]
 [ext_resource type="Texture2D" uid="uid://xqfvokdcwo08" path="res://assets/sprites/anim_Ryu_fishing-Walking_Backward.png" id="5_jpo3w"]
@@ -1612,9 +1614,11 @@ script = ExtResource("2_y37r7")
 [node name="SpriteOrbitStepper" type="Node" parent="."]
 script = ExtResource("2_woub5")
 
-[node name="FishingStateMachine" type="Node" parent="."]
+[node name="FishingSpriteAdapter" type="Node" parent="."]
+script = ExtResource("4_07bsd")
 
 [node name="FishingStateController" type="Node" parent="."]
+script = ExtResource("4_ejpxr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
@@ -1626,7 +1630,7 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Walk_E"
+animation = &"Prep_Throw"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0)

@@ -147,6 +147,13 @@ sprite = NodePath("../AnimatedSprite3D")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 debug_log = true
 
+[node name="FishingSpriteAdapter" parent="Player" index="2" node_paths=PackedStringArray("controller", "sprite", "direction_selector", "player", "fishing_camera")]
+controller = NodePath("../FishingStateController")
+sprite = NodePath("../AnimatedSprite3D")
+direction_selector = NodePath("../DirectionSelector")
+player = NodePath("..")
+fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
+
 [node name="AnimatedSprite3D" parent="Player" index="5"]
 render_priority = 2
 
@@ -184,11 +191,9 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.7, 0.46, 0)
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
 
 [node name="UI" type="Node3D" parent="."]
-visible = false
 
 [node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
-visible = false
-script = null
+target_3d_path = NodePath("../../Player")
 
 [node name="CameraRig" type="Node3D" parent="."]
 
@@ -245,6 +250,9 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 
 [node name="CollisionShape3D" parent="Zones/FishZone" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
+
+[connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
+[connection signal="exited_to_exploration_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="soft_reset"]
 
 [editable path="World/River_001"]
 [editable path="Player"]
