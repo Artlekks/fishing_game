@@ -193,6 +193,7 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
 [node name="UI" type="Node3D" parent="."]
 
 [node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
+cycle_duration = 0.9
 target_3d_path = NodePath("../../Player")
 
 [node name="CameraRig" type="Node3D" parent="."]
@@ -229,15 +230,16 @@ metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 transform = Transform3D(1, 0, 0, 0, 0.529999, 0.847998, 0, -0.847998, 0.529999, 0, 3.2, 2.27153)
 fov = 35.0
 
-[node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing")]
+[node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing", "fishing_state_controller")]
 script = ExtResource("10_23y3w")
 player = NodePath("../../../Player")
 pivot = NodePath("../../../Player/CamFocus")
 exploration_camera = NodePath("../PCam_Exploration")
 fishing_camera = NodePath("../Cam_Fishing")
 water_facing = NodePath("../../../Zones/FishZone/WaterFacing")
+fishing_state_controller = NodePath("../../../Player/FishingStateController")
 cone_half_angle_deg = 60.0
-align_time = 1.0
+align_time = 1.5
 
 [node name="Zones" type="Node3D" parent="."]
 

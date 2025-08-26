@@ -2,6 +2,7 @@
 extends Node
 
 signal animation_change(anim_name: StringName)
+signal cancel_finished
 
 enum State {
 	FISHING_NONE,
@@ -43,10 +44,12 @@ func start_sequence() -> void:
 	current_state = State.FISHING_PREP
 
 func force_cancel() -> void:
+	# stay enabled + lock so we can receive the finish callback
+	_enabled = true
+	_intro_lock = true
 	emit_anim("Cancel_Fishing")
-	current_state = State.FISHING_NONE
-	_enabled = false
-	_intro_lock = false
+	# do NOT disable here — we disable after the finish arrives
+
 
 func soft_reset() -> void:
 	current_state = State.FISHING_NONE
@@ -56,9 +59,21 @@ func soft_reset() -> void:
 
 # -------- animation-finished based transitions --------
 func on_animation_finished(anim_name: StringName) -> void:
+	var s := String(anim_name)
+
+	# Handle cancel FIRST (even if _enabled is false later)
+	if s == "Cancel_Fishing":
+		cancel_finished.emit()
+		_enabled = false
+		_intro_lock = false
+		current_state = State.FISHING_NONE
+		return
+
+	# keep your normal gating for the other clips
 	if not _enabled or current_state == State.FISHING_NONE:
-		return  # ignore stale finishes after cancel/disable
-	match String(anim_name):
+		return
+
+	match s:
 		"Prep_Fishing":
 			_intro_lock = false
 			emit_anim("Fishing_Idle")
@@ -74,6 +89,9 @@ func on_animation_finished(anim_name: StringName) -> void:
 		_:
 			pass
 
+
+	if anim_name == "Cancel_Fishing":
+		cancel_finished.emit()
 
 # -------- per-frame input (gated) --------
 func _process(_delta: float) -> void:
