@@ -1,4 +1,4 @@
-[gd_scene load_steps=225 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=232 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -30,6 +30,7 @@
 [ext_resource type="Texture2D" uid="uid://dhv70hn8tptnm" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopLeft.png" id="25_yrl0g"]
 [ext_resource type="Script" uid="uid://duiloslw7alif" path="res://scripts/axis_gizmo.gd" id="27_yhyju"]
 [ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="28_j8b1y"]
+[ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="29_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
@@ -792,6 +793,30 @@ region = Rect2(768, 0, 192, 160)
 atlas = ExtResource("28_j8b1y")
 region = Rect2(960, 0, 192, 160)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_y2xnn"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(0, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_00b7a"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(192, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0w0si"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(384, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxv1e"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(576, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_33445"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(768, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_206jm"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(960, 0, 192, 160)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_6gvld"]
 animations = [{
 "frames": [{
@@ -1540,6 +1565,29 @@ animations = [{
 "loop": true,
 "name": &"Walk_SW",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y2xnn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_00b7a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0w0si")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxv1e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_33445")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_206jm")
+}],
+"loop": true,
+"name": &"Walk_W",
+"speed": 5.0
 }]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajpwy"]
@@ -1578,7 +1626,7 @@ billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Walk_SW"
+animation = &"Walk_E"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0)
