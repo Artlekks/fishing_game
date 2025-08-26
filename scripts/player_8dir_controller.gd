@@ -152,38 +152,30 @@ func _play_8dir_animation(base: String, dir: String) -> void:
 # ---------- Fishing mode helpers ----------
 
 func _can_enter_fishing() -> bool:
+	var ok: bool = false
+
 	if water_facing == null:
 		push_warning("water_facing not assigned; cannot test fishing cone.")
-		return false
+		ok = false
+	else:
+		var player_fwd: Vector3 = global_transform.basis.z
+		var water_fwd: Vector3 = water_facing.global_transform.basis.z
+		# test only on the XZ plane
+		player_fwd.y = 0.0
+		water_fwd.y = 0.0
 
-	var player_fwd: Vector3 = global_transform.basis.z.normalized()
-	var water_fwd: Vector3 = water_facing.global_transform.basis.z.normalized()
+		var lp: float = player_fwd.length()
+		var lw: float = water_fwd.length()
+		if lp > 0.0 and lw > 0.0:
+			player_fwd = player_fwd / lp
+			water_fwd  = water_fwd / lw
+			var d: float = clampf(player_fwd.dot(water_fwd), -1.0, 1.0)
+			var angle_deg: float = rad_to_deg(acos(d))
+			ok = angle_deg <= half_angle_deg
+		else:
+			ok = false
 
-	var d: float = clampf(player_fwd.dot(water_fwd), -1.0, 1.0)
-	var angle_deg: float = rad_to_deg(acos(d))
-	return angle_deg <= half_angle_deg
-
-# func _enter_fishing() -> void:
-	in_fishing_mode = true
-	set_movement_enabled(false)
-	velocity = Vector3.ZERO
-	move_and_slide()
-
-	_activate_cam(fishing_camera)
-	_deactivate_cam(exploration_camera)
-
-	_cache_fishcam_geometry()
-	_align_fishcam_to_player_axis()
-
-# func _exit_fishing() -> void:
-	in_fishing_mode = false
-	set_movement_enabled(true)
-
-	if _fishcam_tween and _fishcam_tween.is_running():
-		_fishcam_tween.kill()
-
-	_activate_cam(exploration_camera)
-	_deactivate_cam(fishing_camera)
+	return ok
 
 # ---------- Camera utils (works for Camera3D and PhantomCamera3D) ----------
 

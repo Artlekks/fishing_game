@@ -37,6 +37,13 @@ var _dir_step: int = 0                  # +1 CCW, -1 CW
 var _entry_anim_name: String = ""
 var _entry_flip_h: bool = false
 
+func _wrap_index(i: int) -> int:
+	var n: int = dir_order_ccw.size()
+	var r: int = i % n
+	if r < 0:
+		r += n
+	return r
+
 func _ready() -> void:
 	if camera_controller == null:
 		return
@@ -130,16 +137,17 @@ func _on_exit_finished() -> void:
 
 # ---------- helpers ----------
 func _apply_one_step() -> void:
-	var next_idx: int = _wrap(_start_idx + (_applied_steps + 1) * _dir_step, DIR_COUNT)
+	var next_idx: int = _wrap_index(_start_idx + (_applied_steps + 1) * _dir_step)
 	var token: String = dir_order_ccw[next_idx]
-	var name: String = _anim_for(token)
+	var anim_name: String = _anim_for(token)   # <-- renamed
 
 	var frames: SpriteFrames = sprite.sprite_frames
-	if frames != null and frames.has_animation(name):
-		sprite.flip_h = false   # guarantee no mirroring during stepping
-		sprite.play(name)
+	if frames != null and frames.has_animation(anim_name):
+		sprite.flip_h = false                    # guarantee no mirroring during stepping
+		sprite.play(anim_name)
 		if debug_log:
-			print("[SpriteStepper] -> ", name, " (flip_h=false)")
+			print("[SpriteStepper] -> ", anim_name, " (flip_h=false)")
+
 
 func _current_dir_index_normalized() -> int:
 	# Prefer world +Z (more reliable than reading the current clip name)
