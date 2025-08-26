@@ -1,4 +1,4 @@
-[gd_scene load_steps=209 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=232 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -6,8 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://b5ygrwsxedyeh" path="res://assets/sprites/anim_Ryu_fishing-Idle.png" id="2_8vgkq"]
 [ext_resource type="Texture2D" uid="uid://by5ac2yvwvb0v" path="res://assets/sprites/anim_Ryu_fishing-Turn_180.png" id="2_ak2we"]
 [ext_resource type="Texture2D" uid="uid://bha4biyf0le2h" path="res://assets/sprites/anim_Ryu_fishing-Catch.png" id="2_fw2ok"]
-[ext_resource type="Script" uid="uid://dtmyflxyvmqbf" path="res://scripts/fishing_state_controller.gd" id="2_jdonv"]
-[ext_resource type="Script" uid="uid://lou8w0dn0v0w" path="res://scripts/fishing_state_machine.gd" id="2_y37r7"]
+[ext_resource type="Script" uid="uid://dtwagkkkckfp0" path="res://scripts/sprite_orbit_stepper.gd" id="2_woub5"]
+[ext_resource type="Script" uid="uid://d2wydfwha8pwy" path="res://scripts/fishing_movement_lock.gd" id="2_y37r7"]
 [ext_resource type="Texture2D" uid="uid://bd1qif4bsq1ue" path="res://assets/sprites/anim_Ryu_fishing-Prep_Fishing.png" id="3_r57kr"]
 [ext_resource type="Texture2D" uid="uid://ga65n7hqvcqw" path="res://assets/sprites/anim_Ryu_fishing-Walking_Forward.png" id="3_sd3ct"]
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="4_xtlf1"]
@@ -24,11 +24,13 @@
 [ext_resource type="Texture2D" uid="uid://dtlvjtohbgge5" path="res://assets/sprites/anim_Ryu_fishing-Reel_Forward.png" id="8_qsxyu"]
 [ext_resource type="Texture2D" uid="uid://bcruetqc3kvnt" path="res://assets/sprites/anim_Ryu_fishing-Reel_Right.png" id="8_ybngr"]
 [ext_resource type="Texture2D" uid="uid://ic3a7718cj1u" path="res://assets/sprites/anim_Ryu_fishing-Bite.png" id="9_7vjmx"]
+[ext_resource type="Texture2D" uid="uid://2dnhkylhm7dj" path="res://assets/sprites/anim_Ryu_fishing-Turn_L.png" id="9_t1pps"]
 [ext_resource type="Texture2D" uid="uid://cbtwx6me6af4d" path="res://assets/sprites/anim_Ryu_fishing-Big_Bite.png" id="10_fw2ok"]
 [ext_resource type="Texture2D" uid="uid://dtnxootnm3x1w" path="res://assets/sprites/anim_Ryu_fishing-Broken_Rod.png" id="11_7vjmx"]
-[ext_resource type="Script" uid="uid://co8eb3vfmwuo3" path="res://scripts/fishing_animation_controller.gd" id="24_u8h60"]
+[ext_resource type="Texture2D" uid="uid://dhv70hn8tptnm" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopLeft.png" id="25_yrl0g"]
 [ext_resource type="Script" uid="uid://duiloslw7alif" path="res://scripts/axis_gizmo.gd" id="27_yhyju"]
-[ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="29_xy7eu"]
+[ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="28_j8b1y"]
+[ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="29_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
@@ -227,9 +229,13 @@ region = Rect2(4032, 0, 192, 160)
 atlas = ExtResource("2_ak2we")
 region = Rect2(768, 0, 192, 160)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_45a2y"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_t1pps"]
 atlas = ExtResource("2_ak2we")
 region = Rect2(576, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xy7eu"]
+atlas = ExtResource("9_t1pps")
+region = Rect2(384, 0, 192, 160)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g6chb"]
 atlas = ExtResource("2_ak2we")
@@ -237,6 +243,14 @@ region = Rect2(0, 0, 192, 160)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1dt75"]
 atlas = ExtResource("2_ak2we")
+region = Rect2(192, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yrl0g"]
+atlas = ExtResource("9_t1pps")
+region = Rect2(0, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j8b1y"]
+atlas = ExtResource("9_t1pps")
 region = Rect2(192, 0, 192, 160)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6o43v"]
@@ -683,6 +697,30 @@ region = Rect2(768, 0, 192, 160)
 atlas = ExtResource("4_xtlf1")
 region = Rect2(960, 0, 192, 160)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ejpxr"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(0, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_07bsd"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(192, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bae3b"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(384, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dljik"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(576, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y2vhc"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(768, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fv1g4"]
+atlas = ExtResource("25_yrl0g")
+region = Rect2(960, 0, 192, 160)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_yhyju"]
 atlas = ExtResource("5_jpo3w")
 region = Rect2(0, 0, 192, 160)
@@ -729,6 +767,54 @@ region = Rect2(768, 0, 192, 160)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jdonv"]
 atlas = ExtResource("5_xtlf1")
+region = Rect2(960, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5n8e8"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(0, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jsuvs"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(192, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vrkhl"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(384, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m5p1b"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(576, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b4qqu"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(768, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ist8"]
+atlas = ExtResource("28_j8b1y")
+region = Rect2(960, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y2xnn"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(0, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_00b7a"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(192, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0w0si"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(384, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxv1e"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(576, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_33445"]
+atlas = ExtResource("29_j8b1y")
+region = Rect2(768, 0, 192, 160)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_206jm"]
+atlas = ExtResource("29_j8b1y")
 region = Rect2(960, 0, 192, 160)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6gvld"]
@@ -909,10 +995,18 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_45a2y")
+"texture": SubResource("AtlasTexture_t1pps")
 }],
 "loop": true,
 "name": &"Idle_NE",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xy7eu")
+}],
+"loop": true,
+"name": &"Idle_NW",
 "speed": 5.0
 }, {
 "frames": [{
@@ -929,6 +1023,22 @@ animations = [{
 }],
 "loop": true,
 "name": &"Idle_SE",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yrl0g")
+}],
+"loop": true,
+"name": &"Idle_SW",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j8b1y")
+}],
+"loop": true,
+"name": &"Idle_W",
 "speed": 5.0
 }, {
 "frames": [{
@@ -1366,6 +1476,29 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_ejpxr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_07bsd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bae3b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dljik")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y2vhc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fv1g4")
+}],
+"loop": true,
+"name": &"Walk_NW",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_yhyju")
 }, {
 "duration": 1.0,
@@ -1409,6 +1542,52 @@ animations = [{
 "loop": true,
 "name": &"Walk_SE",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5n8e8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jsuvs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vrkhl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m5p1b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b4qqu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ist8")
+}],
+"loop": true,
+"name": &"Walk_SW",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y2xnn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_00b7a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0w0si")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxv1e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_33445")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_206jm")
+}],
+"loop": true,
+"name": &"Walk_W",
+"speed": 5.0
 }]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajpwy"]
@@ -1427,33 +1606,33 @@ collision_layer = 2
 script = ExtResource("1_jdonv")
 move_speed = 1.0
 
-[node name="FishingStateMachine" type="Node" parent="." node_paths=PackedStringArray("controller", "sprite")]
+[node name="FishingMovementLock" type="Node" parent="."]
 script = ExtResource("2_y37r7")
-controller = NodePath("FishingStateController")
-sprite = NodePath("../AnimatedSprite3D")
 
-[node name="FishingStateController" type="Node" parent="FishingStateMachine"]
-script = ExtResource("2_jdonv")
+[node name="SpriteOrbitStepper" type="Node" parent="."]
+script = ExtResource("2_woub5")
+
+[node name="FishingStateMachine" type="Node" parent="."]
+
+[node name="FishingStateController" type="Node" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
 
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="." node_paths=PackedStringArray("controller", "sprite")]
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 billboard = 1
 texture_filter = 0
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Prep_Throw"
-script = ExtResource("24_u8h60")
-controller = NodePath("../FishingStateMachine/FishingStateController")
-sprite = NodePath(".")
+animation = &"Walk_E"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
-transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, -0.1, 0)
-sorting_offset = -0.1
+transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0)
+sorting_offset = 1.0
 material_override = SubResource("StandardMaterial3D_ajpwy")
+cast_shadow = 0
 alpha_cut = 2
 texture_filter = 0
 texture = SubResource("CompressedTexture2D_ajpwy")
@@ -1463,9 +1642,7 @@ script = ExtResource("27_yhyju")
 
 [node name="CamFocus" type="Node3D" parent="."]
 
-[node name="DirectionSelector" type="Node3D" parent="." node_paths=PackedStringArray("dots")]
-script = ExtResource("29_xy7eu")
-dots = [NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")]
+[node name="DirectionSelector" type="Node3D" parent="."]
 
 [node name="dot_0" type="Sprite3D" parent="DirectionSelector"]
 transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.22, 0.1, 0)
