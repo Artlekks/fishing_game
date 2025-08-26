@@ -1,7 +1,9 @@
 # fishing_camera_controller.gd — Godot 4.4.1 (no ternary)
 # - Locks K/I during align
 # - ENTER forces CCW arc (optional)
-# - EXIT reverses the exact ENTER arc, after Cancel_Fishing finishes
+# - EXIT reverses the exact ENTER arc, but only after Prep_Fishing has finished
+# - Plays Cancel_Fishing fully before rotating back
+
 extends Node
 
 @export var player: Node3D
@@ -39,29 +41,34 @@ var _exp_theta := 0.0
 var _enter_direction := 0       # +1 CCW, -1 CW
 var _enter_arc_rad := 0.0       # |ENTER arc|
 var _active_arc_rad := 0.0
+var _can_exit := false          # becomes true after Prep_Fishing finished
 
 func _ready() -> void:
 	if player == null or pivot == null or exploration_camera == null or fishing_camera == null:
 		push_error("FishingCameraController: assign player/pivot/exploration_camera/fishing_camera.")
 		set_process(false)
 		return
+
+	# Listen for "ready_for_cancel" from the FSM (emitted after Prep_Fishing finishes)
+	if fishing_state_controller and fishing_state_controller.has_signal("ready_for_cancel"):
+		fishing_state_controller.ready_for_cancel.connect(_on_fsm_ready_for_cancel)
+
 	_make_exploration_current()
 	fishing_camera.current = false
 	_sample_from_exploration()
 
 func _unhandled_input(event: InputEvent) -> void:
-	# While aligning, still allow EXIT (I). Block everything else.
+	# While aligning, block input (prevents I from breaking the enter tween)
 	if _aligning:
-		if (not _align_to_exploration) and event.is_action_pressed("exit_fishing"):
-			_exit_fishing()
 		return
 
 	if event.is_action_pressed("enter_fishing"):
 		if not _in_fishing and _can_enter_fishing():
 			_enter_fishing()
 	elif event.is_action_pressed("exit_fishing"):
-		if _in_fishing:
-			_exit_fishing()  # plays Cancel_Fishing, then exits
+		# Only allow exit after Prep_Fishing finished (FSM told us it's ready)
+		if _in_fishing and _can_exit:
+			_exit_fishing()
 
 func _process(delta: float) -> void:
 	var driving := fishing_camera.current or (_aligning and _align_to_exploration)
@@ -129,6 +136,7 @@ func _can_enter_fishing() -> bool:
 
 # ---------- enter / exit ----------
 func _enter_fishing() -> void:
+	_can_exit = false   # block I until FSM says ready
 	_sample_from_exploration()  # sets _theta and _exp_theta
 
 	# Target yaw = behind the player (+Z forward → camera at -Z)
@@ -165,11 +173,7 @@ func _enter_fishing() -> void:
 	fishing_camera.current = true
 
 func _exit_fishing() -> void:
-	# If we were still ENTER-aligning, stop that tween immediately.
-	if _aligning and not _align_to_exploration:
-		_aligning = false
-		# Keep the fishing cam active at the current angle
-		fishing_camera.current = true
+	_can_exit = false  # lock out repeated presses
 
 	# 1) Play Cancel_Fishing fully
 	if fishing_state_controller:
@@ -272,3 +276,7 @@ func get_align_total_rad() -> float:
 	if not _aligning:
 		return 0.0
 	return _active_arc_rad
+
+# --- FSM hooks ---
+func _on_fsm_ready_for_cancel() -> void:
+	_can_exit = true
