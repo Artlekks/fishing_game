@@ -28,8 +28,8 @@ var movement_enabled: bool = true
 var in_fishing_mode: bool = false
 var _anim_lock: bool = false
 
-const FLIP_DIRS := {"W": true, "NW": true, "SW": true}
-const MIRROR_MAP := {"W": "E", "NW": "NE", "SW": "SE"}
+# const FLIP_DIRS := {"W": true, "NW": true, "SW": true}
+# const MIRROR_MAP := {"W": "E", "NW": "NE", "SW": "SE"}
 const DIRS := ["S","SE","E","NE","N","NW","W","SW"]
 
 # cached fishing-cam geometry (kept constant)
@@ -103,32 +103,51 @@ func _yaw_to_dir(yaw: float) -> String:
 
 
 func _play_8dir_animation(base: String, dir: String) -> void:
-	if dir == null or dir == "":
-		dir = "S"
-	var flip: bool = FLIP_DIRS.has(dir)
-	var token: String = MIRROR_MAP.get(dir, dir) if flip else dir
-	var anim := "%s_%s" % [base, token]
-
-	if frames == null or not frames.has_animation(anim):
-		var candidates: PackedStringArray = (
-			["Walk_S","Walk_E","Walk_N","Walk_NE","Walk_SE","Walk"]
-			if base == "Walk"
-			else ["Idle_S","Idle_E","Idle_N","Idle_NE","Idle_SE","Idle","Walk_S"]
-		)
-		for c in candidates:
-			if frames != null and frames.has_animation(c):
-				anim = c
-				break
-
-	sprite.flip_h = flip
-	sprite.offset = Vector2(-original_offset.x, original_offset.y) if flip else original_offset
-
+	# If fishing/stepper owns the sprite, don't touch anything.
 	if _anim_lock:
 		return
 
-	if frames != null and frames.has_animation(anim) and anim != last_anim:
-		sprite.play(anim)
-		last_anim = anim
+	if dir == "" or dir == null:
+		dir = "S"
+
+	# Direct mapping: "Idle_W" plays Idle_W (no mirroring).
+	var anim_name: String = base + "_" + dir
+
+	var have: bool = false
+	if frames != null:
+		have = frames.has_animation(anim_name)
+
+	# Conservative fallback list (keeps same-side preference; no E↔W swapping)
+	if not have:
+		var fallbacks: PackedStringArray = []
+		if base == "Walk":
+			fallbacks = ["Walk_" + dir, "Walk_S", "Walk_N", "Walk_W", "Walk_E", "Walk"]
+		else:
+			fallbacks = ["Idle_" + dir, "Idle_S", "Idle_N", "Idle_W", "Idle_E", "Idle"]
+
+		var i: int = 0
+		while i < fallbacks.size():
+			var cand: String = fallbacks[i]
+			if frames != null and frames.has_animation(cand):
+				anim_name = cand
+				have = true
+				break
+			i += 1
+
+	if not have:
+		return
+
+	# Force no mirroring for 8dir control.
+	if sprite.flip_h:
+		sprite.flip_h = false
+	sprite.offset = original_offset
+
+	if anim_name != last_anim:
+		sprite.play(anim_name)
+		last_anim = anim_name
+		if print_debug:
+			print("[8dir] ", anim_name, " (flip_h=false)")
+
 
 # ---------- Fishing mode helpers ----------
 
