@@ -21,6 +21,16 @@ extends Node
 @export var debug_log: bool = false
 @export var force_ccw_enter: bool = true
 
+# --- Minimal focus after-rotation (projection shift) ---
+@export var use_enter_focus_offset: bool = true
+@export var focus_delay_frames: int = 5          # ~4–5 frames
+@export var enter_h_offset: float = 1.5         # try +0.25 (horizontal)
+@export var enter_v_offset: float = 0.8        # try -0.25 (vertical)
+
+@export var enter_focus_tween_time: float = 0.25
+@export var exit_focus_tween_time: float = 0.20
+@export var focus_tween_ease_out: bool = true
+
 signal entered_fishing_view
 signal exited_to_exploration_view
 signal align_started(to_fishing: bool)
@@ -42,6 +52,8 @@ var _enter_direction := 0       # +1 CCW, -1 CW
 var _enter_arc_rad := 0.0       # |ENTER arc|
 var _active_arc_rad := 0.0
 var _can_exit := false          # becomes true after Prep_Fishing finished
+var _focus_apply_token: int = 5
+var _focus_offset_tween: Tween
 
 func _ready() -> void:
 	if player == null or pivot == null or exploration_camera == null or fishing_camera == null:
@@ -110,7 +122,7 @@ func _process(delta: float) -> void:
 			else:
 				_in_fishing = true
 				entered_fishing_view.emit()
-
+	
 	_set_pos_from_angles(_theta, _elev_phi, _radius)
 	fishing_camera.look_at(pivot.global_position, Vector3.UP)
 
@@ -171,8 +183,13 @@ func _enter_fishing() -> void:
 	align_started.emit(true)
 
 	fishing_camera.current = true
+	_schedule_enter_focus_offset()
 
 func _exit_fishing() -> void:
+	# cancel any scheduled enter-offset job and tween back to center
+	_focus_apply_token += 1
+	await _tween_focus_offset_to(0.0, 0.0, exit_focus_tween_time)
+
 	_can_exit = false  # lock out repeated presses
 
 	# 1) Play Cancel_Fishing fully
@@ -252,6 +269,62 @@ func _make_exploration_current() -> void:
 		(exploration_camera as Camera3D).current = true
 	elif exploration_camera.has_method("make_current"):
 		exploration_camera.call("make_current")
+
+func _apply_focus_offset(h: float, v: float) -> void:
+	if fishing_camera:
+		fishing_camera.h_offset = h
+		fishing_camera.v_offset = v
+
+func _clear_focus_offset() -> void:
+	_apply_focus_offset(0.0, 0.0)
+
+func _tween_focus_offset_to(h: float, v: float, dur: float) -> void:
+	if fishing_camera == null:
+		return
+	# kill any previous tween
+	if _focus_offset_tween and _focus_offset_tween.is_valid():
+		_focus_offset_tween.kill()
+	_focus_offset_tween = null
+
+	if dur <= 0.0:
+		_apply_focus_offset(h, v)
+		return
+
+	_focus_offset_tween = create_tween()
+	if focus_tween_ease_out:
+		_focus_offset_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	# run h & v in parallel
+	_focus_offset_tween.tween_property(fishing_camera, "h_offset", h, dur)
+	_focus_offset_tween.set_parallel(true)
+	_focus_offset_tween.tween_property(fishing_camera, "v_offset", v, dur)
+	await _focus_offset_tween.finished
+
+# Wait until ENTER align is fully done, then N frames, then tween the offset.
+func _schedule_enter_focus_offset() -> void:
+	_focus_apply_token += 1
+	var my_token: int = _focus_apply_token
+
+	# start centered every time
+	_clear_focus_offset()
+
+	# wait while entering alignment is running
+	while _aligning and not _align_to_exploration:
+		await get_tree().process_frame
+		if my_token != _focus_apply_token:
+			return
+
+	# extra delay frames
+	var n: int = focus_delay_frames
+	if n < 0:
+		n = 0
+	while n > 0:
+		await get_tree().process_frame
+		if my_token != _focus_apply_token:
+			return
+		n -= 1
+
+	if use_enter_focus_offset and my_token == _focus_apply_token:
+		await _tween_focus_offset_to(enter_h_offset, enter_v_offset, enter_focus_tween_time)
 
 # --- public getters for stepper / debug ---
 func is_aligning() -> bool:

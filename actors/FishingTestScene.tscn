@@ -240,6 +240,11 @@ water_facing = NodePath("../../../Zones/FishZone/WaterFacing")
 fishing_state_controller = NodePath("../../../Player/FishingStateController")
 cone_half_angle_deg = 60.0
 align_time = 1.5
+debug_log = true
+enter_h_offset = 1.7
+enter_v_offset = 0.9
+enter_focus_tween_time = 0.8
+exit_focus_tween_time = 0.8
 
 [node name="Zones" type="Node3D" parent="."]
 
