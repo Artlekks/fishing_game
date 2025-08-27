@@ -1,38 +1,62 @@
 extends Node3D
 
-@export var player_path: NodePath                      # set this to your player root
-@export var dots: Array[Node3D] = []                   # assign dot_0..dot_7 in order
-@export var frame_hold_time: float = 0.10              # seconds between steps
+@export var player_path: NodePath
+@export var dots: Array[Node3D] = []
+@export var frame_hold_time: float = 0.10
 @export var pause_frames: int = 6
 @export var blank_frames: int = 0
 
 @export var local_offset: Vector3 = Vector3(0.0, 0.8, 0.6)
-# ^ position of the selector relative to the player (tweak to place it near the rod tip)
+@export var max_yaw_deg: float = 45.0              # clamp range
+@export var yaw_speed_deg: float = 120.0           # turn speed
+@export var follow_player_position: bool = true    # keep DS anchored on player
+
+var _base_yaw_rad: float = 0.0     # captured on show (zero reference)
+var _yaw_offset_rad: float = 0.0   # user-controlled offset from zero (clamped)
 
 var _timer: float = 0.0
 var _index: int = -1
 var _active: bool = false
-var _phase: String = "grow"                            # "grow" -> "pause" -> "blank"
+var _phase: String = "grow"        # "grow" -> "pause" -> "blank"
 var _player: Node3D
 
 func _ready() -> void:
 	_player = get_node_or_null(player_path) as Node3D
 	_apply_overlay_material_to_dots()
 	_set_all(false)
+	visible = false
+	set_process(false)
 
 func _process(delta: float) -> void:
-	if _active and is_instance_valid(_player):
-		_update_pose_to_player()
-
-	# animation loop
-	if not _active:
+	if not _active or not is_instance_valid(_player):
 		return
 
+	# --- aiming input ---
+	var left: bool = Input.is_action_pressed("ds_left")
+	var right: bool = Input.is_action_pressed("ds_right")
+	if left or right:
+		var dir: float = 0.0
+		if left:
+			dir -= 1.0
+		if right:
+			dir += 1.0
+		var speed: float = deg_to_rad(yaw_speed_deg)
+		_yaw_offset_rad += dir * speed * delta
+		var limit: float = deg_to_rad(max_yaw_deg)
+		if _yaw_offset_rad > limit:
+			_yaw_offset_rad = limit
+		if _yaw_offset_rad < -limit:
+			_yaw_offset_rad = -limit
+
+	_update_pose_to_player()
+
+	# --- frame gate for the dot animation ---
 	_timer += delta
 	if _timer < frame_hold_time:
 		return
 	_timer = 0.0
 
+	# --- animation loop ---
 	if _phase == "grow":
 		_index += 1
 		if _index < dots.size():
@@ -66,9 +90,18 @@ func _process(delta: float) -> void:
 func show_for_fishing(p: Node3D = null) -> void:
 	if p != null:
 		_player = p
+	if _player == null:
+		_player = get_node_or_null(player_path) as Node3D
+
+	_capture_base_yaw()
+	_yaw_offset_rad = 0.0
+
 	_active = true
+	visible = true
+	set_process(true)
+
 	_restart_cycle()
-	_set_all(false)
+	_update_pose_to_player()
 
 func start_looping(p: Node3D = null) -> void:
 	show_for_fishing(p)
@@ -79,6 +112,22 @@ func stop_looping() -> void:
 func hide_for_fishing() -> void:
 	_active = false
 	_set_all(false)
+	visible = false
+	set_process(false)
+	# keep yaw offset; it's the chosen aim
+
+# Zero reference from player's facing
+func _capture_base_yaw() -> void:
+	if _player == null:
+		_base_yaw_rad = 0.0
+		return
+	var fwd: Vector3 = -_player.global_transform.basis.z
+	fwd.y = 0.0
+	if fwd.length() < 0.0001:
+		_base_yaw_rad = 0.0
+	else:
+		fwd = fwd.normalized()
+		_base_yaw_rad = atan2(fwd.x, fwd.z)
 
 # --------------------------------------------------------------------
 # Internals
@@ -99,7 +148,7 @@ func _apply_overlay_material_to_dots() -> void:
 		if d == null:
 			continue
 
-		# If you already set a Material Override in the editor, don't touch it.
+		# If a Material Override already exists (set in editor), keep it
 		if d is GeometryInstance3D:
 			var gi: GeometryInstance3D = d
 			if gi.material_override != null:
@@ -107,36 +156,37 @@ func _apply_overlay_material_to_dots() -> void:
 
 		var mat: StandardMaterial3D = StandardMaterial3D.new()
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.no_depth_test = true                               # Godot 4 name
+		mat.no_depth_test = true
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.render_priority = 127
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST  # crisp pixels
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 
 		if d is Sprite3D:
 			var spr: Sprite3D = d
-			# preserve the sprite's texture so it doesn't turn white
 			mat.albedo_texture = spr.texture
 			spr.material_override = mat
 		elif d is GeometryInstance3D:
 			var gi2: GeometryInstance3D = d
 			gi2.material_override = mat
 
-
 func _update_pose_to_player() -> void:
-	# 1) Set world position from player's transform + local offset
-	var world_from_player := _player.global_transform
-	var world_pos := world_from_player * local_offset
-	global_position = world_pos
+	# Position
+	var pos: Vector3 = global_transform.origin
+	if follow_player_position and _player != null:
+		var xf: Transform3D = _player.global_transform
+		pos = xf.origin + xf.basis * local_offset
 
-	# 2) Compute a stable horizontal facing direction from player:
-	#    we align our LOCAL +Z to the player's LOCAL -Z projected on XZ plane.
-	var dir := -_player.global_transform.basis.z
-	dir.y = 0.0
-	if dir.length() < 1e-6:
-		return
-	dir = dir.normalized()
+	# Orientation: base + offset (do NOT re-align with look_at here)
+	var yaw: float = _base_yaw_rad + _yaw_offset_rad
+	var basis: Basis = Basis(Vector3.UP, yaw)
 
-	# 3) Use looking_at: in Godot, -Z looks at the target. We want +Z forward,
-	#    so look_at then rotate 180° around Y to flip -Z -> +Z.
-	look_at(global_position + dir, Vector3.UP)
-	rotate_y(PI)
+	global_transform = Transform3D(basis, pos)
+
+# Optional helpers
+func get_yaw_offset_deg() -> float:
+	return rad_to_deg(_yaw_offset_rad)
+
+func get_cast_forward() -> Vector3:
+	var yaw: float = _base_yaw_rad + _yaw_offset_rad
+	var dir: Vector3 = Vector3(sin(yaw), 0.0, cos(yaw))
+	return dir.normalized()
