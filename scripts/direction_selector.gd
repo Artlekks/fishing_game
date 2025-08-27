@@ -100,20 +100,27 @@ func _apply_overlay_material_to_dots() -> void:
 		if d == null:
 			continue
 
-		var mat := StandardMaterial3D.new()
+		# If you already set a Material Override in the editor, don't touch it.
+		if d is GeometryInstance3D:
+			var gi: GeometryInstance3D = d
+			if gi.material_override != null:
+				continue
+
+		var mat: StandardMaterial3D = StandardMaterial3D.new()
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.disable_depth_test = true
+		mat.no_depth_test = true                               # Godot 4 name
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.render_priority = 127
 		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST  # crisp pixels
 
 		if d is Sprite3D:
-			var spr := d as Sprite3D
-			# Put the sprite's texture into the material so it doesn't turn white.
+			var spr: Sprite3D = d
+			# preserve the sprite's texture so it doesn't turn white
 			mat.albedo_texture = spr.texture
 			spr.material_override = mat
 		elif d is GeometryInstance3D:
-			(d as GeometryInstance3D).material_override = mat
+			var gi2: GeometryInstance3D = d
+			gi2.material_override = mat
 
 
 func _update_pose_to_player() -> void:
