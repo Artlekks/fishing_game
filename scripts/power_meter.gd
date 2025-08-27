@@ -18,6 +18,7 @@ extends CanvasLayer
 @export var anchor_norm: Vector2 = Vector2(0.5, 1.0)      # 0..1 (0.5,1.0 = bottom-center of the bar)
 @export var clamp_inside_screen: bool = true
 @export var follow_speed: float = 18.0                    # higher = snappier
+@export var follow_target: bool = false   # false = static HUD (recommended for your case)
 
 var _root: Node2D
 var _bg: Sprite2D
@@ -57,9 +58,15 @@ func _ready() -> void:
 	if _bg and _bg.texture:
 		_bar_px_size = _bg.texture.get_size() * _bg.scale
 
-	set_process(true)
+	set_process(follow_target)
 
 func _process(delta: float) -> void:
+	if not follow_target:
+		return
+	if not visible:
+		return
+	# ... keep the rest of your existing _process() unchanged ...
+
 	if not visible:
 		return
 

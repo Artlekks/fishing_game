@@ -193,8 +193,11 @@ transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
 [node name="UI" type="Node3D" parent="."]
 
 [node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
+offset = Vector2(-475, 230)
+transform = Transform2D(1, 0, 0, 1, -475, 230)
 cycle_duration = 0.9
 target_3d_path = NodePath("../../Player")
+screen_offset_px = Vector2(0, 0)
 
 [node name="CameraRig" type="Node3D" parent="."]
 
