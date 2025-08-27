@@ -14,7 +14,6 @@ var _index: int = -1
 var _active: bool = false
 var _phase: String = "grow"                            # "grow" -> "pause" -> "blank"
 var _player: Node3D
-var _mat_always_on_top: StandardMaterial3D
 
 func _ready() -> void:
 	_player = get_node_or_null(player_path) as Node3D
