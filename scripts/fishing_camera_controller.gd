@@ -1,8 +1,9 @@
-# fishing_camera_controller.gd — Godot 4.4.1 (no ternary)
+# fishing_camera_controller.gd — Godot 4.4.1
 # - Locks K/I during align
 # - ENTER forces CCW arc (optional)
 # - EXIT reverses the exact ENTER arc, but only after Prep_Fishing has finished
 # - Plays Cancel_Fishing fully before rotating back
+# - Uses a single scheduler for focus offset after ENTER (no duplicate triggers)
 
 extends Node
 
@@ -21,12 +22,11 @@ extends Node
 @export var debug_log: bool = false
 @export var force_ccw_enter: bool = true
 
-# --- Minimal focus after-rotation (projection shift) ---
+# --- Focus-after-rotation (screen-space projection shift) ---
 @export var use_enter_focus_offset: bool = true
-@export var focus_delay_frames: int = 5          # ~4–5 frames
-@export var enter_h_offset: float = 1.5         # try +0.25 (horizontal)
-@export var enter_v_offset: float = 0.8        # try -0.25 (vertical)
-
+@export var focus_delay_frames: int = 5
+@export var enter_h_offset: float = 1.5
+@export var enter_v_offset: float = 0.8
 @export var enter_focus_tween_time: float = 0.25
 @export var exit_focus_tween_time: float = 0.20
 @export var focus_tween_ease_out: bool = true
@@ -34,24 +34,29 @@ extends Node
 signal entered_fishing_view
 signal exited_to_exploration_view
 signal align_started(to_fishing: bool)
+signal orbit_completed(sign: int, step_deg: float)   # +1 CCW, -1 CW, step size in degrees
 
-var _in_fishing := false
-var _aligning := false
-var _align_to_exploration := false
+var _orbit_step_mode: bool = false
+var _orbit_step_sign: int = 0
 
-var _radius := 6.0
-var _elev_phi := 0.0
-var _theta := 0.0
+var _in_fishing: bool = false
+var _aligning: bool = false
+var _align_to_exploration: bool = false
 
-var _theta_start := 0.0
-var _theta_goal := 0.0
-var _t_elapsed := 0.0
+var _radius: float = 6.0
+var _elev_phi: float = 0.0
+var _theta: float = 0.0
 
-var _exp_theta := 0.0
-var _enter_direction := 0       # +1 CCW, -1 CW
-var _enter_arc_rad := 0.0       # |ENTER arc|
-var _active_arc_rad := 0.0
-var _can_exit := false          # becomes true after Prep_Fishing finished
+var _theta_start: float = 0.0
+var _theta_goal: float = 0.0
+var _t_elapsed: float = 0.0
+
+var _exp_theta: float = 0.0
+var _enter_direction: int = 0       # +1 CCW, -1 CW
+var _enter_arc_rad: float = 0.0     # |ENTER arc|
+var _active_arc_rad: float = 0.0
+var _can_exit: bool = false         # becomes true after Prep_Fishing finished
+
 var _focus_apply_token: int = 5
 var _focus_offset_tween: Tween
 
@@ -83,7 +88,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_exit_fishing()
 
 func _process(delta: float) -> void:
-	var driving := fishing_camera.current or (_aligning and _align_to_exploration)
+	var driving: bool = fishing_camera.current or (_aligning and _align_to_exploration)
 	if not driving:
 		return
 
@@ -92,37 +97,52 @@ func _process(delta: float) -> void:
 		if _t_elapsed > align_time:
 			_t_elapsed = align_time
 
-		var t := 1.0
+		var t: float = 1.0
 		if align_time > 0.0:
 			t = _t_elapsed / align_time
 		if ease_out:
 			t = 1.0 - pow(1.0 - t, 3.0)
 
-		var d_theta := 0.0
+		var d_theta: float = 0.0
 		if _align_to_exploration:
-			# EXIT: reverse the ENTER arc exactly
 			d_theta = float(-_enter_direction) * _enter_arc_rad
 		else:
-			# ENTER: follow the chosen direction
-			if force_ccw_enter:
+			if _orbit_step_mode:
+				# Signed step requested by DS
 				d_theta = float(_enter_direction) * _enter_arc_rad
 			else:
-				d_theta = _delta_with_dir(_theta_start, _theta_goal, _enter_direction)
+				if force_ccw_enter:
+					d_theta = float(_enter_direction) * _enter_arc_rad
+				else:
+					d_theta = _delta_with_dir(_theta_start, _theta_goal, _enter_direction)
 
 		_theta = _theta_start + d_theta * t
 
 		if _t_elapsed >= align_time:
 			_aligning = false
+
 			if _align_to_exploration:
+				# EXIT path
 				_theta = _exp_theta
 				_make_exploration_current()
 				fishing_camera.current = false
 				_in_fishing = false
 				exited_to_exploration_view.emit()
 			else:
-				_in_fishing = true
-				entered_fishing_view.emit()
-	
+				# ENTER / ORBIT-IN-FISHING
+				if _orbit_step_mode:
+					# Sector orbit step requested by DS: don't restart FSM
+					_theta = _theta_goal
+					_orbit_step_mode = false
+
+					var step_deg: float = rad_to_deg(_active_arc_rad)
+					orbit_completed.emit(_orbit_step_sign, step_deg)
+				else:
+					# First time entering fishing view only
+					_in_fishing = true
+					entered_fishing_view.emit()
+					# Focus shift is scheduled by _enter_fishing(); nothing to call here.
+
 	_set_pos_from_angles(_theta, _elev_phi, _radius)
 	fishing_camera.look_at(pivot.global_position, Vector3.UP)
 
@@ -133,8 +153,8 @@ func _can_enter_fishing() -> bool:
 	if player == null or water_facing == null:
 		return false
 
-	var pfwd := player.global_transform.basis.z
-	var wfwd := water_facing.global_transform.basis.z
+	var pfwd: Vector3 = player.global_transform.basis.z
+	var wfwd: Vector3 = water_facing.global_transform.basis.z
 	pfwd.y = 0.0
 	wfwd.y = 0.0
 	if pfwd.length() == 0.0 or wfwd.length() == 0.0:
@@ -142,8 +162,8 @@ func _can_enter_fishing() -> bool:
 
 	pfwd = pfwd.normalized()
 	wfwd = wfwd.normalized()
-	var dotv := clampf(pfwd.dot(wfwd), -1.0, 1.0)
-	var ang_deg := rad_to_deg(acos(dotv))
+	var dotv: float = clampf(pfwd.dot(wfwd), -1.0, 1.0)
+	var ang_deg: float = rad_to_deg(acos(dotv))
 	return ang_deg <= cone_half_angle_deg
 
 # ---------- enter / exit ----------
@@ -152,8 +172,8 @@ func _enter_fishing() -> void:
 	_sample_from_exploration()  # sets _theta and _exp_theta
 
 	# Target yaw = behind the player (+Z forward → camera at -Z)
-	var fwd := player.global_transform.basis.z
-	var back2 := Vector2(-fwd.x, -fwd.z)
+	var fwd: Vector3 = player.global_transform.basis.z
+	var back2: Vector2 = Vector2(-fwd.x, -fwd.z)
 	if back2.length() == 0.0:
 		back2 = Vector2(0.0, 1.0)
 	else:
@@ -164,16 +184,16 @@ func _enter_fishing() -> void:
 
 	if force_ccw_enter:
 		# Positive modular delta [0..TAU)
-		var ccw := fmod(_theta_goal - _theta_start + TAU, TAU)
+		var ccw: float = fmod(_theta_goal - _theta_start + TAU, TAU)
 		if abs(PI - ccw) < 0.01:
 			ccw = PI
 		_enter_direction = 1
 		_enter_arc_rad = ccw
 		_active_arc_rad = _enter_arc_rad
 	else:
-		var d_short := _shortest_delta(_theta_start, _theta_goal)
+		var d_short: float = _shortest_delta(_theta_start, _theta_goal)
 		_enter_direction = _dir_sign(d_short)
-		var d_enter_signed := _delta_with_dir(_theta_start, _theta_goal, _enter_direction)
+		var d_enter_signed: float = _delta_with_dir(_theta_start, _theta_goal, _enter_direction)
 		_enter_arc_rad = abs(d_enter_signed)
 		_active_arc_rad = _enter_arc_rad
 
@@ -183,7 +203,7 @@ func _enter_fishing() -> void:
 	align_started.emit(true)
 
 	fishing_camera.current = true
-	_schedule_enter_focus_offset()
+	_schedule_enter_focus_offset()  # single, safe path for focus
 
 func _exit_fishing() -> void:
 	# cancel any scheduled enter-offset job and tween back to center
@@ -212,8 +232,8 @@ func _start_exit_to_exploration_view() -> void:
 
 # ---------- orbit ----------
 func _sample_from_exploration() -> void:
-	var rel := exploration_camera.global_position - pivot.global_position
-	var xz_len := Vector2(rel.x, rel.z).length()
+	var rel: Vector3 = exploration_camera.global_position - pivot.global_position
+	var xz_len: float = Vector2(rel.x, rel.z).length()
 	if xz_len < 0.0001:
 		xz_len = 0.0001
 
@@ -226,12 +246,12 @@ func _sample_from_exploration() -> void:
 	_exp_theta = _theta
 
 func _set_pos_from_angles(theta: float, phi: float, r: float) -> void:
-	var P := pivot.global_position
-	var cos_phi := cos(phi)
-	var xz := cos_phi * r
-	var x := sin(theta) * xz
-	var z := cos(theta) * xz
-	var y := sin(phi) * r
+	var P: Vector3 = pivot.global_position
+	var cos_phi: float = cos(phi)
+	var xz: float = cos_phi * r
+	var x: float = sin(theta) * xz
+	var z: float = cos(theta) * xz
+	var y: float = sin(phi) * r
 	fishing_camera.global_position = Vector3(P.x + x, P.y + y, P.z + z)
 
 # ---------- helpers ----------
@@ -243,23 +263,23 @@ func _dir_sign(x: float) -> int:
 	return 0
 
 func _delta_with_dir(from_theta: float, to_theta: float, desired_dir: int) -> float:
-	var raw_delta := _shortest_delta(from_theta, to_theta)  # (-PI, PI]
+	var raw_delta: float = _shortest_delta(from_theta, to_theta)  # (-PI, PI]
 	if desired_dir == 0 or raw_delta == 0.0:
 		return raw_delta
-	var same_dir := false
+	var same_dir: bool = false
 	if raw_delta > 0.0 and desired_dir > 0:
 		same_dir = true
 	elif raw_delta < 0.0 and desired_dir < 0:
 		same_dir = true
 	if same_dir:
 		return raw_delta
-	var dir_sign := 1.0
+	var dir_sign: float = 1.0
 	if desired_dir < 0:
 		dir_sign = -1.0
 	return raw_delta + TAU * dir_sign
 
 func _shortest_delta(a: float, b: float) -> float:
-	var d := fmod(b - a + PI, TAU)
+	var d: float = fmod(b - a + PI, TAU)
 	if d < 0.0:
 		d += TAU
 	return d - PI
@@ -326,6 +346,33 @@ func _schedule_enter_focus_offset() -> void:
 	if use_enter_focus_offset and my_token == _focus_apply_token:
 		await _tween_focus_offset_to(enter_h_offset, enter_v_offset, enter_focus_tween_time)
 
+# Orbit step triggered by DirectionSelector (e.g., ±30°)
+func orbit_around_player(delta_deg: float) -> void:
+	# Ignore if not in fishing view or if already aligning.
+	if not _in_fishing:
+		return
+	if _aligning:
+		return
+
+	var delta_rad: float = deg_to_rad(delta_deg)
+	_theta_start = _theta
+	_theta_goal = _theta + delta_rad
+
+	_enter_direction = 1
+	if delta_rad < 0.0:
+		_enter_direction = -1
+	_active_arc_rad = absf(delta_rad)
+	_enter_arc_rad = _active_arc_rad
+
+	_t_elapsed = 0.0
+	_aligning = true
+	_align_to_exploration = false
+	_orbit_step_mode = true
+	_orbit_step_sign = _enter_direction
+
+	align_started.emit(true)
+	fishing_camera.current = true
+
 # --- public getters for stepper / debug ---
 func is_aligning() -> bool:
 	return _aligning
@@ -338,7 +385,7 @@ func get_align_delta_rad() -> float:
 func get_align_sign() -> int:
 	if not _aligning:
 		return 0
-	var d := _theta - _theta_start
+	var d: float = _theta - _theta_start
 	if d > 0.0:
 		return 1
 	elif d < 0.0:
@@ -350,6 +397,6 @@ func get_align_total_rad() -> float:
 		return 0.0
 	return _active_arc_rad
 
-# --- FSM hooks ---
+# --- FSM hook ---
 func _on_fsm_ready_for_cancel() -> void:
 	_can_exit = true

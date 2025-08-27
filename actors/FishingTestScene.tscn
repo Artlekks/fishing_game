@@ -170,6 +170,7 @@ script = ExtResource("6_kkgos")
 player_path = NodePath("..")
 dots = [NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")]
 local_offset = Vector3(0, 0, 0)
+camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
 
 [node name="dot_0" parent="Player/DirectionSelector" index="0"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.22, 0.1, 0)
@@ -274,8 +275,10 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 [node name="CollisionShape3D" parent="Zones/FishZone" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
+[connection signal="request_camera_orbit" from="Player/DirectionSelector" to="CameraRig/Cameras/FishingCameraController" method="orbit_around_player"]
 [connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
 [connection signal="exited_to_exploration_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="soft_reset"]
+[connection signal="orbit_completed" from="CameraRig/Cameras/FishingCameraController" to="Player/DirectionSelector" method="on_camera_orbit_completed"]
 
 [editable path="World/River_001"]
 [editable path="Player"]
