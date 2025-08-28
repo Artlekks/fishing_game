@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=4 uid="uid://y0r5beh0g8ei"]
+[gd_scene load_steps=22 format=4 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://7udgt1a7s7pi" path="res://assets/models/fbx/River_001.blend" id="1_twt30"]
 [ext_resource type="Texture2D" uid="uid://b6p7jev721lti" path="res://assets/models/fbx/River_001_Marsh.png" id="2_fbfnt"]
@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://sdh188exepwu" path="res://actors/ExplorationPlayer.tscn" id="4_1vxb6"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="5_1a8ak"]
 [ext_resource type="PackedScene" uid="uid://cervguyak73k0" path="res://actors/FishZone.tscn" id="5_b0l47"]
-[ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="6_kkgos"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="6_x75a5"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="7_fbfnt"]
 [ext_resource type="Material" uid="uid://die4mg1q3qvno" path="res://data/ds_dot_overlay.tres" id="7_m77w1"]
@@ -165,12 +164,8 @@ render_priority = 1
 [node name="AxisGizmo" parent="Player" index="6"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
-[node name="DirectionSelector" parent="Player" index="8" node_paths=PackedStringArray("dots") groups=["direction_selector"]]
-script = ExtResource("6_kkgos")
-player_path = NodePath("..")
-dots = [NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")]
-local_offset = Vector3(0, 0, 0)
-camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
+[node name="DirectionSelector" parent="Player" index="8" groups=["direction_selector"]]
+visible = false
 
 [node name="dot_0" parent="Player/DirectionSelector" index="0"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.22, 0.1, 0)
@@ -275,7 +270,6 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 [node name="CollisionShape3D" parent="Zones/FishZone" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
-[connection signal="request_camera_orbit" from="Player/DirectionSelector" to="CameraRig/Cameras/FishingCameraController" method="orbit_around_player"]
 [connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
 [connection signal="exited_to_exploration_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="soft_reset"]
 [connection signal="orbit_completed" from="CameraRig/Cameras/FishingCameraController" to="Player/DirectionSelector" method="on_camera_orbit_completed"]
