@@ -121,23 +121,46 @@ func _stream_camera(delta: float, edge_sign: int) -> void:
 	var cap: float = extra_cap_deg
 	var step: float = stream_speed_deg * delta
 
-	# pushing outward until cap, else pull toward center
+	var delta_deg: float = 0.0
 	var same_side: bool = (_extra_deg == 0.0) or (signf(_extra_deg) == float(edge_sign))
+
 	if same_side:
-		var remaining: float = cap - absf(_extra_deg)
-		if remaining <= 0.0:
+		var remaining_up: float = cap - absf(_extra_deg)
+		if remaining_up <= 0.0:
 			return
-		var d: float = minf(step, remaining) * float(edge_sign)
-		_cam_ctrl.call("orbit_apply_delta_around_pivot", d, _player)
-		_extra_deg += d
-		_base_yaw += deg_to_rad(d)
-		_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+		delta_deg = minf(step, remaining_up) * float(edge_sign)
 	else:
-		var back: float = minf(step, absf(_extra_deg)) * float(-signf(_extra_deg))
-		_cam_ctrl.call("orbit_apply_delta_around_pivot", back, _player)
-		_extra_deg += back
-		_base_yaw += deg_to_rad(back)
-		_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+		var remaining_down: float = absf(_extra_deg)
+		if remaining_down <= 0.0:
+			return
+		delta_deg = minf(step, remaining_down) * float(-signf(_extra_deg))
+
+	_apply_camera_delta(delta_deg)
+
+	_extra_deg += delta_deg
+	_base_yaw += deg_to_rad(delta_deg)
+	_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+
+func _apply_camera_delta(delta_deg: float) -> void:
+	if _cam_ctrl == null:
+		return
+	if _cam_ctrl.has_method("orbit_apply_delta_immediate"):
+		_cam_ctrl.call("orbit_apply_delta_immediate", delta_deg)
+		return
+	if _cam_ctrl.has_method("orbit_around_player"):
+		_cam_ctrl.call("orbit_around_player", delta_deg) # step/tween fallback
+		return
+	# last-resort (only if your controller has neither API):
+	var cam := _cam_ctrl.get("fishing_camera") as Camera3D
+	if cam != null and _player != null:
+		var ang := deg_to_rad(delta_deg)
+		var piv := _player.global_transform.origin
+		var rel := cam.global_transform.origin - piv
+		rel = Basis(Vector3.UP, ang) * rel
+		var nb := cam.global_transform.basis.rotated(Vector3.UP, ang)
+		cam.global_transform = Transform3D(nb, piv + rel)
+		cam.look_at(piv, Vector3.UP)
+
 
 # ---- starting yaw from WaterFacing (optional) or player forward ----
 func _compute_start_yaw() -> float:

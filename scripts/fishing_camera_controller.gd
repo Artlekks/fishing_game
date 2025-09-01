@@ -380,18 +380,17 @@ func orbit_around_player(delta_deg: float) -> void:
 	align_started.emit(true)
 	fishing_camera.current = true
 	
+# Continuous yaw change (degrees). No tween. Updates our azimuth and re-places the fishing camera.
 func orbit_apply_delta_immediate(delta_deg: float) -> void:
-	if _is_exiting:
-		return
-	# Safer than relying on your own flags: only move if the fishing cam is actually current.
-	if fishing_camera == null or not fishing_camera.is_current():
-		return
-	if _aligning:
-		return
+	# 1) Update the controller's azimuth (θ) that your _process/_set_pos_from_angles uses.
 	_theta += deg_to_rad(delta_deg)
-	_set_pos_from_angles(_theta, _elev_phi, _radius)
-	fishing_camera.look_at(pivot.global_position, Vector3.UP)
 
+	# 2) Recompute position from the SAME helper you already use everywhere.
+	_set_pos_from_angles(_theta, _elev_phi, _radius)
+
+	# 3) Keep the camera looking at the pivot.
+	if is_instance_valid(fishing_camera) and is_instance_valid(pivot):
+		fishing_camera.look_at(pivot.global_position, Vector3.UP)
 
 # --- public getters for stepper / debug ---
 func orbit_apply_delta_around_pivot(delta_deg: float, pivot_override: Node3D = null) -> void:
