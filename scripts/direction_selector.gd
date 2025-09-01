@@ -1,138 +1,206 @@
 extends Node3D
-
 class_name DirectionSelector
 
-# ---- External references (set in Inspector) ----
+# ---- Paths ----
 @export var player_path: NodePath
 @export var camera_controller_path: NodePath
-@export var fishing_state_controller_path: NodePath   # Controller that emits `animation_change(anim: StringName)`
+@export var facing_source_path: NodePath         # optional (e.g. WaterFacing)
+@export_enum("+X","-X","+Z","-Z") var facing_axis: String = "-X"
 
-# Eight dots (N, NW, W, SW, S, SE, E, NE) or any number you use.
-# Fill these in the Inspector. They can be Sprite3D or MeshInstance3D/GeometryInstance3D.
+# ---- Dots (drag in order: dot_0..dot_7) ----
 @export var dots: Array[Node3D] = []
+@export var frame_hold_time: float = 1.0 / 60.0  # 1 frame at 60 FPS
+@export var pause_frames: int = 6                # all dots on for ~6 frames
 
-# Optional: enable/disable input handling for DS (left/right). Not used unless you add logic later.
-@export var action_left: StringName = &"ds_left"
-@export var action_right: StringName = &"ds_right"
-@export var enable_input: bool = false
+# ---- Placement (player-local) ----
+@export var local_offset: Vector3 = Vector3(0.0, 0.8, 0.6)
 
-# ---- Internal state ----
+# ---- Aim ----
+@export var max_local_deg: float = 30.0          # DS local swing
+@export var yaw_speed_deg: float = 180.0         # deg/sec to reach edge
+
+# ---- Camera continuous orbit (after 30°) ----
+@export var stream_speed_deg: float = 90.0       # deg/sec while held at edge
+@export var extra_cap_deg: float = 60.0          # extra beyond ±30° (→ total ±90°)
+
+# ---- Input ----
+const ACT_LEFT  := "ds_left"
+const ACT_RIGHT := "ds_right"
+
+# ---- State ----
 var _player: Node3D = null
-var _camera_controller: Node = null
-var _fsm: Node = null
-var _active: bool = false
+var _cam_ctrl: Node = null
+var _facing_src: Node3D = null
+
+var _base_yaw: float = 0.0            # world yaw baseline
+var _local_yaw: float = 0.0           # ±30°
+var _extra_deg: float = 0.0           # camera extra from center (−60..+60)
+var _edge_pause: float = 0.0
+var _was_at_edge: bool = false
+
+# dot cycle state
+var _phase: String = "grow"           # "grow" → "pause"
+var _idx: int = -1
+var _t: float = 0.0
 
 func _ready() -> void:
 	_player = get_node_or_null(player_path) as Node3D
-	_camera_controller = get_node_or_null(camera_controller_path)
-	_fsm = get_node_or_null(fishing_state_controller_path)
+	_cam_ctrl = get_node_or_null(camera_controller_path)
+	_facing_src = get_node_or_null(facing_source_path) as Node3D
 
-	# Apply overlay material and start hidden/inactive
-	_apply_overlay_material_to_dots()
 	_set_all(false)
 	visible = false
 	set_process(false)
 
-	# Camera hooks — hide as soon as exit starts (align out), and after exit completes.
-	if _camera_controller != null:
-		if _camera_controller.has_signal("align_started"):
-			var c1 := Callable(self, "_on_cam_align_started")
-			if not _camera_controller.is_connected("align_started", c1):
-				_camera_controller.connect("align_started", c1)
-		if _camera_controller.has_signal("exited_to_exploration_view"):
-			var c2 := Callable(self, "_on_cam_exited")
-			if not _camera_controller.is_connected("exited_to_exploration_view", c2):
-				_camera_controller.connect("exited_to_exploration_view", c2)
-
-	# FSM hook — mirror UX without coupling DS into FSM code.
-	# We only listen; we never call back into FSM or sprites.
-	if _fsm != null and _fsm.has_signal("animation_change"):
-		var c3 := Callable(self, "_on_fsm_animation_change")
-		if not _fsm.is_connected("animation_change", c3):
-			_fsm.connect("animation_change", c3)
-
-func _process(_delta: float) -> void:
-	if not _active:
-		return
-	# No input handling in this version. DS is display-only.
-
-# ---- Public API (called by listeners only; safe to call from anywhere) ----
 func show_for_fishing(origin: Node3D = null) -> void:
-	# origin is optional (player). DS does not rely on it for visibility.
 	if origin != null:
 		_player = origin
-	_active = true
-	_set_all(true)
+	if _player == null:
+		_player = get_node_or_null(player_path) as Node3D
+	_facing_src = get_node_or_null(facing_source_path) as Node3D
+
+	_base_yaw = _compute_start_yaw()
+	_local_yaw = 0.0
+	_extra_deg = 0.0
+	_edge_pause = 0.0
+	_was_at_edge = false
+
+	_restart_dots()
+
 	visible = true
 	set_process(true)
+	_update_pose()
 
 func hide_for_fishing() -> void:
-	_active = false
-	_set_all(false)
 	visible = false
 	set_process(false)
+	_set_all(false)
 
-# ---- Listeners ----
-func _on_cam_align_started(to_fishing: bool) -> void:
-	# When exiting fishing view (to_fishing == false), hide immediately so DS never overlaps with exit sprites.
-	if not to_fishing:
-		hide_for_fishing()
+func _process(delta: float) -> void:
+	if _player == null or _cam_ctrl == null:
+		_update_pose()
+		_step_dots(delta)
+		return
 
-func _on_cam_exited() -> void:
-	# After camera fully returns to exploration, ensure DS is hidden.
-	hide_for_fishing()
+	# input
+	var dir: float = 0.0
+	if Input.is_action_pressed(ACT_LEFT):
+		dir -= 1.0
+	if Input.is_action_pressed(ACT_RIGHT):
+		dir += 1.0
 
-func _on_fsm_animation_change(anim_name: StringName) -> void:
-	var s := String(anim_name)
-	if s == "Fishing_Idle":
-		show_for_fishing(_player)
-	elif s == "Prep_Throw":
-		hide_for_fishing()
-	elif s == "Cancel_Fishing":
-		hide_for_fishing()
+	# 1) glide to ±30°
+	var max_local: float = deg_to_rad(max_local_deg)
+	if dir != 0.0:
+		_local_yaw += deg_to_rad(yaw_speed_deg) * dir * delta
+		_local_yaw = clampf(_local_yaw, -max_local, max_local)
 
-# ---- Utilities (materials/visibility) ----
+	# just reached edge?
+	var at_edge: bool = absf(_local_yaw) >= max_local - 0.0001
+	if at_edge and not _was_at_edge:
+		_edge_pause = 0.12  # brief dwell
+
+	# 2) while at edge and key held → continuous camera orbit
+	if at_edge and dir != 0.0:
+		if _edge_pause > 0.0:
+			_edge_pause -= delta
+			if _edge_pause < 0.0:
+				_edge_pause = 0.0
+		else:
+			var edge_sign: int = 1
+			if _local_yaw < 0.0:
+				edge_sign = -1
+			_stream_camera(delta, edge_sign)
+
+	_update_pose()
+	_step_dots(delta)
+	_was_at_edge = at_edge
+
+# ---- continuous camera orbit after 30° ----
+func _stream_camera(delta: float, edge_sign: int) -> void:
+	var cap: float = extra_cap_deg
+	var step: float = stream_speed_deg * delta
+
+	# pushing outward until cap, else pull toward center
+	var same_side: bool = (_extra_deg == 0.0) or (signf(_extra_deg) == float(edge_sign))
+	if same_side:
+		var remaining: float = cap - absf(_extra_deg)
+		if remaining <= 0.0:
+			return
+		var d: float = minf(step, remaining) * float(edge_sign)
+		_cam_ctrl.call("orbit_apply_delta_around_pivot", d, _player)
+		_extra_deg += d
+		_base_yaw += deg_to_rad(d)
+		_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+	else:
+		var back: float = minf(step, absf(_extra_deg)) * float(-signf(_extra_deg))
+		_cam_ctrl.call("orbit_apply_delta_around_pivot", back, _player)
+		_extra_deg += back
+		_base_yaw += deg_to_rad(back)
+		_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+
+# ---- starting yaw from WaterFacing (optional) or player forward ----
+func _compute_start_yaw() -> float:
+	if _facing_src != null:
+		var b: Basis = _facing_src.global_transform.basis
+		var v: Vector3 = Vector3.ZERO
+		if facing_axis == "+X":
+			v = b.x
+		elif facing_axis == "-X":
+			v = -b.x
+		elif facing_axis == "+Z":
+			v = b.z
+		else:
+			v = -b.z
+		v.y = 0.0
+		if v.length() > 0.0001:
+			v = v.normalized()
+			return atan2(v.x, v.z)
+	# fallback = player forward
+	var fwd: Vector3 = -_player.global_transform.basis.z
+	fwd.y = 0.0
+	if fwd.length() > 0.0001:
+		fwd = fwd.normalized()
+		return atan2(fwd.x, fwd.z)
+	return 0.0
+
+# ---- pose ----
+func _update_pose() -> void:
+	if _player != null:
+		var xf: Transform3D = _player.global_transform
+		global_position = xf.origin + xf.basis * local_offset
+	rotation.y = _base_yaw + _local_yaw
+
+# ---- dots: 0..7 grow, hold all, reset (time-based) ----
+func _step_dots(delta: float) -> void:
+	_t += delta
+	if _t < frame_hold_time:
+		return
+	_t = 0.0
+
+	if _phase == "grow":
+		_idx += 1
+		if _idx < dots.size():
+			var d := dots[_idx]
+			if d: d.visible = true
+			if _idx == dots.size() - 1:
+				_phase = "pause"
+				_idx = pause_frames
+		else:
+			_phase = "pause"
+			_idx = pause_frames
+	elif _phase == "pause":
+		_idx -= 1
+		if _idx <= 0:
+			_restart_dots()
+
+func _restart_dots() -> void:
+	_set_all(false)
+	_phase = "grow"
+	_idx = -1
+	_t = 0.0
+
 func _set_all(state: bool) -> void:
-	var count := dots.size()
-	var i := 0
-	while i < count:
-		var d := dots[i]
-		if d != null:
+	for d in dots:
+		if d:
 			d.visible = state
-		i += 1
-
-func _apply_overlay_material_to_dots() -> void:
-	# Provide a lightweight unshaded overlay so dots remain readable in any lighting.
-	var count := dots.size()
-	var i := 0
-	while i < count:
-		var d := dots[i]
-		if d == null:
-			i += 1
-			continue
-
-		# If author already assigned a material_override in the editor, leave it.
-		if d is GeometryInstance3D:
-			var gi := d as GeometryInstance3D
-			if gi.material_override != null:
-				i += 1
-				continue
-
-		var mat := StandardMaterial3D.new()
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.no_depth_test = true
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.render_priority = 127
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-		mat.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
-
-		if d is Sprite3D:
-			var spr := d as Sprite3D
-			if spr.texture != null:
-				mat.albedo_texture = spr.texture
-			spr.material_override = mat
-		elif d is GeometryInstance3D:
-			var gi2 := d as GeometryInstance3D
-			gi2.material_override = mat
-
-		i += 1

@@ -1614,7 +1614,7 @@ script = ExtResource("2_y37r7")
 [node name="SpriteOrbitStepper" type="Node" parent="."]
 script = ExtResource("2_woub5")
 
-[node name="FishingSpriteAdapter" type="Node" parent="."]
+[node name="FishingStateMachine" type="Node" parent="."]
 script = ExtResource("4_07bsd")
 
 [node name="FishingStateController" type="Node" parent="."]

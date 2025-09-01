@@ -7,10 +7,10 @@
 # - Never touch camera exit or sprite restore logic (that stays in your stepper)
 
 extends Node
+@export var direction_selector: DirectionSelector
 
 @export var controller: Node                              # FishingStateController (emits `animation_change(anim: StringName)`)
 @export var sprite: AnimatedSprite3D
-@export var direction_selector: Node = null               # Optional. If set, must expose show_for_fishing()/hide_for_fishing()
 @export var player: Node3D = null                         # Optional. Passed to DS.show_for_fishing()
 @export var fishing_camera: Camera3D = null               # Optional, not used by this script (kept for modularity)
 @export var enforce_every_frame: bool = true
@@ -70,12 +70,10 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 	# 1) DS visibility (optional; DS remains decoupled from exit sprites)
 	if direction_selector != null:
 		if anim == "Fishing_Idle":
-			if direction_selector.has_method("show_for_fishing"):
-				# Pass player if available; DS ignores null.
-				direction_selector.call("show_for_fishing", player)
+			direction_selector.show_for_fishing(player)
 		elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-			if direction_selector.has_method("hide_for_fishing"):
-				direction_selector.call("hide_for_fishing")
+			direction_selector.hide_for_fishing()
+
 
 	# 2) Power bar lifecycle
 	if anim == "Prep_Throw":

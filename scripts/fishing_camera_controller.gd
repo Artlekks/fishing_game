@@ -56,6 +56,7 @@ var _enter_direction: int = 0       # +1 CCW, -1 CW
 var _enter_arc_rad: float = 0.0     # |ENTER arc|
 var _active_arc_rad: float = 0.0
 var _can_exit: bool = false         # becomes true after Prep_Fishing finished
+var _is_exiting: bool = false
 
 var _focus_apply_token: int = 5
 var _focus_offset_tween: Tween
@@ -128,6 +129,8 @@ func _process(delta: float) -> void:
 				fishing_camera.current = false
 				_in_fishing = false
 				exited_to_exploration_view.emit()
+				_is_exiting = false
+		
 			else:
 				# ENTER / ORBIT-IN-FISHING
 				if _orbit_step_mode:
@@ -229,6 +232,7 @@ func _start_exit_to_exploration_view() -> void:
 	_align_to_exploration = true
 	_active_arc_rad = _enter_arc_rad
 	align_started.emit(false)
+	_is_exiting = true
 
 # ---------- orbit ----------
 func _sample_from_exploration() -> void:
@@ -346,14 +350,17 @@ func _schedule_enter_focus_offset() -> void:
 	if use_enter_focus_offset and my_token == _focus_apply_token:
 		await _tween_focus_offset_to(enter_h_offset, enter_v_offset, enter_focus_tween_time)
 
+
 # Orbit step triggered by DirectionSelector (e.g., ±30°)
 func orbit_around_player(delta_deg: float) -> void:
+	if _is_exiting:
+		return
 	# Ignore if not in fishing view or if already aligning.
 	if not _in_fishing:
 		return
 	if _aligning:
 		return
-
+	
 	var delta_rad: float = deg_to_rad(delta_deg)
 	_theta_start = _theta
 	_theta_goal = _theta + delta_rad
@@ -372,8 +379,46 @@ func orbit_around_player(delta_deg: float) -> void:
 
 	align_started.emit(true)
 	fishing_camera.current = true
+	
+func orbit_apply_delta_immediate(delta_deg: float) -> void:
+	if _is_exiting:
+		return
+	# Safer than relying on your own flags: only move if the fishing cam is actually current.
+	if fishing_camera == null or not fishing_camera.is_current():
+		return
+	if _aligning:
+		return
+	_theta += deg_to_rad(delta_deg)
+	_set_pos_from_angles(_theta, _elev_phi, _radius)
+	fishing_camera.look_at(pivot.global_position, Vector3.UP)
+
 
 # --- public getters for stepper / debug ---
+func orbit_apply_delta_around_pivot(delta_deg: float, pivot_override: Node3D = null) -> void:
+	# Continuous, no tween. Rotates the fishing_camera around the given pivot on +Y.
+	if fishing_camera == null:
+		return
+	var p: Node3D = pivot_override
+	if p == null:
+		p = pivot
+	if p == null:
+		return
+
+	var ang: float = deg_to_rad(delta_deg)
+
+	# Rotate camera position around pivot
+	var cam_pos: Vector3 = fishing_camera.global_transform.origin
+	var pivot_pos: Vector3 = p.global_transform.origin
+	var v: Vector3 = cam_pos - pivot_pos
+	var rot: Basis = Basis(Vector3.UP, ang)
+	v = rot * v
+	cam_pos = pivot_pos + v
+
+	# Keep basis coherent and look back to pivot
+	var new_basis: Basis = fishing_camera.global_transform.basis.rotated(Vector3.UP, ang)
+	fishing_camera.global_transform = Transform3D(new_basis, cam_pos)
+	fishing_camera.look_at(pivot_pos, Vector3.UP)
+
 func is_aligning() -> bool:
 	return _aligning
 
@@ -400,3 +445,4 @@ func get_align_total_rad() -> float:
 # --- FSM hook ---
 func _on_fsm_ready_for_cancel() -> void:
 	_can_exit = true
+	_is_exiting = true

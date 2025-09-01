@@ -3,9 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://7udgt1a7s7pi" path="res://assets/models/fbx/River_001.blend" id="1_twt30"]
 [ext_resource type="Texture2D" uid="uid://b6p7jev721lti" path="res://assets/models/fbx/River_001_Marsh.png" id="2_fbfnt"]
 [ext_resource type="Texture2D" uid="uid://c8oupfxf1w7g0" path="res://assets/models/fbx/River_001_Marsh.png.png" id="3_23y3w"]
+[ext_resource type="Texture2D" uid="uid://c604j7m873hmu" path="res://assets/models/fbx/River_001_texpage-P8-F7B966398D445DA8-295D32AD34C50BB7-128x256-0-0-256x25.png" id="3_twt30"]
 [ext_resource type="PackedScene" uid="uid://b75bwnobhjxa0" path="res://actors/PowerMeter.tscn" id="3_yj5gx"]
 [ext_resource type="PackedScene" uid="uid://sdh188exepwu" path="res://actors/ExplorationPlayer.tscn" id="4_1vxb6"]
-[ext_resource type="Texture2D" uid="uid://c604j7m873hmu" path="res://assets/models/fbx/River_001_texpage-P8-F7B966398D445DA8-295D32AD34C50BB7-128x256-0-0-256x25.png" id="4_m77w1"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="5_1a8ak"]
 [ext_resource type="PackedScene" uid="uid://cervguyak73k0" path="res://actors/FishZone.tscn" id="5_b0l47"]
 [ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="6_m77w1"]
@@ -16,7 +16,6 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kkgos"]
 transparency = 4
-shading_mode = 0
 diffuse_mode = 3
 albedo_texture = ExtResource("2_fbfnt")
 texture_filter = 0
@@ -82,7 +81,7 @@ texture_filter = 0
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fbfnt"]
 transparency = 4
 shading_mode = 0
-albedo_texture = ExtResource("4_m77w1")
+albedo_texture = ExtResource("3_twt30")
 texture_filter = 0
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ahm77"]
@@ -150,7 +149,7 @@ sprite = NodePath("../AnimatedSprite3D")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 debug_log = true
 
-[node name="FishingStateMachine" parent="Player" index="2" node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera")]
+[node name="FishingSpriteAdapter" parent="Player" index="2" node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera")]
 direction_selector = NodePath("../DirectionSelector")
 controller = NodePath("../FishingStateController")
 sprite = NodePath("../AnimatedSprite3D")
@@ -167,54 +166,42 @@ render_priority = 1
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
 [node name="DirectionSelector" parent="Player" index="8" node_paths=PackedStringArray("dots") groups=["direction_selector"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.436357, 0, 0)
 script = ExtResource("6_m77w1")
 player_path = NodePath("..")
 camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
-facing_source_path = NodePath("../../Zones/FishZone/WaterFacing")
 dots = [NodePath("dot_0"), NodePath("dot_1"), NodePath("dot_2"), NodePath("dot_3"), NodePath("dot_4"), NodePath("dot_5"), NodePath("dot_6"), NodePath("dot_7")]
-frame_hold_time = 0.1
-local_offset = Vector3(-0.2, 0, -0.015)
 
 [node name="dot_0" parent="Player/DirectionSelector" index="0"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0.1, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.22, 0.1, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_1" parent="Player/DirectionSelector" index="1"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.08, 0.14, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.3, 0.16, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_2" parent="Player/DirectionSelector" index="2"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.16, 0.18, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.38, 0.22, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_3" parent="Player/DirectionSelector" index="3"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.24, 0.22, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.46, 0.28, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_4" parent="Player/DirectionSelector" index="4"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.32, 0.26, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.54, 0.34, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_5" parent="Player/DirectionSelector" index="5"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.4, 0.3, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.62, 0.4, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_6" parent="Player/DirectionSelector" index="6"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.48, 0.34, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.7, 0.46, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="dot_7" parent="Player/DirectionSelector" index="7"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.56, 0.38, 0)
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0.78, 0.52, 0)
 material_override = ExtResource("7_m77w1")
-render_priority = 127
 
 [node name="UI" type="Node3D" parent="."]
 
@@ -262,7 +249,7 @@ fov = 35.0
 [node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing", "fishing_state_controller")]
 script = ExtResource("10_23y3w")
 player = NodePath("../../../Player")
-pivot = NodePath("../../../Player")
+pivot = NodePath("../../../Player/CamFocus")
 exploration_camera = NodePath("../PCam_Exploration")
 fishing_camera = NodePath("../Cam_Fishing")
 water_facing = NodePath("../../../Zones/FishZone/WaterFacing")
