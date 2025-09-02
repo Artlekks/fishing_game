@@ -60,6 +60,7 @@ var _is_exiting: bool = false
 
 var _focus_apply_token: int = 5
 var _focus_offset_tween: Tween
+var _entry_dir_frozen: bool = false
 
 func _ready() -> void:
 	if player == null or pivot == null or exploration_camera == null or fishing_camera == null:
@@ -198,7 +199,8 @@ func _enter_fishing() -> void:
 		var d_enter_signed: float = _delta_with_dir(_theta_start, _theta_goal, _enter_direction)
 		_enter_arc_rad = abs(d_enter_signed)
 		_active_arc_rad = _enter_arc_rad
-
+		_entry_dir_frozen = true
+		
 	_t_elapsed = 0.0
 	_aligning = true
 	_align_to_exploration = false
@@ -236,6 +238,10 @@ func _start_exit_to_exploration_view() -> void:
 	var directed := _delta_with_dir(_theta_start, _exp_theta, -_enter_direction)
 	_active_arc_rad = absf(directed)
 
+func _set_enter_direction_once(dir: int) -> void:
+	if not _entry_dir_frozen:
+		_enter_direction = dir
+		
 # ---------- orbit ----------
 func _sample_from_exploration() -> void:
 	var rel: Vector3 = exploration_camera.global_position - pivot.global_position
