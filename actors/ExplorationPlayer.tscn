@@ -1,4 +1,4 @@
-[gd_scene load_steps=234 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=235 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -34,6 +34,7 @@
 [ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="28_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="29_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
+[ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="34_bae3b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
 radius = 0.0838186
@@ -1647,51 +1648,65 @@ script = ExtResource("27_yhyju")
 [node name="CamFocus" type="Node3D" parent="."]
 
 [node name="DirectionSelector" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.181921, 0.0610066, 0)
+script = ExtResource("34_bae3b")
 
-[node name="dot_0" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.22, 0.1, 0)
+[node name="DS_ScreenFacing" type="Node3D" parent="DirectionSelector"]
+
+[node name="DS_Aim" type="Node3D" parent="DirectionSelector/DS_ScreenFacing"]
+
+[node name="dot_0" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_1" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.3, 0.16, 0)
+[node name="dot_1" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.1, 0.05, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_2" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.38, 0.22, 0)
+[node name="dot_2" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.2, 0.1, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_3" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.46, 0.28, 0)
+[node name="dot_3" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.3, 0.15, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_4" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.54, 0.34, 0)
+[node name="dot_4" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.4, 0.2, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_5" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.62, 0.4, 0)
+[node name="dot_5" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.5, 0.25, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_6" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.7, 0.46, 0)
+[node name="dot_6" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.6, 0.3, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_7" type="Sprite3D" parent="DirectionSelector"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.78, 0.52, 0)
+[node name="dot_7" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.7, 0.35, 0)
 billboard = 1
+fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
