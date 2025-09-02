@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cdvgj4jlrv1p5" path="res://scripts/fish_zone.gd" id="1_mxd7y"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_mxd7y"]
-radius = 1.65525
+radius = 1.49364
 
 [node name="FishZone" type="Area3D" groups=["fish_zone"]]
 script = ExtResource("1_mxd7y")

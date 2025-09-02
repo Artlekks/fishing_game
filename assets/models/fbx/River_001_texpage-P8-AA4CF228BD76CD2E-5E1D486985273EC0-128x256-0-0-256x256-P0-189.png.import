@@ -2,17 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nmyhf8j6w2pi"
-path.s3tc="res://.godot/imported/texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png-d3ed4a03f7cbc6b7223c4b505bcebde1.s3tc.ctex"
+uid="uid://cfv0c214fythq"
+path.s3tc="res://.godot/imported/River_001_texpage-P8-AA4CF228BD76CD2E-5E1D486985273EC0-128x256-0-0-256x256-P0-189.png-f29ad7a3fefda0d20d2477351bd4cfc3.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
+generator_parameters={
+"md5": "6313ba2454fb2cca1c6d974d4580924f"
+}
 
 [deps]
 
-source_file="res://assets/models/textures/texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png"
-dest_files=["res://.godot/imported/texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png-d3ed4a03f7cbc6b7223c4b505bcebde1.s3tc.ctex"]
+source_file="res://assets/models/fbx/River_001_texpage-P8-AA4CF228BD76CD2E-5E1D486985273EC0-128x256-0-0-256x256-P0-189.png"
+dest_files=["res://.godot/imported/River_001_texpage-P8-AA4CF228BD76CD2E-5E1D486985273EC0-128x256-0-0-256x256-P0-189.png-f29ad7a3fefda0d20d2477351bd4cfc3.s3tc.ctex"]
 
 [params]
 
