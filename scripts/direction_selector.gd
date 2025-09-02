@@ -2,29 +2,35 @@ extends Node3D
 class_name DirectionSelector
 
 # --- References ---
-@export var follow_target: Node3D            # anchor (player/hand). If null, uses self.
-@export var fishing_camera: Camera3D         # used to copy yaw for the screen-facing plane
-@export var camera_controller: Node = null   # optional; must implement orbit_apply_delta_immediate(deg)
+@export var follow_target: Node3D
+@export var fishing_camera: Camera3D
+@export var camera_controller: Node = null      # must implement orbit_apply_delta_immediate(deg)
+@export var dots: Array[Node3D] = []
 
-@export var dots: Array[Node3D] = []         # optional: for batch visibility
-
-# --- Tuning ---
+# --- Visual placement / orientation ---
 @export var local_offset: Vector3 = Vector3(-0.2, 0.0, -0.015)
+@export var base_yaw_offset_deg: float = 180.0  # spawn flipped 180° from camera yaw (your request)
 
-@export var max_local_deg: float = 30.0      # visual DS yaw range (±30°) before streaming
-@export var max_total_deg: float = 90.0      # absolute cap from center (±90° total)
-@export var edge_hold_time: float = 0.12     # short pause at ±30° before streaming
+# --- Movement limits / timing ---
+@export var max_local_deg: float = 30.0         # DS local range before streaming
+@export var max_total_deg: float = 90.0         # absolute cap from center
+@export var edge_hold_time: float = 0.12        # pause at ±30 before streaming
 
-@export var yaw_speed_deg: float = 180.0     # speed for the first 30° (visual-only)
-@export var stream_speed_deg: float = 90.0   # camera streaming speed once at edge
+@export var yaw_speed_deg: float = 180.0        # speed for the first 30° (visual)
+@export var stream_speed_deg: float = 90.0      # camera streaming speed after hold
 
+# --- Input actions ---
 @export var enable_input: bool = true
 @export var action_left: StringName = &"ds_left"
 @export var action_right: StringName = &"ds_right"
 
+# --- Dot cadence (dot_0..dot_7, hold, clear, repeat) ---
+@export var dot_step_time: float = 0.10         # seconds per step
+@export var dot_hold_steps: int = 6             # how many steps to hold with all dots on
+
 # --- Internals ---
-var _screen: Node3D = null        # DS_ScreenFacing
-var _aim: Node3D = null           # DS_Aim
+var _screen: Node3D = null
+var _aim: Node3D = null
 var _active: bool = false
 var _local_yaw_deg: float = 0.0
 
@@ -32,16 +38,20 @@ var _edge_hold_t: float = 0.0
 var _streaming: bool = false
 var _last_input_sign: int = 0
 
-# how many degrees of camera rotation we have streamed from center (right=+, left=-)
+# signed camera-stream offset from center, in degrees (right +, left -)
 var _streamed_from_center_deg: float = 0.0
-var _max_stream_deg: float = 60.0  # computed from max_total_deg - max_local_deg
+var _max_stream_deg: float = 60.0
+
+# dots animation state
+var _dot_time: float = 0.0
+var _dot_index: int = -1    # -1 means all off; 0..7 progressively on
+var _dot_hold_left: int = 0
 
 func _ready() -> void:
 	_screen = get_node_or_null("DS_ScreenFacing") as Node3D
 	_aim = get_node_or_null("DS_ScreenFacing/DS_Aim") as Node3D
-
 	if _screen == null or _aim == null:
-		push_error("DirectionSelector: expected children 'DS_ScreenFacing/DS_Aim'.")
+		push_error("DirectionSelector: expected 'DS_ScreenFacing/DS_Aim' children.")
 		set_process(false)
 		return
 
@@ -63,6 +73,12 @@ func show_for_fishing(origin: Node3D = null) -> void:
 	_last_input_sign = 0
 	_streamed_from_center_deg = 0.0
 
+	# restart dot cadence
+	_dot_time = 0.0
+	_dot_index = -1
+	_dot_hold_left = 0
+	_apply_dot_frame()
+
 	_set_all_dots_visible(true)
 	visible = true
 	set_process(true)
@@ -80,6 +96,7 @@ func _process(delta: float) -> void:
 		return
 
 	_update_pose()
+	_update_dot_anim(delta)
 
 	if not enable_input:
 		return
@@ -94,18 +111,17 @@ func _process(delta: float) -> void:
 		input_sign = 1
 
 	if input_sign == 0:
-		# released: stop streaming, reset hold
 		_edge_hold_t = 0.0
 		_streaming = false
 		_last_input_sign = 0
 	else:
-		# if direction flipped while streaming, require a new hold at the other edge
+		# If direction flipped while streaming, stop streaming and require a new hold at the new edge
 		if _streaming and input_sign != _last_input_sign:
 			_streaming = false
 			_edge_hold_t = 0.0
 
 		if not _streaming:
-			# move visual DS toward the edge at yaw_speed
+			# steer visual DS toward new edge
 			var target: float = float(input_sign) * max_local_deg
 			var step: float = yaw_speed_deg * delta * float(input_sign)
 			var next_yaw: float = _local_yaw_deg + step
@@ -118,7 +134,7 @@ func _process(delta: float) -> void:
 
 			_local_yaw_deg = next_yaw
 
-			# when at edge, accumulate hold time
+			# hold timer once exactly at the edge
 			var at_edge: bool = absf(_local_yaw_deg) >= max_local_deg - 0.001
 			if at_edge:
 				_edge_hold_t += delta
@@ -130,17 +146,26 @@ func _process(delta: float) -> void:
 				_edge_hold_t = 0.0
 
 		if _streaming:
-			# total cap: ±(max_local + max_stream) == ±max_total
-			var remaining: float = _max_stream_deg - absf(_streamed_from_center_deg)
-			if remaining > 0.0001:
-				var delta_cam: float = stream_speed_deg * delta
-				if delta_cam > remaining:
-					delta_cam = remaining
-				if camera_controller != null and camera_controller.has_method("orbit_apply_delta_immediate"):
-					camera_controller.call("orbit_apply_delta_immediate", delta_cam * float(input_sign))
-					_streamed_from_center_deg += delta_cam * float(input_sign)
+			# compute remaining capacity toward the pressed direction (signed)
+			var target_stream: float = float(_last_input_sign) * _max_stream_deg
+			var signed_remaining: float = target_stream - _streamed_from_center_deg
+			var mag_remaining: float = absf(signed_remaining)
 
-			# keep DS aim pinned at the edge while streaming
+			if mag_remaining > 0.0001:
+				var step_deg: float = stream_speed_deg * delta
+				if step_deg > mag_remaining:
+					step_deg = mag_remaining
+				var signed_step: float = step_deg
+				if signed_remaining < 0.0:
+					signed_step = -step_deg
+
+				# apply to camera
+				if camera_controller != null and camera_controller.has_method("orbit_apply_delta_immediate"):
+					camera_controller.call("orbit_apply_delta_immediate", signed_step)
+
+				_streamed_from_center_deg += signed_step
+
+			# keep visual DS pinned at ±30 while streaming
 			_local_yaw_deg = float(_last_input_sign) * max_local_deg
 
 	_apply_local_yaw()
@@ -151,16 +176,16 @@ func _update_pose() -> void:
 	if anchor == null:
 		anchor = self
 
-	# place DS root at anchor + local offset
+	# root position = anchor + local offset (in anchor space)
 	var t: Transform3D = anchor.global_transform
 	var offset_ws: Vector3 = t.basis * local_offset
 	global_position = anchor.global_position + offset_ws
 
-	# screen-facing: copy camera yaw only
+	# screen-facing yaw = camera yaw + base offset (keep level)
 	if fishing_camera != null:
-		var yaw: float = _extract_camera_yaw(fishing_camera)
+		var yaw_cam: float = _extract_camera_yaw(fishing_camera)
 		var e: Vector3 = _screen.rotation
-		e.y = yaw
+		e.y = yaw_cam + deg_to_rad(base_yaw_offset_deg)
 		e.x = 0.0
 		e.z = 0.0
 		_screen.rotation = e
@@ -171,6 +196,43 @@ func _apply_local_yaw() -> void:
 	var e: Vector3 = _aim.rotation
 	e.y = deg_to_rad(_local_yaw_deg)
 	_aim.rotation = e
+
+# --- Dots cadence ---
+func _update_dot_anim(delta: float) -> void:
+	_dot_time += delta
+	if _dot_hold_left > 0:
+		# holding with all dots visible
+		if _dot_time >= dot_step_time:
+			_dot_time = 0.0
+			_dot_hold_left -= 1
+			if _dot_hold_left <= 0:
+				# clear and restart
+				_dot_index = -1
+				_apply_dot_frame()
+		return
+
+	if _dot_time >= dot_step_time:
+		_dot_time = 0.0
+		if _dot_index < 7:
+			_dot_index += 1
+			_apply_dot_frame()
+		else:
+			# reached dot_7: hold a few steps with all on
+			_dot_hold_left = dot_hold_steps
+
+func _apply_dot_frame() -> void:
+	var n: int = dots.size()
+	var i: int = 0
+	while i < n:
+		var d: Node3D = dots[i]
+		if d != null:
+			if _dot_index < 0:
+				d.visible = false
+			elif i <= _dot_index:
+				d.visible = true
+			else:
+				d.visible = false
+		i += 1
 
 # --- Helpers ---
 func _set_all_dots_visible(v: bool) -> void:
@@ -183,7 +245,6 @@ func _set_all_dots_visible(v: bool) -> void:
 		i += 1
 
 func _extract_camera_yaw(cam: Camera3D) -> float:
-	# compute yaw from camera forward on XZ
 	var fwd: Vector3 = -(cam.global_transform.basis.z)
 	var y: float = 0.0
 	if absf(fwd.x) > 0.000001 or absf(fwd.z) > 0.000001:

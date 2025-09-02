@@ -154,10 +154,38 @@ render_priority = 1
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
 [node name="DirectionSelector" parent="Player" index="8" node_paths=PackedStringArray("follow_target", "fishing_camera", "camera_controller", "dots") groups=["direction_selector"]]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.181921, 0.0610066, 0)
 follow_target = NodePath("..")
 fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 dots = [NodePath("DS_ScreenFacing/DS_Aim/dot_0"), NodePath("DS_ScreenFacing/DS_Aim/dot_1"), NodePath("DS_ScreenFacing/DS_Aim/dot_2"), NodePath("DS_ScreenFacing/DS_Aim/dot_3"), NodePath("DS_ScreenFacing/DS_Aim/dot_4"), NodePath("DS_ScreenFacing/DS_Aim/dot_5"), NodePath("DS_ScreenFacing/DS_Aim/dot_6"), NodePath("DS_ScreenFacing/DS_Aim/dot_7")]
+local_offset = Vector3(0, 0, 0)
+max_local_deg = 15.0
+max_total_deg = 45.0
+
+[node name="dot_0" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="0"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+
+[node name="dot_1" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="1"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.1, 0.05, 0)
+
+[node name="dot_2" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="2"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.2, 0.1, 0)
+
+[node name="dot_3" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="3"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.3, 0.15, 0)
+
+[node name="dot_4" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="4"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.4, 0.2, 0)
+
+[node name="dot_5" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="5"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.5, 0.25, 0)
+
+[node name="dot_6" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="6"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.6, 0.3, 0)
+
+[node name="dot_7" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="7"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.7, 0.35, 0)
 
 [node name="UI" type="Node3D" parent="."]
 
