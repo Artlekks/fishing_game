@@ -140,6 +140,7 @@ func _stream_camera(delta: float, edge_sign: int) -> void:
 	_extra_deg += delta_deg
 	_base_yaw += deg_to_rad(delta_deg)
 	_local_yaw = float(edge_sign) * deg_to_rad(max_local_deg)
+	_extra_deg = clampf(_extra_deg, -extra_cap_deg, extra_cap_deg)
 
 func _apply_camera_delta(delta_deg: float) -> void:
 	if _cam_ctrl == null:

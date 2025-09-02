@@ -67,19 +67,21 @@ func _pm_cancel() -> void:
 func _on_controller_animation_change(anim_name: StringName) -> void:
 	var anim := String(anim_name)
 
-	# 1) DS visibility (optional; DS remains decoupled from exit sprites)
+	# DS visibility
 	if direction_selector != null:
 		if anim == "Fishing_Idle":
-			direction_selector.show_for_fishing(player)
+			if direction_selector.has_method("show_for_fishing"):
+				direction_selector.call("show_for_fishing", player)
 		elif anim == "Prep_Throw" or anim == "Cancel_Fishing":
-			direction_selector.hide_for_fishing()
+			if direction_selector.has_method("hide_for_fishing"):
+				direction_selector.call("hide_for_fishing")
 
-
-	# 2) Power bar lifecycle
+	# Power bar
 	if anim == "Prep_Throw":
 		_pm_start()
 	elif anim == "Cancel_Fishing" or anim == "Throw":
 		_pm_cancel()
+
 
 	# 3) Play the sprite animation safely
 	_play_sprite_anim(anim)
