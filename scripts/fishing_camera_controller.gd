@@ -106,11 +106,10 @@ func _process(delta: float) -> void:
 
 		var d_theta: float = 0.0
 		if _align_to_exploration:
-			d_theta = float(-_enter_direction) * _enter_arc_rad
+			d_theta = _delta_with_dir(_theta_start, _exp_theta, -_enter_direction)
 		else:
 			if _orbit_step_mode:
-				# Signed step requested by DS
-				d_theta = float(_enter_direction) * _enter_arc_rad
+				d_theta = float(_orbit_step_sign) * _active_arc_rad
 			else:
 				if force_ccw_enter:
 					d_theta = float(_enter_direction) * _enter_arc_rad
@@ -230,9 +229,12 @@ func _start_exit_to_exploration_view() -> void:
 	_t_elapsed = 0.0
 	_aligning = true
 	_align_to_exploration = true
-	_active_arc_rad = _enter_arc_rad
 	align_started.emit(false)
 	_is_exiting = true
+
+	# Use reverse of entry direction; compute arc from current θ to _exp_theta
+	var directed := _delta_with_dir(_theta_start, _exp_theta, -_enter_direction)
+	_active_arc_rad = absf(directed)
 
 # ---------- orbit ----------
 func _sample_from_exploration() -> void:
@@ -355,31 +357,31 @@ func _schedule_enter_focus_offset() -> void:
 func orbit_around_player(delta_deg: float) -> void:
 	if _is_exiting:
 		return
-	# Ignore if not in fishing view or if already aligning.
 	if not _in_fishing:
 		return
 	if _aligning:
 		return
-	
+
 	var delta_rad: float = deg_to_rad(delta_deg)
 	_theta_start = _theta
 	_theta_goal = _theta + delta_rad
 
-	_enter_direction = 1
-	if delta_rad < 0.0:
-		_enter_direction = -1
+	# DO NOT touch entry direction/arc here.
 	_active_arc_rad = absf(delta_rad)
-	_enter_arc_rad = _active_arc_rad
+	_orbit_step_mode = true
+
+	_orbit_step_sign = 1
+	if delta_rad < 0.0:
+		_orbit_step_sign = -1
 
 	_t_elapsed = 0.0
 	_aligning = true
 	_align_to_exploration = false
-	_orbit_step_mode = true
-	_orbit_step_sign = _enter_direction
 
 	align_started.emit(true)
 	fishing_camera.current = true
-	
+
+
 # Continuous yaw change (degrees). No tween. Updates our azimuth and re-places the fishing camera.
 func orbit_apply_delta_immediate(delta_deg: float) -> void:
 	# 1) Update the controller's azimuth (θ) that your _process/_set_pos_from_angles uses.
