@@ -14,6 +14,7 @@ extends Node
 @export var player: Node3D = null                         # Optional. Passed to DS.show_for_fishing()
 @export var fishing_camera: Camera3D = null               # Optional, not used by this script (kept for modularity)
 @export var enforce_every_frame: bool = true
+@export var fishing_camera_controller: Node = null  # drag your FishingCameraController here
 
 # PowerMeter group (HUD node looked up dynamically so there's no hard reference)
 @export var power_meter_group: StringName = &"hud_power_meter"
@@ -37,7 +38,14 @@ func _ready() -> void:
 	# Sprite → FSM (animation finished)
 	if not sprite.animation_finished.is_connected(_on_sprite_animation_finished):
 		sprite.animation_finished.connect(_on_sprite_animation_finished)
-
+	
+	# connect once
+	if fishing_camera and fishing_camera.has_signal("entered_fishing_view"):
+		fishing_camera.entered_fishing_view.connect(_on_cam_ready_for_ds)
+	
+	if fishing_camera_controller != null and fishing_camera_controller.has_signal("entered_fishing_view"):
+		fishing_camera_controller.entered_fishing_view.connect(_on_cam_ready_for_ds)
+		# remove any old call that showed DS on "Fishing_Idle"
 func _process(_delta: float) -> void:
 	if not enforce_every_frame:
 		return
@@ -89,6 +97,16 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 func _on_sprite_animation_finished() -> void:
 	if controller != null:
 		controller.call("on_animation_finished", StringName(sprite.animation))
+
+func _on_cam_ready_for_ds() -> void:
+	if direction_selector:
+		direction_selector.show_for_fishing(player)  # pass your player/anchor
+	# Run next frame so the camera's last look_at/transform is already applied.
+	call_deferred("_deferred_show_ds")
+	
+func _deferred_show_ds() -> void:
+	if direction_selector != null and direction_selector.has_method("show_for_fishing"):
+		direction_selector.call("show_for_fishing")  # pass player if your DS expects it
 
 # ---------------- Helpers ----------------
 func _play_sprite_anim(anim: String) -> void:

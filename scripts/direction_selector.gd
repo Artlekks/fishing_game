@@ -28,6 +28,8 @@ class_name DirectionSelector
 @export var dot_step_time: float = 0.10         # seconds per step
 @export var dot_hold_steps: int = 6             # how many steps to hold with all dots on
 
+@export var spawn_local_deg: float = 15.0       # the on-screen slant you want at spawn
+
 # --- Internals ---
 var _screen: Node3D = null
 var _aim: Node3D = null
@@ -66,18 +68,29 @@ func _ready() -> void:
 func show_for_fishing(origin: Node3D = null) -> void:
 	if origin != null:
 		follow_target = origin
+
+	top_level = true                    # <<< ignore parent transform while active
+	rotation = Vector3.ZERO            # clean slate
+	scale = Vector3.ONE
+
+	# snap screen-facing yaw now
+	if fishing_camera != null:
+		var yaw_cam := _extract_camera_yaw(fishing_camera)
+		var e := _screen.rotation
+		e.y = yaw_cam + deg_to_rad(base_yaw_offset_deg)
+		e.x = 0.0
+		e.z = 0.0
+		_screen.rotation = e
+
 	_active = true
-	_local_yaw_deg = 0.0
 	_edge_hold_t = 0.0
 	_streaming = false
 	_last_input_sign = 0
 	_streamed_from_center_deg = 0.0
 
-	# restart dot cadence
-	_dot_time = 0.0
-	_dot_index = -1
-	_dot_hold_left = 0
-	_apply_dot_frame()
+	_local_yaw_deg = spawn_local_deg   # your fixed slant (e.g., 15)
+
+	# (dot reset as you already have)
 
 	_set_all_dots_visible(true)
 	visible = true
@@ -87,9 +100,11 @@ func show_for_fishing(origin: Node3D = null) -> void:
 
 func hide_for_fishing() -> void:
 	_active = false
+	top_level = false                   # <<< restore normal parenting
 	_set_all_dots_visible(false)
 	visible = false
 	set_process(false)
+
 
 func _process(delta: float) -> void:
 	if not _active:
@@ -176,19 +191,27 @@ func _update_pose() -> void:
 	if anchor == null:
 		anchor = self
 
-	# root position = anchor + local offset (in anchor space)
-	var t: Transform3D = anchor.global_transform
-	var offset_ws: Vector3 = t.basis * local_offset
-	global_position = anchor.global_position + offset_ws
+	# anchor position
+	var p := anchor.global_position
 
-	# screen-facing yaw = camera yaw + base offset (keep level)
+	# offset in SCREEN space (yaw from camera), not player space
 	if fishing_camera != null:
-		var yaw_cam: float = _extract_camera_yaw(fishing_camera)
-		var e: Vector3 = _screen.rotation
-		e.y = yaw_cam + deg_to_rad(base_yaw_offset_deg)
+		var yaw_cam := _extract_camera_yaw(fishing_camera)
+		var yaw := yaw_cam + deg_to_rad(base_yaw_offset_deg)
+
+		var screen_basis := Basis(Vector3.UP, yaw)   # yaw-only, level
+		var offset_ws := screen_basis * local_offset
+
+		# write a full global transform with identity basis -> no inherited rotation
+		global_transform = Transform3D(Basis.IDENTITY, p + offset_ws)
+
+		# keep the view-aligned child yawed to the camera
+		var e := _screen.rotation
+		e.y = yaw
 		e.x = 0.0
 		e.z = 0.0
 		_screen.rotation = e
+
 
 func _apply_local_yaw() -> void:
 	if _aim == null:
