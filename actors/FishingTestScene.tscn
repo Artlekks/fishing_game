@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://y0r5beh0g8ei"]
+[gd_scene load_steps=25 format=3 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://bsoegp3obkt23" path="res://assets/models/fbx/River_001.glb" id="1_twt30"]
 [ext_resource type="Texture2D" uid="uid://dql6tqfotmh70" path="res://assets/models/fbx/River_001_texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png" id="2_7mysf"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://dxr6el6wnxr2c" path="res://assets/models/fbx/River_001_texpage-P8-F7B966398D445DA8-295D32AD34C50BB7-128x256-0-0-256x256-P0-255.png" id="5_bj8je"]
 [ext_resource type="Script" uid="uid://csjccrhj5wnx7" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd" id="6_x75a5"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="7_fbfnt"]
+[ext_resource type="PackedScene" uid="uid://dlrxhabxv2084" path="res://actors/FishingHUD.tscn" id="9_00n6f"]
 [ext_resource type="Script" uid="uid://7hqptmotblom" path="res://scripts/fishing_camera_controller.gd" id="10_23y3w"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
@@ -205,6 +206,18 @@ follow_viewport_enabled = true
 cycle_duration = 0.9
 target_3d_path = NodePath("../../Player")
 
+[node name="FishingHud" parent="UI" instance=ExtResource("9_00n6f")]
+camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
+root_path = NodePath("HUDRoot")
+compass_path = NodePath("HUDRoot/Compass")
+location_path = NodePath("HUDRoot/Location")
+menu_path = NodePath("HUDRoot/Menu")
+compass_on = Vector2(26, 15)
+location_on = Vector2(352, 22)
+menu_on = Vector2(26, 365)
+compass_off_margin_px = 64.0
+menu_off_margin_px = 80.0
+
 [node name="CameraRig" type="Node3D" parent="."]
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
@@ -274,4 +287,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.92
 [editable path="World/River_001"]
 [editable path="Player"]
 [editable path="UI/PowerMeter"]
+[editable path="UI/FishingHud"]
 [editable path="Zones/FishZone"]
