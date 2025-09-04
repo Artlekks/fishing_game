@@ -37,7 +37,7 @@
 [ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="34_bae3b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
-radius = 0.0838186
+radius = 0.0972981
 height = 0.450552
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v4ops"]
@@ -1622,11 +1622,11 @@ script = ExtResource("4_07bsd")
 script = ExtResource("4_ejpxr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.223204, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+offset = Vector2(0, 11)
 billboard = 1
 texture_filter = 0
 render_priority = 1
@@ -1634,12 +1634,12 @@ sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Prep_Throw"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
-transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0, 0, 0)
-sorting_offset = 1.0
+transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, 0.075, 0)
 material_override = SubResource("StandardMaterial3D_ajpwy")
 cast_shadow = 0
 alpha_cut = 2
 texture_filter = 0
+render_priority = 10
 texture = SubResource("CompressedTexture2D_ajpwy")
 
 [node name="AxisGizmo" type="Node3D" parent="."]
