@@ -1626,10 +1626,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.223204, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0819474, 0)
 offset = Vector2(0, 11)
 billboard = 1
 texture_filter = 0
-render_priority = 1
 sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Prep_Throw"
 
@@ -1639,7 +1639,6 @@ material_override = SubResource("StandardMaterial3D_ajpwy")
 cast_shadow = 0
 alpha_cut = 2
 texture_filter = 0
-render_priority = 10
 texture = SubResource("CompressedTexture2D_ajpwy")
 
 [node name="AxisGizmo" type="Node3D" parent="."]
