@@ -453,3 +453,11 @@ func get_align_total_rad() -> float:
 func _on_fsm_ready_for_cancel() -> void:
 	_can_exit = true
 	_is_exiting = true
+
+# Public helper for HUD — true only when K can be pressed in exploration.
+func is_cast_allowed() -> bool:
+	# Don’t show in fishing or while aligning
+	if _in_fishing or _aligning:
+		return false
+	# Reuse the same gating used for K (player +Z vs WaterFacing +Z within cone)
+	return _can_enter_fishing()

@@ -213,12 +213,9 @@ follow_viewport_enabled = true
 cycle_duration = 0.9
 target_3d_path = NodePath("../../Player")
 
-[node name="FishingHud" parent="UI" instance=ExtResource("9_00n6f")]
+[node name="FishingHud" parent="UI" node_paths=PackedStringArray("fishing_camera_controller") instance=ExtResource("9_00n6f")]
 camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
-root_path = NodePath("HUDRoot")
-compass_path = NodePath("HUDRoot/Compass")
-location_path = NodePath("HUDRoot/Location")
-menu_path = NodePath("HUDRoot/Menu")
+fishing_camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 compass_on = Vector2(26, 15)
 location_on = Vector2(352, 22)
 menu_on = Vector2(26, 365)
