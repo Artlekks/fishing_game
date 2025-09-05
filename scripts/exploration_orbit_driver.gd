@@ -92,8 +92,8 @@ func _orbit_to(target_deg: float) -> void:
 func _set_yaw_immediate(v: float) -> void:
 	_yaw_deg = v
 
-func _schedule_sprite_switch(sign: int) -> void:
-	_pending_sign = sign
+func _schedule_sprite_switch(dir_sign: int) -> void:
+	_pending_sign = dir_sign
 	if not _sprite_timer.is_stopped():
 		_sprite_timer.stop()
 	_sprite_timer.wait_time = max(0.0, rotate_time * clamp(sprite_switch_progress, 0.0, 1.0))

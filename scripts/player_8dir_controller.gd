@@ -184,13 +184,13 @@ func _play_8dir_animation(base: String, dir: String) -> void:
 			print("[8dir] ", anim_name, " (flip_h=false)")
 
 # --- Camera-orbit → sprite facing (exploration only) ---
-func _on_exploration_orbit_step(sign: int) -> void:
+func _on_exploration_orbit_step(_dir: int) -> void:
 	# Ignore while fishing; only exploration sprite should react.
 	if in_fishing_mode:
 		return
 
 	# Q = +1 (CCW), E = -1 (CW). 90° = 2 steps on the 8-dir ring.
-	var steps: int = -sign * 2
+	var steps: int = -_dir * 2
 	var idx: int = DIRS.find(last_dir)
 	if idx == -1:
 		idx = 0

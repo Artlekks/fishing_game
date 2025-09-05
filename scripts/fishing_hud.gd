@@ -131,8 +131,8 @@ func _place_on_screen_immediate() -> void:
 	_menu.position = menu_on
 
 # --- Off-screen math (always leave screen fully) ---
-func _off_up(ctrl: Control, on_pos: Vector2, travel_px: float) -> Vector2:
+func _off_up(_ctrl: Control, on_pos: Vector2, travel_px: float) -> Vector2:
 	return Vector2(on_pos.x, on_pos.y - travel_px)
 
-func _off_left(ctrl: Control, on_pos: Vector2, travel_px: float) -> Vector2:
+func _off_left(_ctrl: Control, on_pos: Vector2, travel_px: float) -> Vector2:
 	return Vector2(on_pos.x - travel_px, on_pos.y)
