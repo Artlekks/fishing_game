@@ -59,34 +59,69 @@ func _on_cam_align_finished() -> void:
 	_anim_lock = false
 	
 func _physics_process(_delta: float) -> void:
+	# Lock during fishing
 	if in_fishing_mode:
-		velocity = Vector3.ZERO
+		velocity.x = 0.0
+		velocity.z = 0.0
 		move_and_slide()
 		return
 
+	# Read input (with a tiny deadzone to prevent stray gamepad noise)
 	var iv := Input.get_vector("move_left","move_right","move_forward","move_back")
+	if iv.length() < 0.001:
+		iv = Vector2.ZERO
 
 	if movement_enabled and iv.length_squared() > 0.0:
-		var dir := Vector3(iv.x, 0.0, iv.y)
-		var yaw := atan2(dir.x, dir.z)  # 0 → +Z
+		# --- camera-relative axes on XZ plane ---
+		var cam_node := exploration_camera as Node3D
+		var cam_basis: Basis
+		if cam_node != null:
+			cam_basis = cam_node.global_transform.basis
+		else:
+			cam_basis = Basis()  # identity fallback
+
+		var cam_forward := (-cam_basis.z); cam_forward.y = 0.0; cam_forward = cam_forward.normalized()
+		var cam_right   := ( cam_basis.x); cam_right.y   = 0.0; cam_right   = cam_right.normalized()
+
+		# Input.get_vector: forward is -Y; S (down) is +Y
+		var move_vec: Vector3 = (cam_right * iv.x) + (cam_forward * (-iv.y))
+		move_vec.y = 0.0
+		move_vec = move_vec.normalized()
+
+		# Face movement; snap to 8 dirs if requested
+		var yaw_world := atan2(move_vec.x, move_vec.z)
 		if snap_to_8_directions:
 			var step := PI / 4.0
-			yaw = round(yaw / step) * step
-		rotation.y = yaw
+			yaw_world = round(yaw_world / step) * step
+			move_vec.x = sin(yaw_world)
+			move_vec.z = cos(yaw_world)
 
-		last_dir = _yaw_to_dir(rotation.y)
+		rotation.y = yaw_world
 
-		var mv := dir.normalized() * move_speed
-		velocity.x = mv.x
-		velocity.z = mv.z
+		# Screen-space (camera) dir for sprites: right = cam_right, down = cam_basis.z
+		var cam_down := cam_basis.z; cam_down.y = 0.0; cam_down = cam_down.normalized()
+		var sx := cam_right.dot(move_vec)  # +right on screen
+		var sy := cam_down.dot(move_vec)   # +down  on screen
+		var ang_screen := atan2(sx, sy)    # 0=S, +π/2=E, π=N, -π/2=W
+		if snap_to_8_directions:
+			var step2 := PI / 4.0
+			ang_screen = round(ang_screen / step2) * step2
+		var idx := wrapi(int(round(ang_screen / (PI / 4.0))), 0, DIRS.size())
+		last_dir = DIRS[idx]
+
+		velocity.x = move_vec.x * move_speed
+		velocity.z = move_vec.z * move_speed
 
 		_play_8dir_animation("Walk", last_dir)
 	else:
+		# IMPORTANT: stop movement & play Idle when no input
 		velocity.x = 0.0
 		velocity.z = 0.0
 		_play_8dir_animation("Idle", last_dir)
 
+	# Always advance physics every frame
 	move_and_slide()
+
 
 func _process(_delta: float) -> void:
 	# Keep the fishing camera centered on the player while in fishing mode
