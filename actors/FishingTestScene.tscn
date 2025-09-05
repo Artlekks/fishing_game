@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://y0r5beh0g8ei"]
+[gd_scene load_steps=28 format=3 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://bsoegp3obkt23" path="res://assets/models/fbx/River_001.glb" id="1_twt30"]
 [ext_resource type="Texture2D" uid="uid://dql6tqfotmh70" path="res://assets/models/fbx/River_001_texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png" id="2_7mysf"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://7hqptmotblom" path="res://scripts/fishing_camera_controller.gd" id="10_23y3w"]
 [ext_resource type="Texture2D" uid="uid://bbthseaubq6v1" path="res://assets/sprites/Compass_Face.png" id="10_bj8je"]
 [ext_resource type="Texture2D" uid="uid://bybktjbfq40mh" path="res://assets/sprites/Fishing_Icon.png" id="11_emtsy"]
+[ext_resource type="Script" uid="uid://ceq2i4ivihpl8" path="res://scripts/exploration_orbit_driver.gd" id="12_emtsy"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -234,6 +235,10 @@ fish_icon_grey = ExtResource("10_bj8je")
 fish_icon_purple = ExtResource("11_emtsy")
 
 [node name="CameraRig" type="Node3D" parent="."]
+script = ExtResource("12_emtsy")
+player_path = NodePath("../Player")
+fishing_controller_path = NodePath("Cameras/FishingCameraController")
+sprite_switch_progress = 0.3
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
 physics_interpolation_mode = 1
@@ -248,13 +253,12 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
 [node name="Cameras" type="Node3D" parent="CameraRig"]
 
-[node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" node_paths=PackedStringArray("follow_target", "look_at_target")]
+[node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" node_paths=PackedStringArray("look_at_target")]
 transform = Transform3D(0.999983, 0, 0, 0, 0.707086, 0.707089, 0, -0.707086, 0.707089, -0.757727, 2.5, 3.14352)
 top_level = true
 script = ExtResource("6_x75a5")
 priority = 10
 follow_mode = 2
-follow_target = NodePath("../../../Player")
 look_at_mode = 2
 look_at_target = NodePath("../../../Player")
 tween_resource = SubResource("Resource_twt30")
