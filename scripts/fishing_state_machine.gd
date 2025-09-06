@@ -15,9 +15,13 @@ extends Node
 @export var fishing_camera: Camera3D = null               # Optional, not used by this script (kept for modularity)
 @export var enforce_every_frame: bool = true
 @export var fishing_camera_controller: Node = null  # drag your FishingCameraController here
+@export var bait_caster_path: NodePath = NodePath("")
 
 # PowerMeter group (HUD node looked up dynamically so there's no hard reference)
 @export var power_meter_group: StringName = &"hud_power_meter"
+@export var bait_caster: Node = null   # drag your BaitCaster node here
+
+var _bait_caster: Node = null
 
 const FISHING_ANIMS: PackedStringArray = [
 	"Cancel_Fishing","Fishing_Catch","Fishing_Idle","Prep_Fishing",
@@ -27,6 +31,8 @@ const FISHING_ANIMS: PackedStringArray = [
 ]
 
 func _ready() -> void:
+	_bait_caster = get_node_or_null(bait_caster_path)
+
 	if controller == null or sprite == null:
 		push_error("Assign 'controller' (FishingStateController) and 'sprite' (AnimatedSprite3D).")
 		return
@@ -46,6 +52,9 @@ func _ready() -> void:
 	if fishing_camera_controller != null and fishing_camera_controller.has_signal("entered_fishing_view"):
 		fishing_camera_controller.entered_fishing_view.connect(_on_cam_ready_for_ds)
 		# remove any old call that showed DS on "Fishing_Idle"
+	
+	_bait_caster = get_node_or_null(bait_caster_path)
+
 func _process(_delta: float) -> void:
 	if not enforce_every_frame:
 		return
@@ -75,7 +84,7 @@ func _pm_cancel() -> void:
 func _on_controller_animation_change(anim_name: StringName) -> void:
 	var anim := String(anim_name)
 
-	# DS visibility
+	# --- DirectionSelector visibility (keep as you had) ---
 	if direction_selector != null:
 		if anim == "Fishing_Idle":
 			if direction_selector.has_method("show_for_fishing"):
@@ -84,14 +93,36 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 			if direction_selector.has_method("hide_for_fishing"):
 				direction_selector.call("hide_for_fishing")
 
-	# Power bar
+	# --- Power meter lifecycle ---
 	if anim == "Prep_Throw":
 		_pm_start()
 	elif anim == "Cancel_Fishing" or anim == "Throw":
 		_pm_cancel()
 
+	# --- Launch bait when Throw starts (power already captured) ---
+	if anim == "Throw" and _bait_caster != null:
+		var power: float = 0.0
+		if controller != null:
+			if controller.has_method("get_throw_power"):
+				power = float(controller.call("get_throw_power"))
+			else:
+				var v = controller.get("throw_power")  # safe even if absent (returns null)
+				if v is float:
+					power = v
+				elif v is int:
+					power = float(v)
 
-	# 3) Play the sprite animation safely
+		var dir := Vector3(0, 0, 1)
+		if direction_selector != null and direction_selector.has_method("get_cast_forward"):
+			dir = direction_selector.call("get_cast_forward") as Vector3
+
+		_bait_caster.call("perform_cast", power, dir)
+
+	# --- Despawn bait if fishing is canceled (I) ---
+	if anim == "Cancel_Fishing" and _bait_caster != null:
+		_bait_caster.call("despawn")
+
+	# --- your existing sprite/anim call ---
 	_play_sprite_anim(anim)
 
 func _on_sprite_animation_finished() -> void:

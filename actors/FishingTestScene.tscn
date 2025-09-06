@@ -149,12 +149,15 @@ sprite = NodePath("../AnimatedSprite3D")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 debug_log = true
 
-[node name="FishingStateMachine" parent="Player" index="2" node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera")]
+[node name="FishingStateMachine" parent="Player" index="2" node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera", "fishing_camera_controller", "bait_caster")]
 direction_selector = NodePath("../DirectionSelector")
 controller = NodePath("../FishingStateController")
 sprite = NodePath("../AnimatedSprite3D")
 player = NodePath("..")
 fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
+fishing_camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
+bait_caster_path = NodePath("../BaitCaster")
+bait_caster = NodePath("../BaitCaster")
 
 [node name="AnimatedSprite3D" parent="Player" index="5"]
 no_depth_test = true
@@ -166,10 +169,18 @@ sorting_offset = -0.1
 no_depth_test = true
 alpha_cut = 0
 
-[node name="AxisGizmo" parent="Player" index="6"]
+[node name="BaitCaster" parent="Player" index="7"]
+spawn_marker_path = NodePath("../BaitSpawner")
+water_y_node_path = NodePath("../../Zones/FishZone/WaterFacing")
+direction_selector_path = NodePath("../DirectionSelector")
+min_speed = 2.0
+max_speed = 8.0
+fallback_water_y = 5.0
+
+[node name="AxisGizmo" parent="Player" index="8"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
-[node name="DirectionSelector" parent="Player" index="8" node_paths=PackedStringArray("follow_target", "fishing_camera", "camera_controller", "dots") groups=["direction_selector"]]
+[node name="DirectionSelector" parent="Player" index="10" node_paths=PackedStringArray("follow_target", "fishing_camera", "camera_controller", "dots") groups=["direction_selector"]]
 follow_target = NodePath("..")
 fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
@@ -239,7 +250,7 @@ sprite_switch_progress = 0.3
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
 physics_interpolation_mode = 1
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, -0.757727, 2.5, 3.14352)
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707106, 0, -0.707106, 0.707107, -0.757727, 2.5, 3.14352)
 fov = 35.0
 
 [node name="PhantomCameraHost" type="Node" parent="CameraRig/Camera3D"]

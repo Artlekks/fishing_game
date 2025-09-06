@@ -1,4 +1,4 @@
-[gd_scene load_steps=235 format=3 uid="uid://sdh188exepwu"]
+[gd_scene load_steps=237 format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -34,7 +34,9 @@
 [ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="28_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="29_j8b1y"]
 [ext_resource type="Texture2D" uid="uid://b7hfnfceljxqo" path="res://assets/sprites/Point.png" id="30_yrl0g"]
+[ext_resource type="Script" uid="uid://ddcg77jrfw7jk" path="res://scripts/bait_caster.gd" id="33_dljik"]
 [ext_resource type="Script" uid="uid://lxpjow1em4n6" path="res://scripts/direction_selector.gd" id="34_bae3b"]
+[ext_resource type="PackedScene" uid="uid://t7t8sxuekigk" path="res://actors/bait.tscn" id="34_y2vhc"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpo3w"]
 radius = 0.0972981
@@ -1640,6 +1642,13 @@ cast_shadow = 0
 alpha_cut = 2
 texture_filter = 0
 texture = SubResource("CompressedTexture2D_ajpwy")
+
+[node name="BaitSpawner" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.554043, 0)
+
+[node name="BaitCaster" type="Node3D" parent="."]
+script = ExtResource("33_dljik")
+bait_scene = ExtResource("34_y2vhc")
 
 [node name="AxisGizmo" type="Node3D" parent="."]
 script = ExtResource("27_yhyju")
