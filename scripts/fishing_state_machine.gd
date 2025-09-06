@@ -23,6 +23,14 @@ extends Node
 
 var _bait_caster: Node = null
 
+const REEL_ANIMS: PackedStringArray = [
+	"Reel", "Reel_Left", "Reel_Right", "Reel_Back", "Reel_Front",
+	"Reel_Idle", "Reel_Left_Idle", "Reel_Right_Idle", "Reel_Back_Strong",
+	"Reel_Bite", "Reel_Bite_Strong"
+]
+var _reel_mode: bool = false
+
+
 const FISHING_ANIMS: PackedStringArray = [
 	"Cancel_Fishing","Fishing_Catch","Fishing_Idle","Prep_Fishing",
 	"Prep_Throw","Prep_Throw_Idle","Reel","Reel_Back","Reel_Back_Strong",
@@ -33,27 +41,38 @@ const FISHING_ANIMS: PackedStringArray = [
 func _ready() -> void:
 	_bait_caster = get_node_or_null(bait_caster_path)
 
+	if _bait_caster != null and _bait_caster.has_signal("bait_returned"):
+		if not _bait_caster.is_connected("bait_returned", Callable(self, "_on_bait_returned")):
+			_bait_caster.connect("bait_returned", Callable(self, "_on_bait_returned"))
+
+	# make sure _process runs if you drive hold-to-reel from here
+	set_process(enforce_every_frame)
+	
 	if controller == null or sprite == null:
 		push_error("Assign 'controller' (FishingStateController) and 'sprite' (AnimatedSprite3D).")
 		return
 
-	# Controller → FSM
 	if not controller.is_connected("animation_change", Callable(self, "_on_controller_animation_change")):
 		controller.connect("animation_change", Callable(self, "_on_controller_animation_change"))
 
-	# Sprite → FSM (animation finished)
 	if not sprite.animation_finished.is_connected(_on_sprite_animation_finished):
 		sprite.animation_finished.connect(_on_sprite_animation_finished)
-	
-	# connect once
+
 	if fishing_camera and fishing_camera.has_signal("entered_fishing_view"):
 		fishing_camera.entered_fishing_view.connect(_on_cam_ready_for_ds)
-	
+
 	if fishing_camera_controller != null and fishing_camera_controller.has_signal("entered_fishing_view"):
 		fishing_camera_controller.entered_fishing_view.connect(_on_cam_ready_for_ds)
-		# remove any old call that showed DS on "Fishing_Idle"
-	
+
 	_bait_caster = get_node_or_null(bait_caster_path)
+
+	# ✅ make sure _process() runs so hold-to-reel works
+	set_process(enforce_every_frame)
+
+	if _bait_caster != null and _bait_caster.has_signal("bait_returned"):
+		if not _bait_caster.is_connected("bait_returned", Callable(self, "_on_bait_returned")):
+			_bait_caster.connect("bait_returned", Callable(self, "_on_bait_returned"))
+
 
 func _process(_delta: float) -> void:
 	if not enforce_every_frame:
@@ -62,6 +81,19 @@ func _process(_delta: float) -> void:
 		return
 	_force_no_flip_if_fishing(String(sprite.animation))
 
+	if _bait_caster != null:
+		var holding := _reel_mode and Input.is_action_pressed("fish")  # K
+		_bait_caster.call("set_reel_active", holding)
+
+	# Hold-to-reel: send state to bait while in reel mode
+	if _reel_mode and _bait_caster != null:
+		var holding: bool = Input.is_action_pressed("fish")
+		_bait_caster.call("set_reel_active", holding)
+
+	
+	if _reel_mode and _bait_caster != null:
+		var holding: bool = Input.is_action_pressed("fish")  # K
+		_bait_caster.call("set_reel_active", holding)
 # ---------------- PowerMeter (looked up by group) ----------------
 var _pm_cache: Node = null
 
@@ -82,9 +114,9 @@ func _pm_cancel() -> void:
 
 # ---------------- Animation flow ----------------
 func _on_controller_animation_change(anim_name: StringName) -> void:
-	var anim := String(anim_name)
+	var anim: String = String(anim_name)
 
-	# --- DirectionSelector visibility (keep as you had) ---
+	# --- DS visibility (unchanged) ---
 	if direction_selector != null:
 		if anim == "Fishing_Idle":
 			if direction_selector.has_method("show_for_fishing"):
@@ -93,36 +125,52 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 			if direction_selector.has_method("hide_for_fishing"):
 				direction_selector.call("hide_for_fishing")
 
-	# --- Power meter lifecycle ---
+	# --- Power meter lifecycle (unchanged) ---
 	if anim == "Prep_Throw":
 		_pm_start()
 	elif anim == "Cancel_Fishing" or anim == "Throw":
 		_pm_cancel()
 
-	# --- Launch bait when Throw starts (power already captured) ---
+	# --- Launch bait when Throw starts (unchanged) ---
 	if anim == "Throw" and _bait_caster != null:
 		var power: float = 0.0
 		if controller != null:
 			if controller.has_method("get_throw_power"):
 				power = float(controller.call("get_throw_power"))
 			else:
-				var v = controller.get("throw_power")  # safe even if absent (returns null)
+				var v: Variant = controller.get("throw_power")
 				if v is float:
 					power = v
 				elif v is int:
 					power = float(v)
 
-		var dir := Vector3(0, 0, 1)
+		var dir: Vector3 = Vector3(0, 0, 1)
 		if direction_selector != null and direction_selector.has_method("get_cast_forward"):
 			dir = direction_selector.call("get_cast_forward") as Vector3
 
 		_bait_caster.call("perform_cast", power, dir)
 
-	# --- Despawn bait if fishing is canceled (I) ---
-	if anim == "Cancel_Fishing" and _bait_caster != null:
-		_bait_caster.call("despawn")
+# ---- Reeling mode enter/leave (guarded) ----
+	var is_reel_anim := REEL_ANIMS.has(String(anim_name))
+	if is_reel_anim:
+		if not _reel_mode:
+			_reel_mode = true
+			if _bait_caster != null:
+				_bait_caster.call("start_reel")
+	else:
+		if _reel_mode:
+			_reel_mode = false
+			if _bait_caster != null:
+				_bait_caster.call("set_reel_active", false)
 
-	# --- your existing sprite/anim call ---
+
+	# --- Stop reeling / clear on these transitions ---
+	if anim == "Throw" or anim == "Cancel_Fishing":
+		_reel_mode = false
+		if _bait_caster != null:
+			_bait_caster.call("set_reel_active", false)
+
+	# --- Play the character sprite anim (unchanged) ---
 	_play_sprite_anim(anim)
 
 func _on_sprite_animation_finished() -> void:
@@ -164,3 +212,19 @@ func _force_no_flip_if_fishing(anim: String) -> void:
 		if s.x < 0.0:
 			s.x = -s.x
 			sprite.scale = s
+
+func _on_bait_returned() -> void:
+	# stop reeling logic in the caster
+	if _bait_caster != null:
+		_bait_caster.call("set_reel_active", false)
+
+	# leave reel-mode guard so _process() stops driving reeling
+	_reel_mode = false
+
+	# Drive the game back to the "Fishing_Idle" phase (DS visible again).
+	# Prefer a controller API if present, otherwise fall back to a direct emit.
+	if controller != null:
+		if controller.has_method("set_idle_from_reel"):
+			controller.call("set_idle_from_reel")
+		else:
+			controller.call("emit_anim", StringName("Fishing_Idle"))

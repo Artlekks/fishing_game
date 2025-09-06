@@ -49,6 +49,14 @@ func start_sequence() -> void:
 	emit_anim("Prep_Fishing")
 	current_state = State.FISHING_PREP
 
+func set_idle_from_reel() -> void:
+	# Only if we’re in the fishing flow.
+	if not _enabled:
+		return
+	_intro_lock = false
+	emit_anim("Fishing_Idle")
+	current_state = State.FISHING_IDLE
+
 func force_cancel() -> void:
 	# stay enabled + lock so we can receive the finish callback
 	_enabled = true

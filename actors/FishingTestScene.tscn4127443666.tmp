@@ -173,12 +173,10 @@ alpha_cut = 0
 spawn_marker_path = NodePath("../BaitSpawner")
 water_y_node_path = NodePath("../../Zones/FishZone/WaterFacing")
 direction_selector_path = NodePath("../DirectionSelector")
-power_max_value = 50.0
 min_speed = 2.0
 max_speed = 8.0
-launch_angle_deg = 30.0
 fallback_water_y = 5.0
-reel_kill_radius = 0.2
+reel_kill_radius = 10.0
 
 [node name="AxisGizmo" parent="Player" index="8"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)

@@ -1,5 +1,7 @@
 extends Node3D
 
+signal bait_returned   # fired after a successful reel-in & despawn
+
 @export var bait_scene: PackedScene
 @export var player_path: NodePath = ^".."
 @export var spawn_marker_path: NodePath = ^"../BaitSpawn"
@@ -11,6 +13,8 @@ extends Node3D
 @export var max_speed: float = 22.0
 @export var launch_angle_deg: float = 45.0
 @export var fallback_water_y: float = 0.0
+@export var reel_speed: float = 12.0
+@export var reel_kill_radius: float = 0.7
 
 var _player: Node3D
 var _spawn: Node3D
@@ -73,6 +77,12 @@ func perform_cast(power: float, dir_world: Vector3 = Vector3(0,0,1)) -> void:
 	if _bait.has_signal("landed"):
 		_bait.connect("landed", Callable(self, "_on_bait_landed"))
 
+# After you instantiate the bait in perform_cast(...)
+# (right after: var inst := bait_scene.instantiate() as Node3D)
+	_bait = inst
+	if _bait.has_method("set_kill_radius"):
+		_bait.call("set_kill_radius", reel_kill_radius)
+
 func _on_bait_landed(_point: Vector3) -> void:
 	# Reel will be added later.
 	pass
@@ -81,6 +91,30 @@ func _cleanup_bait() -> void:
 	if is_instance_valid(_bait):
 		_bait.queue_free()
 	_bait = null
+
+# Pulls toward the spawn marker; change to _player if you prefer
+func start_reel() -> void:
+	if not is_instance_valid(_bait):
+		return
+	# push current Inspector value every time we begin reeling
+	if _bait.has_method("set_kill_radius"):
+		_bait.call("set_kill_radius", reel_kill_radius)
+
+	var target: Node3D = _player
+	if _bait.has_method("start_reel"):
+		_bait.call("start_reel", target)
+
+	if _bait.has_signal("reeled_in") and not _bait.is_connected("reeled_in", Callable(self, "_on_bait_reeled_in")):
+		_bait.connect("reeled_in", Callable(self, "_on_bait_reeled_in"))
+
+
+func set_reel_active(active: bool) -> void:
+	if is_instance_valid(_bait) and _bait.has_method("set_reel_active"):
+		_bait.call("set_reel_active", active)
+
+func _on_bait_reeled_in() -> void:
+	despawn()
+	bait_returned.emit()
 
 func despawn() -> void:
 	_cleanup_bait()

@@ -1633,7 +1633,7 @@ offset = Vector2(0, 11)
 billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Prep_Throw"
+animation = &"Reel"
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, 0.075, 0)
