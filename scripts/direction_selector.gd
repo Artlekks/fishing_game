@@ -275,24 +275,14 @@ func _extract_camera_yaw(cam: Camera3D) -> float:
 	return y
 
 # --- Public: world-space cast forward (XZ) – derived from the visible dots ---
+# direction_selector.gd
 func get_cast_forward() -> Vector3:
-	# Use the first and last dot to infer the exact forward you see on screen
-	var n := dots.size()
-	if n >= 2:
-		var tail := dots[0] as Node3D         # near the player
-		var head := dots[n - 1] as Node3D     # farthest dot
-		if tail != null and head != null:
-			var v := head.global_position - tail.global_position
-			v.y = 0.0
-			var m := v.length()
-			if m > 0.0001:
-				return v / m
-
-	# Fallback (unlikely needed): camera yaw + DS offsets
-	var yaw_cam: float = _extract_camera_yaw(fishing_camera)
-	var total_deg: float = base_yaw_offset_deg + _local_yaw_deg + _streamed_from_center_deg
-	var yaw: float = yaw_cam + deg_to_rad(total_deg)
-	return Vector3(sin(yaw), 0.0, cos(yaw)).normalized()
+	# Use the node’s world +Z (blue arrow). Zero Y so we stay on the water plane.
+	var fwd: Vector3 = global_transform.basis.z
+	fwd.y = 0.0
+	if fwd.length() == 0.0:
+		return Vector3(0, 0, 1)
+	return fwd.normalized()
 
 
 func get_cast_yaw_deg() -> float:

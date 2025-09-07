@@ -179,6 +179,7 @@ max_speed = 8.0
 launch_angle_deg = 30.0
 fallback_water_y = 5.0
 reel_kill_radius = 0.2
+yaw_calibration_deg = -55.0
 
 [node name="AxisGizmo" parent="Player" index="8"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
