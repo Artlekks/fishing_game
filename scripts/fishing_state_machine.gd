@@ -147,6 +147,8 @@ func _on_controller_animation_change(anim_name: StringName) -> void:
 		var dir: Vector3 = Vector3(0, 0, 1)
 		if direction_selector != null and direction_selector.has_method("get_cast_forward"):
 			dir = direction_selector.call("get_cast_forward") as Vector3
+		
+		print("DS dir XZ:", Vector2(dir.x, dir.z).normalized())
 
 		_bait_caster.call("perform_cast", power, dir)
 
