@@ -20,6 +20,8 @@ extends Node
 # PowerMeter group (HUD node looked up dynamically so there's no hard reference)
 @export var power_meter_group: StringName = &"hud_power_meter"
 @export var bait_caster: Node = null   # drag your BaitCaster node here
+@export var reel_left_action: StringName = &"ui_left"
+@export var reel_right_action: StringName = &"ui_right"
 
 var _bait_caster: Node = null
 
@@ -89,11 +91,18 @@ func _process(_delta: float) -> void:
 	if _reel_mode and _bait_caster != null:
 		var holding: bool = Input.is_action_pressed("fish")
 		_bait_caster.call("set_reel_active", holding)
+		_bait_caster.call("set_curve_input", 0)
 
-	
 	if _reel_mode and _bait_caster != null:
-		var holding: bool = Input.is_action_pressed("fish")  # K
-		_bait_caster.call("set_reel_active", holding)
+		var left_pressed := Input.is_action_pressed(reel_left_action)
+		var right_pressed := Input.is_action_pressed(reel_right_action)
+		var sign := 0
+		if left_pressed and not right_pressed:
+			sign = -1
+		elif right_pressed and not left_pressed:
+			sign = 1
+		_bait_caster.call("set_curve_input", sign)
+
 # ---------------- PowerMeter (looked up by group) ----------------
 var _pm_cache: Node = null
 

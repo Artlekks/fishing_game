@@ -9,6 +9,7 @@
 [node name="Bait" type="Node3D"]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_tdw1c")
+curve_max_strength = 1.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.1, -8.88178e-16, 0, 8.88178e-16, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

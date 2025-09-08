@@ -168,7 +168,7 @@ min_speed = 2.0
 max_speed = 8.0
 launch_angle_deg = 30.0
 fallback_water_y = 5.0
-reel_speed = 50.0
+reel_speed = 1.0
 reel_kill_radius = 0.2
 cast_yaw_trim_deg = -70.0
 
