@@ -6,40 +6,24 @@ signal reeled_in()
 # ---------- Tuning ----------
 @export var gravity: float = 24.0
 
-# Reeling pacing (world units / sec). Set by BaitCaster via set_reel_speed_per_sec().
+# Reeling pacing (horizontal XZ), set by caster via set_reel_speed_per_sec()
 @export var reel_fps: float = 8.0
 @export var reel_step_dist: float = 0.35
 @export var reel_kill_radius: float = 0.7
 
-# Sinking controls (when not reeling)
-@export var sink_rate: float = 0.6                    # m/s downward in water
-@export var sink_accel: float = 0.0                   # optional ease-in (m/s^2); keep 0 for linear
-@export var water_max_depth: float = 3.0              # fallback depth if no bottom node is provided
-@export var water_bottom_path: NodePath = NodePath("")# optional: node whose Y defines the bottom
+# Sinking controls
+@export var sink_rate: float = 0.6
+@export var sink_accel: float = 0.0
+@export var water_max_depth: float = 3.0
+@export var water_bottom_path: NodePath = NodePath("")
 
-# Reeling vertical behavior
-@export var reel_rise_rate: float = 1.5               # m/s the bait climbs while reeling
-@export var player_feet_offset_y: float = 0.0         # adjust if player origin isn’t feet
-@export var depth_zone_mask_bit: int = 8   # the bit your DepthZones are on (UI shows 1..20)
+# Reeling vertical behavior (UNITS/SEC). This now truly controls the rise speed.
+@export var reel_rise_rate: float = 0.25          # lower = slower rise to surface while reeling
+@export var player_feet_offset_y: float = 0.0
 
-# Depth zones (detected via Area3D child "DepthProbe")
-var _active_zones: Array[Area3D] = []
-@onready var _probe: Area3D = get_node_or_null("DepthProbe")
-@export var water_bottom_mask_bit: int = 12  # physics bit used by BottomWall StaticBody3D
-
-var _target_feet_y: float = 0.0
-
-# ---------- State ----------
-enum Mode { INACTIVE, FLYING, LANDED, SINKING, REELING }
-
-var _mode: int = Mode.INACTIVE
-var _vel: Vector3 = Vector3.ZERO
-var _water_y: float = 0.0                 # water surface Y for this cast
-var _bottom_y: float = 0.0                # computed bottom limit for sinking
-
-var _reel_target: Node3D = null
-var _reel_active: bool = false            # true only while K is held
-var _reel_speed: float = 0.1              # world units per second
+# Depth zone / physics masks
+@export var depth_zone_mask_bit: int = 8
+@export var water_bottom_mask_bit: int = 12
 
 # Curved reeling
 @export var curve_max_strength: float = 0.8
@@ -47,16 +31,36 @@ var _reel_speed: float = 0.1              # world units per second
 @export var curve_ramp_down: float = 8.0
 @export var curve_falloff_start: float = 5.0
 @export var curve_falloff_end: float = 1.0
-var _zone_recheck_t: float = 0.0
-@export var zone_recheck_interval: float = 0.25   # seconds
-@export var water_touch_offset: float = 0.06
-# Explanation:
-# how far below the bait’s origin the visual “bottom” is.
-# Increase if splash still appears too high; decrease if too low.
 
-var _curve_input: int = 0                 # -1, 0, +1 from FSM
-var _curve_bias: float = 0.0              # smoothed curve input
-var _sink_speed: float = 0.0              # current sinking speed (for accel option)
+# Visual splash alignment: center must reach water + offset to "touch"
+@export var water_touch_offset: float = 0.06
+
+# ---------- State ----------
+enum Mode { INACTIVE, FLYING, LANDED, SINKING, REELING }
+
+var _mode: int = Mode.INACTIVE
+var _vel: Vector3 = Vector3.ZERO
+
+var _water_y: float = 0.0
+var _bottom_y: float = 0.0
+
+var _reel_target: Node3D = null
+var _reel_active: bool = false
+var _reel_speed: float = 0.1
+
+var _target_feet_y: float = 0.0
+
+var _curve_input: int = 0                  # -1,0,+1 from FSM
+var _curve_bias: float = 0.0
+
+# sinking helper
+var _sink_speed: float = 0.0
+
+# depth zones via probe
+@onready var _probe: Area3D = get_node_or_null("DepthProbe")
+var _active_zones: Array[Area3D] = []
+var _zone_recheck_t: float = 0.0
+@export var zone_recheck_interval: float = 0.25
 
 func _ready() -> void:
 	if _probe != null:
@@ -64,16 +68,15 @@ func _ready() -> void:
 		_probe.area_exited.connect(_on_probe_area_exited)
 
 # ---------- Public API ----------
+
 func start(at_position: Vector3, initial_velocity: Vector3, water_surface_y: float) -> void:
 	global_position = at_position
 	_vel = initial_velocity
 	_water_y = water_surface_y
-	
-	
-	# Compute a baseline bottom
+
 	_compute_bottom_y()
 
-	# Initialize active zones from the probe (one-shot at cast start)
+	# initialize probe overlaps once, then recompute
 	_active_zones.clear()
 	if _probe != null:
 		var arr := _probe.get_overlapping_areas()
@@ -85,29 +88,21 @@ func start(at_position: Vector3, initial_velocity: Vector3, water_surface_y: flo
 				_active_zones.append(a)
 			j += 1
 		_recompute_bottom_y()
-	
-		_compute_bottom_y()
+
 	_sink_speed = 0.0
 	_zone_recheck_t = 0.0
-	_refresh_zones_from_probe()   # <-- replace your old init code with this one-liner
+	_refresh_zones_from_probe()
 
-	_sink_speed = 0.0
 	_mode = Mode.FLYING
 	set_physics_process(true)
-
-	print("CAST: water_y=", _water_y)
-# in _recompute_bottom_y end:
-	print("BOTTOM_Y -> ", _bottom_y)
 
 func start_reel(target: Node3D) -> void:
 	_reel_target = target
 
-	# capture the desired finish Y from the current player now
-	_target_feet_y = 0.0
-	if _reel_target != null:
-		_target_feet_y = _reel_target.global_position.y + player_feet_offset_y
+	_target_feet_y = target.global_position.y + player_feet_offset_y
+	if _target_feet_y < _surface_touch_y():
+		_target_feet_y = _surface_touch_y()
 
-	# fallback reel speed if caster didn't set it yet
 	if _reel_speed <= 0.0:
 		_reel_speed = max(0.01, reel_fps * reel_step_dist)
 
@@ -118,11 +113,9 @@ func start_reel(target: Node3D) -> void:
 func set_reel_active(active: bool) -> void:
 	_reel_active = active
 	if active:
-		# pause sinking immediately when reel engages
 		if _mode == Mode.SINKING or _mode == Mode.LANDED:
 			_mode = Mode.REELING
 	else:
-		# resume sinking if we are in water and not already reeling
 		if _mode == Mode.REELING:
 			_mode = Mode.SINKING
 
@@ -142,12 +135,12 @@ func set_kill_radius(r: float) -> void:
 func despawn() -> void:
 	queue_free()
 
-# ---------- Depth zone hooks ----------
+# ---------- Depth zones ----------
+
 func _on_probe_area_entered(a: Area3D) -> void:
 	if a != null and a.is_in_group(&"depth_zone"):
 		_active_zones.append(a)
 		_recompute_bottom_y()
-		print("ENTER:", a.name, " bottom_y=", _bottom_y, " water_y=", _water_y)
 
 func _on_probe_area_exited(a: Area3D) -> void:
 	if a != null and a.is_in_group(&"depth_zone"):
@@ -155,30 +148,25 @@ func _on_probe_area_exited(a: Area3D) -> void:
 		if i != -1:
 			_active_zones.remove_at(i)
 		_recompute_bottom_y()
-		print("EXIT :", a.name, " bottom_y=", _bottom_y, " water_y=", _water_y)
 
 func _recompute_bottom_y() -> void:
-	# Prefer physics bottom (StaticBody3D on WaterBottom layer)
 	var by: float = _query_bottom_y_physics()
-
-	# Safety: never above the surface
 	if by > _water_y:
 		by = _water_y
-
 	_bottom_y = by
 
 # ---------- Internals ----------
+
 func _physics_process(delta: float) -> void:
 	match _mode:
 		Mode.FLYING:
-			# ballistic
+			# ballistic step
 			_vel.y -= gravity * delta
 			var curr := global_position
 			var next := curr + _vel * delta
 
-			# cross water plane (touch_y) this frame?
-			var touch_y := _water_y + water_touch_offset
-
+			# plane cross at touch height
+			var touch_y := _surface_touch_y()
 			if curr.y >= touch_y and next.y <= touch_y:
 				var denom := curr.y - next.y
 				var t: float = 0.0
@@ -190,7 +178,6 @@ func _physics_process(delta: float) -> void:
 				global_position = hit
 				landed.emit(hit)
 
-				# enter sinking unless reel is immediately active
 				if _reel_active:
 					_mode = Mode.REELING
 				else:
@@ -200,7 +187,7 @@ func _physics_process(delta: float) -> void:
 				global_position = next
 
 		Mode.LANDED:
-			# kept for compatibility; immediately flow into SINKING unless reeling
+			# legacy step; immediately choose sink or reel
 			if _reel_active:
 				_mode = Mode.REELING
 			else:
@@ -213,10 +200,8 @@ func _physics_process(delta: float) -> void:
 				_zone_recheck_t = zone_recheck_interval
 				_refresh_zones_from_probe()
 
-			# gradual Y drop toward bottom while not reeling
 			var pos := global_position
 			if pos.y > _bottom_y:
-				# optional accel
 				if sink_accel > 0.0:
 					_sink_speed += sink_accel * delta
 				else:
@@ -228,7 +213,6 @@ func _physics_process(delta: float) -> void:
 				pos.y = new_y
 				global_position = pos
 
-			# if player begins holding reel, switch mode (handled in set_reel_active too)
 			if _reel_active:
 				_mode = Mode.REELING
 
@@ -247,61 +231,66 @@ func _physics_process(delta: float) -> void:
 				_mode = Mode.SINKING
 				return
 
-			# Horizontal pull (XZ) + curve
+			# --- vertical: single, authoritative rule ---
+			var surf_y := _surface_touch_y()
+			var y_now := global_position.y
+			var rise_step := reel_rise_rate * delta
+			if y_now < surf_y:
+				y_now = min(y_now + rise_step, surf_y)
+				global_position.y = y_now
+			else:
+				# already at/above surf_y -> clamp to surf_y (no flying)
+				if y_now > surf_y:
+					global_position.y = surf_y
+
+			# --- horizontal pull (XZ) with curve ---
 			var to3 := tgt.global_position - global_position
 			var to_xz := Vector3(to3.x, 0.0, to3.z)
 			var dist := to_xz.length()
 
-			# compute desired cap Y: cannot exceed water surface, should end at player's feet
-			var cap_y := _target_feet_y
-			if cap_y > _water_y:
-				cap_y = _water_y
+			# finish when overall distance is close
+# finish when we're close horizontally (XZ only)
+			if dist <= reel_kill_radius:
+				# snap XZ to player target
+				var final := global_position
+				final.x = tgt.global_position.x
+				final.z = tgt.global_position.z
 
-			# finish when close in 3D (after we raise to cap)
-			var to3_len := to3.length()
-			if to3_len <= reel_kill_radius:
-				# snap Y to the capped feet level so it doesn't finish below surface
-				var p0 := global_position
-				if p0.y != cap_y:
-					global_position = Vector3(p0.x, cap_y, p0.z)
+				# snap Y to feet but never above the water surface
+				var cap_y := _target_feet_y
+				if cap_y > _water_y:
+					cap_y = _water_y
+				final.y = cap_y
+
+				global_position = final
+
 				_mode = Mode.INACTIVE
 				set_physics_process(false)
-				reeled_in.emit()
+				reeled_in.emit()   # bait_caster listens and despawns the bait
 				return
 
 			if dist > 0.0:
 				var to_dir := to_xz / dist
 
-				# curve ramping
-				var target := float(_curve_input)   # -1..+1
+				var target_bias := float(_curve_input)
 				var rate := curve_ramp_up
-				if absf(target) < absf(_curve_bias):
+				if absf(target_bias) < absf(_curve_bias):
 					rate = curve_ramp_down
-				_curve_bias = move_toward(_curve_bias, target, rate * delta)
+				_curve_bias = move_toward(_curve_bias, target_bias, rate * delta)
 
 				var side := Vector3.UP.cross(to_dir)
 				var k := _curve_bias * _curve_strength_for_dist(dist)
-
 				var steer := (to_dir + side * k).normalized()
+
 				var step := _reel_speed * delta
 				if step > dist:
 					step = dist
 				global_position += steer * step
 
-			# vertical rise toward cap_y (never fly above surface)
-			var p := global_position
-			if p.y < cap_y:
-				var dy := reel_rise_rate * delta
-				var new_y := p.y + dy
-				if new_y > cap_y:
-					new_y = cap_y
-				global_position = Vector3(p.x, new_y, p.z)
-
 		_:
 			set_physics_process(false)
 
 func _curve_strength_for_dist(dist: float) -> float:
-	# linear falloff between end and start
 	if dist <= curve_falloff_end:
 		return 0.0
 	if dist >= curve_falloff_start:
@@ -313,7 +302,6 @@ func _curve_strength_for_dist(dist: float) -> float:
 	return curve_max_strength * t
 
 func _compute_bottom_y() -> void:
-	# prefer a bottom node if provided; otherwise surface - depth
 	var bottom_node := get_node_or_null(water_bottom_path) as Node3D
 	if bottom_node != null:
 		_bottom_y = bottom_node.global_position.y
@@ -323,7 +311,6 @@ func _compute_bottom_y() -> void:
 func _refresh_zones_from_probe() -> void:
 	_active_zones.clear()
 
-	# Sphere positioned at the probe (or bait if no probe)
 	var probe_xform: Transform3D = global_transform
 	var radius: float = 0.4
 
@@ -340,12 +327,9 @@ func _refresh_zones_from_probe() -> void:
 	var params := PhysicsShapeQueryParameters3D.new()
 	params.shape = sphere
 	params.transform = probe_xform
-
-	# IMPORTANT: look for AREAS, not bodies
 	params.collide_with_areas = true
 	params.collide_with_bodies = false
 
-	# Mask for your depth zones (UI bit index; 1..20)
 	var mask: int = 1 << (max(1, depth_zone_mask_bit) - 1)
 	params.collision_mask = mask
 
@@ -363,12 +347,10 @@ func _refresh_zones_from_probe() -> void:
 		i += 1
 
 	_recompute_bottom_y()
-	# Debug once: uncomment to see hits
-	# print("Probe overlaps:", _active_zones.size(), " -> ", _active_zones.map(func(x): return x.name))
 
 func _query_bottom_y_physics() -> float:
 	var from: Vector3 = global_position + Vector3(0.0, 0.1, 0.0)
-	var to: Vector3 = from + Vector3(0.0, -50.0, 0.0)  # “deep enough”
+	var to: Vector3 = from + Vector3(0.0, -50.0, 0.0)
 	var mask: int = 1 << (max(1, water_bottom_mask_bit) - 1)
 
 	var q := PhysicsRayQueryParameters3D.create(from, to, mask)
@@ -385,9 +367,7 @@ func _query_bottom_y_physics() -> float:
 			y = _water_y
 		return y
 
-	# Fallback if nothing was hit
 	return _water_y - max(0.0, water_max_depth)
 
 func _surface_touch_y() -> float:
-	# Touch happens when the bottom of the bait crosses the water plane.
 	return _water_y + water_touch_offset

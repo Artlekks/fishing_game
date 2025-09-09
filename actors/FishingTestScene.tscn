@@ -305,10 +305,13 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
 [node name="DepthZone" parent="Zones" instance=ExtResource("18_ahm77")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.56819, 2.98958)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.60318, 2.98958)
 
 [node name="DepthZone2" parent="Zones" instance=ExtResource("18_ahm77")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -0.964653, 1.61124)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.20003, 1.66387)
+
+[node name="DepthZone3" parent="Zones" instance=ExtResource("18_ahm77")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -0.838888, 0.347913)
 
 [connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
 [connection signal="exited_to_exploration_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="soft_reset"]
@@ -321,3 +324,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -0.964653, 1.61124)
 [editable path="Zones/FishZone"]
 [editable path="Zones/DepthZone"]
 [editable path="Zones/DepthZone2"]
+[editable path="Zones/DepthZone3"]

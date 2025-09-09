@@ -14,7 +14,7 @@ no_depth_test = true
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_tdw1c")
 sink_rate = 0.1
-reel_rise_rate = 0.2
+reel_rise_rate = 0.8
 curve_max_strength = 1.0
 water_touch_offset = -0.2
 
