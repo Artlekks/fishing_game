@@ -172,7 +172,7 @@ launch_angle_deg = 30.0
 fallback_water_y = 5.0
 reel_speed = 1.0
 reel_kill_radius = 0.2
-cast_yaw_trim_deg = -70.0
+cast_yaw_trim_deg = -60.0
 
 [node name="AxisGizmo" parent="Player" index="8"]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)

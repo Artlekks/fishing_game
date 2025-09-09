@@ -16,6 +16,7 @@ script = ExtResource("1_tdw1c")
 sink_rate = 0.1
 reel_rise_rate = 0.2
 curve_max_strength = 1.0
+water_touch_offset = -0.2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.1, -8.88178e-16, 0, 8.88178e-16, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

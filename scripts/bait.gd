@@ -49,6 +49,10 @@ var _reel_speed: float = 0.1              # world units per second
 @export var curve_falloff_end: float = 1.0
 var _zone_recheck_t: float = 0.0
 @export var zone_recheck_interval: float = 0.25   # seconds
+@export var water_touch_offset: float = 0.06
+# Explanation:
+# how far below the bait’s origin the visual “bottom” is.
+# Increase if splash still appears too high; decrease if too low.
 
 var _curve_input: int = 0                 # -1, 0, +1 from FSM
 var _curve_bias: float = 0.0              # smoothed curve input
@@ -172,14 +176,17 @@ func _physics_process(delta: float) -> void:
 			var curr := global_position
 			var next := curr + _vel * delta
 
-			# cross water plane this frame?
-			if curr.y >= _water_y and next.y <= _water_y:
+			# cross water plane (touch_y) this frame?
+			var touch_y := _water_y + water_touch_offset
+
+			if curr.y >= touch_y and next.y <= touch_y:
 				var denom := curr.y - next.y
-				var t := 0.0
+				var t: float = 0.0
 				if absf(denom) > 0.0001:
-					t = (curr.y - _water_y) / denom
+					t = (curr.y - touch_y) / denom
+
 				var hit := curr.lerp(next, t)
-				hit.y = _water_y
+				hit.y = touch_y
 				global_position = hit
 				landed.emit(hit)
 
@@ -380,3 +387,7 @@ func _query_bottom_y_physics() -> float:
 
 	# Fallback if nothing was hit
 	return _water_y - max(0.0, water_max_depth)
+
+func _surface_touch_y() -> float:
+	# Touch happens when the bottom of the bait crosses the water plane.
+	return _water_y + water_touch_offset
