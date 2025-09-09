@@ -106,7 +106,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_emtsy")
 shape = SubResource("ConcavePolygonShape3D_m77w1")
 
 [node name="Water" parent="World/River_001" index="3"]
-transform = Transform3D(5.95303, 0, -1.1722, 0, 2.38547, 0, 2.67362, 0, 2.61, 24.7671, -2.60612, 26.8345)
 surface_material_override/0 = SubResource("StandardMaterial3D_00n6f")
 
 [node name="Plane" parent="World/River_001" index="4"]
@@ -247,7 +246,7 @@ sprite_switch_progress = 0.3
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
 physics_interpolation_mode = 1
-transform = Transform3D(0.957613, -0.149151, 0.246439, -7.45058e-09, 0.855515, 0.517778, -0.28806, -0.495831, 0.819252, -0.758, 1.8, 3.144)
+transform = Transform3D(0.957612, -0.149152, 0.246441, 0, 0.855515, 0.517778, -0.288061, -0.49583, 0.819252, -0.758, 1.8, 3.144)
 fov = 35.0
 
 [node name="PhantomCameraHost" type="Node" parent="CameraRig/Camera3D"]
@@ -259,7 +258,7 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 [node name="Cameras" type="Node3D" parent="CameraRig"]
 
 [node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" node_paths=PackedStringArray("look_at_target")]
-transform = Transform3D(0.957596, -0.149146, 0.246433, -7.45045e-09, 0.85549, 0.517765, -0.288054, -0.495816, 0.819231, -0.758, 1.8, 3.144)
+transform = Transform3D(0.957596, -0.149147, 0.246434, 0, 0.85549, 0.517765, -0.288056, -0.495815, 0.819231, -0.758, 1.8, 3.144)
 top_level = true
 script = ExtResource("6_x75a5")
 priority = 10
@@ -305,10 +304,16 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
 [node name="DepthZone" parent="Zones" instance=ExtResource("18_ahm77")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.56819, 2.98958)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.621124)
+
+[node name="CollisionShape3D" parent="Zones/DepthZone" index="0"]
+transform = Transform3D(0.928148, 0, -0.37221, 0, 1, 0, 0.37221, 0, 0.928148, 0.445974, -2.38419e-07, -0.529226)
 
 [node name="DepthZone2" parent="Zones" instance=ExtResource("18_ahm77")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -0.964653, 1.61124)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.621124)
+
+[node name="CollisionShape3D" parent="Zones/DepthZone2" index="0"]
+transform = Transform3D(0.928148, 0, -0.37221, 0, 1, 0, 0.37221, 0, 0.928148, 1.52478, -2.38419e-07, -1.52015)
 
 [connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
 [connection signal="exited_to_exploration_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="soft_reset"]

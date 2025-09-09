@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpgi68ohdlu8p"]
+
+[ext_resource type="Script" uid="uid://cx8vvebbabfd0" path="res://scripts/depth_zone.gd" id="1_likoc"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bp5p2"]
+size = Vector3(4.4259, 1, 1.31738)
+
+[node name="DepthZone" type="Area3D"]
+collision_layer = 128
+collision_mask = 0
+script = ExtResource("1_likoc")
+
+[node name="BottomWall" type="StaticBody3D" parent="."]
+collision_layer = 2048
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BottomWall" groups=["depth_zone"]]
+shape = SubResource("BoxShape3D_bp5p2")

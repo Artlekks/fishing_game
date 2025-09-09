@@ -1,25 +1,32 @@
-[gd_scene load_steps=4 format=3 uid="uid://t7t8sxuekigk"]
+[gd_scene load_steps=5 format=3 uid="uid://t7t8sxuekigk"]
 
 [ext_resource type="Script" uid="uid://dskacl5px2dec" path="res://scripts/bait.gd" id="1_tdw1c"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_tdw1c"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tdw1c"]
+render_priority = 127
+no_depth_test = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_xb8r5"]
 
 [node name="Bait" type="Node3D"]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_tdw1c")
+sink_rate = 0.1
+reel_rise_rate = 0.2
 curve_max_strength = 1.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.1, -8.88178e-16, 0, 8.88178e-16, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 mesh = SubResource("SphereMesh_tdw1c")
+surface_material_override/0 = SubResource("StandardMaterial3D_tdw1c")
 
-[node name="ReelDetector" type="Area3D" parent="."]
+[node name="DepthProbe" type="Area3D" parent="."]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-collision_layer = 16
-collision_mask = 2
+collision_layer = 0
+collision_mask = 128
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ReelDetector"]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DepthProbe"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 shape = SubResource("SphereShape3D_xb8r5")
