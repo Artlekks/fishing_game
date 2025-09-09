@@ -10,26 +10,26 @@ class_name DepthZone
 @export var bottom_node_path: NodePath = NodePath("")
 
 func get_bottom_y(surface_y: float) -> float:
-	# 1) Optional override by node (kept for flexibility)
+	var bottom_y: float = surface_y
+
+	# Optional override by node (kept for flexibility)
 	if allow_bottom_override:
 		var n: Node3D = get_node_or_null(bottom_node_path) as Node3D
 		if n != null:
-			var by: float = n.global_position.y
-			if by > surface_y:
-				by = surface_y
-			return by
+			bottom_y = n.global_position.y
+			if bottom_y > surface_y:
+				bottom_y = surface_y
+			return bottom_y
 
-	# 2) Read from the first CollisionShape3D child
+	# Read from the first CollisionShape3D child
 	var cs: CollisionShape3D = _find_first_collision_shape()
 	if cs == null:
-		# fallback: do not change anything, return surface_y (shallow)
-		return surface_y
+		return surface_y  # shallow fallback
 
-	var by: float = _compute_shape_bottom_y(cs)
-	# safety: never above the water surface
-	if by > surface_y:
-		by = surface_y
-	return by
+	bottom_y = _compute_shape_bottom_y(cs)
+	if bottom_y > surface_y:
+		bottom_y = surface_y
+	return bottom_y
 
 
 # --- helpers ---

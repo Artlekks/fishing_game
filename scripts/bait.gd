@@ -125,12 +125,12 @@ func set_reel_active(active: bool) -> void:
 func set_reel_speed_per_sec(speed: float) -> void:
 	_reel_speed = max(0.01, speed)
 
-func set_curve_input(sign: int) -> void:
-	if sign < -1:
-		sign = -1
-	if sign > 1:
-		sign = 1
-	_curve_input = sign
+func set_curve_input(curve_sign: int) -> void:
+	if curve_sign < -1:
+		curve_sign = -1
+	elif curve_sign > 1:
+		curve_sign = 1
+	_curve_input = curve_sign
 
 func set_kill_radius(r: float) -> void:
 	reel_kill_radius = max(0.01, r)

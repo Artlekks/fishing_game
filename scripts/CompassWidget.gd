@@ -79,9 +79,8 @@ func _update_ready_icon() -> void:
 	wf = wf.normalized()
 	var dotv: float = clamp(pf.dot(wf), -1.0, 1.0)
 	var ang: float = rad_to_deg(acos(dotv))
-	var ready: bool = ang <= cone_half_angle_deg
-
-	if ready:
+	var is_ready: bool = ang <= cone_half_angle_deg
+	if is_ready:
 		if use_blink_when_ready and _blink_timer != null:
 			if _blink_timer.is_stopped():
 				_blink_on = false

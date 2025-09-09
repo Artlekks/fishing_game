@@ -118,9 +118,9 @@ func _on_bait_reeled_in() -> void:
 	despawn()
 	bait_returned.emit()
 
-func set_curve_input(sign: int) -> void:
+func set_curve_input(curve_sign: int) -> void:
 	if is_instance_valid(_bait) and _bait.has_method("set_curve_input"):
-		_bait.call("set_curve_input", sign)
+		_bait.call("set_curve_input", curve_sign)
 
 func despawn() -> void:
 	_cleanup_bait()

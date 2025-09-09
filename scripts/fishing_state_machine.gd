@@ -96,12 +96,12 @@ func _process(_delta: float) -> void:
 	if _reel_mode and _bait_caster != null:
 		var left_pressed := Input.is_action_pressed(reel_left_action)
 		var right_pressed := Input.is_action_pressed(reel_right_action)
-		var sign := 0
+		var curve_sign := 0
 		if left_pressed and not right_pressed:
-			sign = -1
+			curve_sign = -1
 		elif right_pressed and not left_pressed:
-			sign = 1
-		_bait_caster.call("set_curve_input", sign)
+			curve_sign = 1
+		_bait_caster.call("set_curve_input", curve_sign)
 
 # ---------------- PowerMeter (looked up by group) ----------------
 var _pm_cache: Node = null
