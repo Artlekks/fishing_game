@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dlrxhabxv2084"]
+[gd_scene load_steps=12 format=3 uid="uid://dlrxhabxv2084"]
 
 [ext_resource type="Script" uid="uid://v2e3i08ig836" path="res://scripts/fishing_hud.gd" id="1_8se46"]
 [ext_resource type="Script" uid="uid://c3jrjq4dim75x" path="res://scripts/CompassWidget.gd" id="2_otwwb"]
@@ -8,6 +8,9 @@
 [ext_resource type="Texture2D" uid="uid://bybktjbfq40mh" path="res://assets/sprites/Fishing_Icon.png" id="3_otwwb"]
 [ext_resource type="Texture2D" uid="uid://u3tyt71m2h6" path="res://assets/sprites/Menu.png" id="4_2gox2"]
 [ext_resource type="Texture2D" uid="uid://3llccm0knkks" path="res://assets/sprites/Menu_Cast.png" id="8_akuvi"]
+[ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="9_6vsej"]
+[ext_resource type="Script" uid="uid://rhyohtcmes3s" path="res://scripts/depth_meter.gd" id="9_ysruu"]
+[ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="10_ysruu"]
 
 [node name="FishingHud" type="CanvasLayer"]
 layer = 40
@@ -123,4 +126,49 @@ grow_vertical = 0
 scale = Vector2(2, 2)
 mouse_filter = 2
 texture = ExtResource("8_akuvi")
+stretch_mode = 2
+
+[node name="DepthMeter" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("9_ysruu")
+
+[node name="Frame" type="TextureRect" parent="DepthMeter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -90.385
+offset_top = -122.0
+offset_right = 1.615
+offset_bottom = 122.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("9_6vsej")
+stretch_mode = 2
+
+[node name="Ground" type="TextureRect" parent="DepthMeter"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+stretch_mode = 2
+
+[node name="Arrow" type="TextureRect" parent="DepthMeter"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -55.0
+offset_top = -110.0
+offset_bottom = -70.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("10_ysruu")
 stretch_mode = 2

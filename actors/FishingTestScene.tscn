@@ -128,7 +128,7 @@ visible = false
 visible = false
 
 [node name="Player" parent="." node_paths=PackedStringArray("water_facing", "exploration_camera") groups=["player"] instance=ExtResource("4_1vxb6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.61472, 0, 0.295957)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.61472, 0, 0.211662)
 collision_mask = 9
 water_facing = NodePath("../Zones/FishZone/WaterFacing")
 exploration_camera = NodePath("../CameraRig/Cameras/PCam_Exploration")
@@ -247,7 +247,7 @@ sprite_switch_progress = 0.3
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
 physics_interpolation_mode = 1
-transform = Transform3D(0.957613, -0.149151, 0.246439, -7.45058e-09, 0.855515, 0.517778, -0.28806, -0.495831, 0.819252, -0.758, 1.8, 3.144)
+transform = Transform3D(0.959872, -0.142363, 0.241617, -7.45058e-09, 0.861566, 0.507645, -0.280439, -0.487274, 0.826993, -0.758, 1.8, 3.144)
 fov = 35.0
 
 [node name="PhantomCameraHost" type="Node" parent="CameraRig/Camera3D"]
@@ -259,7 +259,7 @@ metadata/_custom_type_script = "uid://bd046eokvcnu2"
 [node name="Cameras" type="Node3D" parent="CameraRig"]
 
 [node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" node_paths=PackedStringArray("look_at_target")]
-transform = Transform3D(0.957596, -0.149146, 0.246433, -7.45045e-09, 0.85549, 0.517765, -0.288054, -0.495816, 0.819231, -0.758, 1.8, 3.144)
+transform = Transform3D(0.959855, -0.142359, 0.24161, -7.45045e-09, 0.861541, 0.507632, -0.280434, -0.48726, 0.826972, -0.758, 1.8, 3.144)
 top_level = true
 script = ExtResource("6_x75a5")
 priority = 10
@@ -273,7 +273,7 @@ follow_offset = Vector3(0, 2.5, 2.5)
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 
 [node name="Cam_Fishing" type="Camera3D" parent="CameraRig/Cameras"]
-transform = Transform3D(1, 0, 0, 0, 0.866026, 0.5, 0, -0.5, 0.866026, 0, 1.5, 2.3)
+transform = Transform3D(-0.965926, -0.0427175, 0.25527, 0, 0.986286, 0.165048, -0.258819, 0.159424, -0.952679, -1.579, 0.845, -1.752)
 fov = 35.0
 
 [node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing", "fishing_state_controller")]
