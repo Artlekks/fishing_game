@@ -54,6 +54,7 @@ var _target_feet_y: float = 0.0
 var _curve_input: int = 0                  # -1,0,+1 from FSM
 var _curve_bias: float = 0.0
 var _last_depth_y: float = 0.0
+var _last_depth_emit_y: float = 0.0
 
 # sinking helper
 var _sink_speed: float = 0.0
@@ -162,11 +163,12 @@ func _recompute_bottom_y() -> void:
 # ---------- Internals ----------
 
 func _physics_process(delta: float) -> void:
+	# ... your existing movement code ...
 	var y: float = global_position.y
-	if y != _last_depth_y:
-		_last_depth_y = y
+	if y != _last_depth_emit_y:
+		_last_depth_emit_y = y
 		emit_signal("depth_y_changed", y)
-
+		
 	match _mode:
 		Mode.FLYING:
 			# ballistic step
