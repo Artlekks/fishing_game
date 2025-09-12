@@ -249,9 +249,9 @@ fish_icon_purple = ExtResource("11_emtsy")
 
 [node name="DepthMeter" parent="UI/FishingHud" index="1"]
 offset_left = -56.0
-offset_top = -75.0
+offset_top = -77.0
 offset_right = -16.0
-offset_bottom = -35.0
+offset_bottom = -37.0
 frame_path = NodePath("Frame")
 ground_path = NodePath("Ground")
 arrow_path = NodePath("Arrow")
@@ -282,7 +282,6 @@ offset_left = -69.275
 offset_top = -119.205
 offset_right = -69.275
 offset_bottom = -119.205
-stretch_mode = 2
 
 [node name="Arrow" parent="UI/FishingHud/DepthMeter" index="2"]
 z_index = 2

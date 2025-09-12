@@ -255,12 +255,22 @@ offset_bottom = -35.0
 frame_path = NodePath("Frame")
 ground_path = NodePath("Ground")
 arrow_path = NodePath("Arrow")
+use_explicit_track = null
 track_surface_y_px = -115.0
+track_ground_y_px = null
 track_top_inset_px = 0.0
+track_bottom_inset_px = null
 arrow_tip_offset_px = 44.025
 shallow_tex = ExtResource("12_pvu3v")
 mid_tex = ExtResource("13_j8jxs")
 deep_tex = ExtResource("14_moiwe")
+min_depth_for_mid = null
+min_depth_for_deep = null
+ground_offset_px = null
+ground_inset_left_px = null
+ground_inset_top_px = null
+ground_inset_right_px = null
+ground_inset_bottom_px = null
 
 [node name="Frame" parent="UI/FishingHud/DepthMeter" index="0"]
 z_index = 1
@@ -282,7 +292,6 @@ offset_left = -69.275
 offset_top = -119.205
 offset_right = -69.275
 offset_bottom = -119.205
-stretch_mode = 2
 
 [node name="Arrow" parent="UI/FishingHud/DepthMeter" index="2"]
 z_index = 2
