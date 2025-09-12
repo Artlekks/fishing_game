@@ -96,6 +96,9 @@ func _on_bait_landed(point: Vector3) -> void:
 	var yy: float = point.y
 	bait_landed.emit(sy, by, yy)
 
+func get_bait_node() -> Node3D:
+	return _bait    # return the active bait node
+
 func _cleanup_bait() -> void:
 	if is_instance_valid(_bait):
 		_bait.queue_free()

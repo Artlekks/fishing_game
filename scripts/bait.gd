@@ -2,6 +2,7 @@ extends Node3D
 
 signal landed(point: Vector3)
 signal reeled_in()
+signal depth_y_changed(y: float)
 
 # ---------- Tuning ----------
 @export var gravity: float = 24.0
@@ -52,6 +53,7 @@ var _target_feet_y: float = 0.0
 
 var _curve_input: int = 0                  # -1,0,+1 from FSM
 var _curve_bias: float = 0.0
+var _last_depth_y: float = 0.0
 
 # sinking helper
 var _sink_speed: float = 0.0
@@ -63,6 +65,8 @@ var _zone_recheck_t: float = 0.0
 @export var zone_recheck_interval: float = 0.25
 
 func _ready() -> void:
+	_last_depth_y = global_position.y
+
 	if _probe != null:
 		_probe.area_entered.connect(_on_probe_area_entered)
 		_probe.area_exited.connect(_on_probe_area_exited)
@@ -158,6 +162,11 @@ func _recompute_bottom_y() -> void:
 # ---------- Internals ----------
 
 func _physics_process(delta: float) -> void:
+	var y: float = global_position.y
+	if y != _last_depth_y:
+		_last_depth_y = y
+		emit_signal("depth_y_changed", y)
+
 	match _mode:
 		Mode.FLYING:
 			# ballistic step

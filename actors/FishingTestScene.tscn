@@ -293,8 +293,8 @@ power_root_path = NodePath("../PowerMeter/Root")
 script = ExtResource("16_j8jxs")
 caster_path = NodePath("../../Player/BaitCaster")
 depth_meter_path = NodePath("../FishingHud/DepthMeter")
-power_meter_path = NodePath("../PowerMeter")
 appear_time = 0.4
+disappear_time = 0.3
 
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("12_emtsy")

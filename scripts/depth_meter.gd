@@ -19,70 +19,79 @@ class_name DepthMeter
 var _surface_y: float = 0.0
 var _bottom_y: float = 0.0
 var _last_bait_y: float = 0.0
+var _bait_ref: Node3D = null
 
 func _ready() -> void:
 	visible = false
+	set_process(false)
 
-# -- called by gate on cast --
+# Called when casting finished and the bait is in water
 func show_with_bounds(surface_y: float, bottom_y: float) -> void:
 	_surface_y = surface_y
 	_bottom_y = bottom_y
 	_select_ground_texture()
-	if _frame != null:  _frame.visible = true
-	if _ground != null: _ground.visible = _ground.texture != null
-	if _arrow != null:  _arrow.visible = true
 	visible = true
 	_update_arrow_immediate()
+	
+# Let the widget follow the actual bait node on its own
+func set_bait_ref(bait: Node3D) -> void:
+	_bait_ref = bait
 
-# -- called by gate every frame while active --
+# External push is still accepted (safe no-op if you keep it)
+# --- called continuously by the gate (signal + polling) ---
 func set_bait_y(bait_y: float) -> void:
 	_last_bait_y = bait_y
 	_update_arrow_immediate()
 
-# -- called by gate on exit (optional) --
 func hide_meter() -> void:
 	visible = false
+
+func _process(_dt: float) -> void:
+	if _bait_ref != null:
+		var y: float = _bait_ref.global_position.y
+		# Pull live Y every frame so the arrow always mirrors the bait
+		set_bait_y(y)
+
+func _update_arrow_immediate() -> void:
+	if _arrow == null or _frame == null:
+		return
+
+	# lane inside the frame, top -> bottom in local pixels
+	var r: Rect2 = _frame.get_rect()                    # local rect of the frame
+	var top_px: float = r.position.y + track_top_inset_px
+	var bottom_px: float = r.position.y + r.size.y - track_ground_align_px
+	var lane: float = bottom_px - top_px
+	if lane < 0.001:
+		lane = 0.001
+
+	# map world Y (bottom..surface) -> t in [0..1]
+	var span: float = _surface_y - _bottom_y            # surface is higher (less negative)
+	if abs(span) < 0.0001:
+		span = 0.0001
+	var t: float = (_last_bait_y - _bottom_y) / span    # 0 at bottom, 1 at surface
+	if t < 0.0:
+		t = 0.0
+	elif t > 1.0:
+		t = 1.0
+
+	# convert t -> pixel Y (bottom up)
+	var y_px: float = bottom_px - lane * t
+
+	# place arrow (keep X set in editor)
+	var pos: Vector2 = _arrow.position
+	# align by top-left of arrow; if you want center, subtract _arrow.size.y * 0.5
+	pos.y = y_px
+	_arrow.position = pos
 
 func _select_ground_texture() -> void:
 	if _ground == null:
 		return
-	var depth_span: float = _surface_y - _bottom_y
-	if absf(depth_span) < 0.0001:
-		depth_span = 0.0001
-	# Mid/deep thresholds (t in [0..1], 0=bottom, 1=surface)
-	var t_mid: float = 1.2 / 3.0   # tune later
-	var t_deep: float = 2.2 / 3.0
-
-	# choose texture by actual depth
-	var t: float = (_last_bait_y - _bottom_y) / depth_span
-	if t < t_mid:
+	var depth: float = _surface_y - _bottom_y
+	var mid_th: float = 1.2
+	var deep_th: float = 2.2
+	if depth < mid_th and shallow_tex != null:
 		_ground.texture = shallow_tex
-	elif t < t_deep:
+	elif depth < deep_th and mid_tex != null:
 		_ground.texture = mid_tex
-	else:
+	elif deep_tex != null:
 		_ground.texture = deep_tex
-
-func _update_arrow_immediate() -> void:
-	if _frame == null or _arrow == null:
-		return
-	var fr: Rect2 = _frame.get_rect()
-	var track_top: float = fr.position.y + track_top_inset_px
-	var track_bottom: float
-	if _ground != null:
-		track_bottom = _ground.position.y + track_ground_align_px
-	else:
-		track_bottom = fr.position.y + fr.size.y - track_top_inset_px
-	if track_bottom < track_top + 1.0:
-		track_bottom = track_top + 1.0
-
-	var span_world: float = _surface_y - _bottom_y
-	if absf(span_world) < 0.0001:
-		span_world = 0.0001
-	var t: float = (_last_bait_y - _bottom_y) / span_world
-	if t < 0.0: t = 0.0
-	elif t > 1.0: t = 1.0
-
-	var y_px: float = lerp(track_bottom, track_top, t)
-	var p: Vector2 = _arrow.position
-	p.y = y_px - (_arrow.size.y * 0.5)
-	_arrow.position = p
