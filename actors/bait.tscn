@@ -10,7 +10,7 @@ no_depth_test = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_xb8r5"]
 
-[node name="Bait" type="Node3D"]
+[node name="Bait" type="Node3D" groups=["bait"]]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_tdw1c")
 sink_rate = 0.1

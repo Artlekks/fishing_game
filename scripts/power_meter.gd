@@ -29,6 +29,25 @@ extends CanvasLayer
 @export var follow_target: bool = false
 
 # ----- Internal -----
+var _locked: bool = false
+
+func lock_on() -> void:
+	_locked = true
+	auto_hide_on_capture = false
+	_ensure_shown()
+
+func unlock() -> void:
+	_locked = false
+
+func _ensure_shown() -> void:
+	visible = true
+	if _root != null:
+		_root.visible = true
+		var m: Color = (_root as CanvasItem).modulate
+		if m.a < 1.0:
+			m.a = 1.0
+			(_root as CanvasItem).modulate = m
+
 var _root: CanvasItem = null
 var _bg: Sprite2D = null
 var _fill: Sprite2D = null
@@ -72,12 +91,24 @@ func _ready() -> void:
 		_set_ui_visible(true)
 
 	set_process(follow_target)
+	
+	if _root != null and not _root.is_connected("visibility_changed", Callable(self, "_on_root_vis")):
+		_root.visibility_changed.connect(_on_root_vis)
+	set_process(true)
 
 # -----------------------------------------------------------------------------
-# Public API (used by your FSM adapter)
+# handler
+func _on_root_vis() -> void:
+	if _locked and _root != null and not _root.visible:
+		call_deferred("_ensure_shown")
+
+func _set_ui_visible(v: bool) -> void:
+	visible = v
+	if _root != null:
+		_root.visible = v
 
 func start() -> void:
-	# Slide up + start ping-pong
+	# Do nothing if we have no root
 	if _root == null:
 		return
 
@@ -85,47 +116,67 @@ func start() -> void:
 	_set_ratio(0.0)
 	_make_fill_pingpong()
 
-	# Place off-screen at bottom, then tween to final HUD position
 	var dst: Vector2 = _hud_target_pos()
-	var start_y: float = _offscreen_y()
+	var cur: Vector2 = _get_root_pos()
+
+	# Consider "already placed" if we are visible and basically at the target
+	var already_in_place: bool = _is_visible()
+	if already_in_place:
+		var dx: float = absf(cur.x - dst.x)
+		var dy: float = absf(cur.y - dst.y)
+		if dx > 0.5 or dy > 0.5:
+			already_in_place = false
 
 	_kill_slide()
-	_set_root_pos(Vector2(dst.x, start_y))
 	_set_ui_visible(true)
 
-	_slide_tween = create_tween()
-	_slide_tween.set_trans(Tween.TRANS_SINE)
-	_slide_tween.set_ease(Tween.EASE_OUT)
-	_slide_tween.tween_property(_root, "position", dst, appear_time)
+	if already_in_place:
+		# Stay exactly where we are to avoid the off-screen jump
+		_set_root_pos(dst)
+		return
+
+	# Normal first-time appearance: slide from off-screen bottom
+	var start_pos: Vector2 = Vector2(dst.x, _offscreen_y())
+	_set_root_pos(start_pos)
+
+	var t: Tween = create_tween()
+	t.set_trans(Tween.TRANS_SINE)
+	t.set_ease(Tween.EASE_OUT)
+	t.tween_property(_root, "position", dst, appear_time)
+	_slide_tween = t
 
 func capture_power() -> float:
 	var power: float = _ratio * max_value
-	if auto_hide_on_capture:
+	if auto_hide_on_capture and not _locked:
 		cancel()
 	return power
 
+
 func cancel() -> void:
-	# Slide down and hide, stop fill tween
+	if _locked:
+		return
 	_kill_slide()
 	var end_pos: Vector2 = _get_root_pos()
 	end_pos.y = _offscreen_y()
-
-	_slide_tween = create_tween()
-	_slide_tween.set_trans(Tween.TRANS_SINE)
-	_slide_tween.set_ease(Tween.EASE_IN)
-	_slide_tween.tween_property(_root, "position", end_pos, disappear_time)
-	_slide_tween.tween_callback(Callable(self, "_on_slide_out_done"))
-
+	var t: Tween = create_tween()
+	t.set_trans(Tween.TRANS_SINE)
+	t.set_ease(Tween.EASE_IN)
+	t.tween_property(_root, "position", end_pos, disappear_time)
+	t.tween_callback(Callable(self, "_on_slide_out_done"))
+	_slide_tween = t
 	_stop_fill()
+
 
 func set_distance_text(meters: float) -> void:
 	if _label != null:
 		_label.text = String.num(meters, 1) + " m"
 
 # -----------------------------------------------------------------------------
-# Process (only if follow_target = true)
-
+# process guard
 func _process(delta: float) -> void:
+	if _locked and not _is_visible():
+		_ensure_shown()
+
 	if not follow_target:
 		return
 	if not _is_visible():
@@ -177,9 +228,7 @@ func _set_root_pos(p: Vector2) -> void:
 	elif _root is Node2D:
 		(_root as Node2D).position = p
 
-func _set_ui_visible(v: bool) -> void:
-	if _root != null:
-		_root.visible = v
+# make sure setting UI visibility affects the layer too
 
 func _is_visible() -> bool:
 	if _root == null:
@@ -286,3 +335,6 @@ func _set_ratio(r: float) -> void:
 			_fill.region_rect = rr
 	else:
 		_fill.scale = Vector2(_base_scale_x * _ratio, _fill.scale.y)
+
+func get_appear_time() -> float: return appear_time
+func get_disappear_time() -> float: return disappear_time

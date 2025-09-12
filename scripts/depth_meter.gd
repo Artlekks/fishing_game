@@ -1,80 +1,88 @@
 extends Control
+class_name DepthMeter
+
+@export var frame_path: NodePath
+@export var ground_path: NodePath
+@export var arrow_path: NodePath
 
 @export var shallow_tex: Texture2D
 @export var mid_tex: Texture2D
 @export var deep_tex: Texture2D
 
-const UPDATE_HZ := 30.0
+@export var track_top_inset_px: float = 8.0
+@export var track_ground_align_px: float = 0.0
+
+@onready var _frame: TextureRect = get_node_or_null(frame_path) as TextureRect
+@onready var _ground: TextureRect = get_node_or_null(ground_path) as TextureRect
+@onready var _arrow: TextureRect = get_node_or_null(arrow_path) as TextureRect
 
 var _surface_y: float = 0.0
 var _bottom_y: float = 0.0
 var _last_bait_y: float = 0.0
-var _accum: float = 0.0
-var _min_depth_for_mid: float = 1.2   # meters; tweak
-var _min_depth_for_deep: float = 2.2  # meters; tweak
-
-@onready var _frame: TextureRect = $Frame
-@onready var _ground: TextureRect = $Ground
-@onready var _arrow: TextureRect = $Arrow
 
 func _ready() -> void:
 	visible = false
-	if shallow_tex == null:
-		shallow_tex = load("res://Shallow_Depth.png")
-	if mid_tex == null:
-		mid_tex = load("res://Mid_Depth.png")
-	if deep_tex == null:
-		deep_tex = load("res://Deep_Depth.png")
 
+# -- called by gate on cast --
 func show_with_bounds(surface_y: float, bottom_y: float) -> void:
 	_surface_y = surface_y
 	_bottom_y = bottom_y
-	_pick_ground_texture()
+	_select_ground_texture()
+	if _frame != null:  _frame.visible = true
+	if _ground != null: _ground.visible = _ground.texture != null
+	if _arrow != null:  _arrow.visible = true
 	visible = true
+	_update_arrow_immediate()
 
-func hide_meter() -> void:
-	visible = false
-
+# -- called by gate every frame while active --
 func set_bait_y(bait_y: float) -> void:
 	_last_bait_y = bait_y
 	_update_arrow_immediate()
 
-func _process(delta: float) -> void:
-	if not visible:
+# -- called by gate on exit (optional) --
+func hide_meter() -> void:
+	visible = false
+
+func _select_ground_texture() -> void:
+	if _ground == null:
 		return
-	_accum += delta
-	var step := 1.0 / UPDATE_HZ
-	if _accum >= step:
-		_accum -= step
-		_update_arrow_immediate()
-
-func _update_arrow_immediate() -> void:
-	# Map bait_y in [_bottom_y .. _surface_y] to Arrow Y in [bottom_px .. top_px]
-	var r := get_rect()
-	var top_px := r.position.y + 8.0
-	var bottom_px := r.position.y + r.size.y - 8.0
-
-	var depth_span := _surface_y - _bottom_y  # note: surface > bottom (less negative)
+	var depth_span: float = _surface_y - _bottom_y
 	if absf(depth_span) < 0.0001:
 		depth_span = 0.0001
+	# Mid/deep thresholds (t in [0..1], 0=bottom, 1=surface)
+	var t_mid: float = 1.2 / 3.0   # tune later
+	var t_deep: float = 2.2 / 3.0
 
-	var t := (_last_bait_y - _bottom_y) / depth_span  # 0 at bottom, 1 at surface
-	if t < 0.0:
-		t = 0.0
-	elif t > 1.0:
-		t = 1.0
-
-	var y_px := lerp(bottom_px, top_px, t)
-
-	var pos := _arrow.position
-	pos.y = y_px - r.position.y - _arrow.size.y * 0.5
-	_arrow.position = pos
-
-func _pick_ground_texture() -> void:
-	var depth := _surface_y - _bottom_y
-	if depth < _min_depth_for_mid:
+	# choose texture by actual depth
+	var t: float = (_last_bait_y - _bottom_y) / depth_span
+	if t < t_mid:
 		_ground.texture = shallow_tex
-	elif depth < _min_depth_for_deep:
+	elif t < t_deep:
 		_ground.texture = mid_tex
 	else:
 		_ground.texture = deep_tex
+
+func _update_arrow_immediate() -> void:
+	if _frame == null or _arrow == null:
+		return
+	var fr: Rect2 = _frame.get_rect()
+	var track_top: float = fr.position.y + track_top_inset_px
+	var track_bottom: float
+	if _ground != null:
+		track_bottom = _ground.position.y + track_ground_align_px
+	else:
+		track_bottom = fr.position.y + fr.size.y - track_top_inset_px
+	if track_bottom < track_top + 1.0:
+		track_bottom = track_top + 1.0
+
+	var span_world: float = _surface_y - _bottom_y
+	if absf(span_world) < 0.0001:
+		span_world = 0.0001
+	var t: float = (_last_bait_y - _bottom_y) / span_world
+	if t < 0.0: t = 0.0
+	elif t > 1.0: t = 1.0
+
+	var y_px: float = lerp(track_bottom, track_top, t)
+	var p: Vector2 = _arrow.position
+	p.y = y_px - (_arrow.size.y * 0.5)
+	_arrow.position = p

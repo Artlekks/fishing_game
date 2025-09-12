@@ -219,15 +219,12 @@ transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.56, 0.35, 0)
 
 [node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
 layer = 50
-offset = Vector2(146, 200)
+offset = Vector2(140, 200)
 scale = Vector2(0.8, 0.8)
-transform = Transform2D(0.8, 0, 0, 0.8, 146, 200)
+transform = Transform2D(0.8, 0, 0, 0.8, 140, 200)
 follow_viewport_enabled = true
 cycle_duration = 0.9
 target_3d_path = NodePath("../../Player")
-
-[node name="Root" parent="UI/PowerMeter" index="0"]
-scale = Vector2(0.45, 0.45)
 
 [node name="FishingHud" parent="UI" node_paths=PackedStringArray("fishing_camera_controller") instance=ExtResource("9_00n6f")]
 camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
@@ -248,40 +245,12 @@ fish_icon_grey = ExtResource("10_bj8je")
 fish_icon_purple = ExtResource("11_emtsy")
 
 [node name="DepthMeter" parent="UI/FishingHud" index="1"]
-offset_left = -5.0
-offset_top = 6.0
-offset_right = 35.0
-offset_bottom = 46.0
-scale = Vector2(0.9, 0.9)
 frame_path = NodePath("Frame")
 ground_path = NodePath("Ground")
 arrow_path = NodePath("Arrow")
 shallow_tex = ExtResource("12_pvu3v")
 mid_tex = ExtResource("13_j8jxs")
 deep_tex = ExtResource("14_moiwe")
-
-[node name="Frame" parent="UI/FishingHud/DepthMeter" index="0"]
-layout_mode = 0
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = -106.79
-offset_top = -143.495
-offset_right = 25.21
-offset_bottom = 140.505
-grow_horizontal = 1
-grow_vertical = 1
-
-[node name="Ground" parent="UI/FishingHud/DepthMeter" index="1"]
-offset_left = -91.665
-offset_top = -133.11
-offset_right = -51.665
-offset_bottom = -93.11
-scale = Vector2(0.4, 0.4)
-
-[node name="Arrow" parent="UI/FishingHud/DepthMeter" index="2"]
-offset_left = -75.0
-offset_right = -20.0
 
 [node name="PowerBarGate" type="Node" parent="UI"]
 script = ExtResource("12_q0mti")
@@ -293,8 +262,6 @@ power_root_path = NodePath("../PowerMeter/Root")
 script = ExtResource("16_j8jxs")
 caster_path = NodePath("../../Player/BaitCaster")
 depth_meter_path = NodePath("../FishingHud/DepthMeter")
-power_meter_path = NodePath("../PowerMeter")
-appear_time = 0.4
 
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("12_emtsy")

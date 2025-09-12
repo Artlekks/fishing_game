@@ -1,6 +1,9 @@
 extends Node3D
 
 signal bait_returned
+signal cast_started
+signal bait_despawned
+signal bait_landed(surface_y: float, bottom_y: float, bait_y: float)
 
 @export var bait_scene: PackedScene
 @export var player_path: NodePath = ^".."
@@ -49,6 +52,7 @@ func _yaw_rotate_y(dir: Vector3, degrees: float) -> Vector3:
 	return out
 
 func perform_cast(power: float, dir_world: Vector3) -> void:
+	cast_started.emit()
 	var dir := dir_world
 	dir.y = 0.0
 	if dir.length() > 0.0:
@@ -86,8 +90,11 @@ func perform_cast(power: float, dir_world: Vector3) -> void:
 	if _bait.has_signal("landed"):
 		_bait.connect("landed", Callable(self, "_on_bait_landed"))
 
-func _on_bait_landed(_point: Vector3) -> void:
-	pass
+func _on_bait_landed(point: Vector3) -> void:
+	var sy: float = _water_y()
+	var by: float = sy - 3.0        # use your real bottom if you have it
+	var yy: float = point.y
+	bait_landed.emit(sy, by, yy)
 
 func _cleanup_bait() -> void:
 	if is_instance_valid(_bait):
@@ -124,3 +131,4 @@ func set_curve_input(curve_sign: int) -> void:
 
 func despawn() -> void:
 	_cleanup_bait()
+	bait_despawned.emit()
