@@ -261,6 +261,9 @@ arrow_tip_offset_px = 44.025
 shallow_tex = ExtResource("12_pvu3v")
 mid_tex = ExtResource("13_j8jxs")
 deep_tex = ExtResource("14_moiwe")
+use_animated_sprite2d = true
+animated_sprite2d_path = NodePath("DepthAnim")
+anim_frames_count = 31
 
 [node name="Frame" parent="UI/FishingHud/DepthMeter" index="0"]
 z_index = 1
@@ -286,6 +289,9 @@ stretch_mode = 2
 
 [node name="Arrow" parent="UI/FishingHud/DepthMeter" index="2"]
 z_index = 2
+
+[node name="DepthAnim" parent="UI/FishingHud/DepthMeter" index="3"]
+position = Vector2(-38.275, -0.885)
 
 [node name="PowerBarGate" type="Node" parent="UI"]
 script = ExtResource("12_q0mti")
