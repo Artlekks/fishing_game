@@ -8,6 +8,11 @@ extends Node
 func _ready() -> void:
 	player.camera_reference = exploration_camera
 	camera_rig.quarter_turned.connect(player.camera_quarter_turned)
+	game_mode.mode_changed.connect(_on_mode_changed)
+	_on_mode_changed(game_mode.current_mode)
+
+func _on_mode_changed(new_mode) -> void:
+	set_active(new_mode == game_mode.Mode.EXPLORATION)
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if game_mode == null:
@@ -25,3 +30,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("cam_left"):
 		camera_rig.rotate_quarter_turn(-1)
+
+func set_active(active: bool) -> void:
+	player.movement_enabled = active
+	set_process_unhandled_input(active)

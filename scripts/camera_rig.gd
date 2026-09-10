@@ -28,3 +28,6 @@ func rotate_quarter_turn(direction: int) -> void:
 
 	await tween.finished
 	is_rotating = false
+
+func enter_fishing_view() -> void:
+	print("CameraRig: enter fishing view")
