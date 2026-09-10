@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://y0r5beh0g8ei"]
+[gd_scene format=3 uid="uid://y0r5beh0g8ei"]
 
 [ext_resource type="PackedScene" uid="uid://bsoegp3obkt23" path="res://assets/models/fbx/River_001.glb" id="1_twt30"]
 [ext_resource type="Texture2D" uid="uid://dql6tqfotmh70" path="res://assets/models/fbx/River_001_texpage-P8-FB05BA233861DBF6-A4540252A5FEC9A7-128x256-0-0-256x256-P0-190.png" id="2_7mysf"]
@@ -63,91 +63,88 @@ texture_filter = 0
 
 [sub_resource type="Resource" id="Resource_twt30"]
 script = ExtResource("7_fbfnt")
-duration = 1.0
-transition = 0
-ease = 2
 
-[node name="FishingTestScene" type="Node3D"]
+[node name="FishingTestScene" type="Node3D" unique_id=2114470757]
 
-[node name="World" type="Node3D" parent="."]
+[node name="World" type="Node3D" parent="." unique_id=268595614]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World" unique_id=2136325107]
 transform = Transform3D(0.97024, 0.240796, -0.0255451, 0.17076, -0.605588, 0.777241, 0.171687, -0.758472, -0.628684, 0, 1.83915, 0)
 shadow_enabled = true
 shadow_normal_bias = 1.216
 shadow_opacity = 0.7
 shadow_blur = 0.0
 
-[node name="GroundAnchor" type="Node3D" parent="World"]
+[node name="GroundAnchor" type="Node3D" parent="World" unique_id=1818352232]
 
-[node name="River_001" parent="World" instance=ExtResource("1_twt30")]
+[node name="River_001" parent="World" unique_id=615421676 instance=ExtResource("1_twt30")]
 transform = Transform3D(0.052192, 0, 0.0670895, 0, 0.085, 0, -0.0670895, 0, 0.052192, -4.4677, -4.76837e-07, -0.0299289)
 
-[node name="Land02" parent="World/River_001" index="0"]
+[node name="Land02" parent="World/River_001" index="0" unique_id=142806038]
 surface_material_override/0 = SubResource("StandardMaterial3D_ahm77")
 
-[node name="Border2" parent="World/River_001/Land02" index="0"]
+[node name="Border2" parent="World/River_001/Land02" index="0" unique_id=1226520700]
 surface_material_override/0 = SubResource("StandardMaterial3D_q0mti")
 
-[node name="Collider_Lands" parent="World/River_001/Land02" index="1"]
+[node name="Collider_Lands" parent="World/River_001/Land02" index="1" unique_id=749631362]
 visible = false
 
-[node name="StaticBody3D" type="StaticBody3D" parent="World/River_001/Land02" index="2"]
+[node name="StaticBody3D" type="StaticBody3D" parent="World/River_001/Land02" index="2" unique_id=1055163119]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.740195, -0.749999, -4.44653)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World/River_001/Land02/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/River_001/Land02/StaticBody3D" unique_id=932059006]
 shape = SubResource("ConcavePolygonShape3D_7mysf")
 
-[node name="Bridge" parent="World/River_001" index="1"]
+[node name="Bridge" parent="World/River_001" index="1" unique_id=749694953]
 surface_material_override/0 = SubResource("StandardMaterial3D_4sj2k")
 
-[node name="Land01" parent="World/River_001" index="2"]
+[node name="Land01" parent="World/River_001" index="2" unique_id=448124870]
 surface_material_override/0 = SubResource("StandardMaterial3D_bj8je")
 surface_material_override/1 = SubResource("StandardMaterial3D_emtsy")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="World/River_001/Land01" index="0"]
+[node name="StaticBody3D" type="StaticBody3D" parent="World/River_001/Land01" index="0" unique_id=1680349796]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World/River_001/Land01/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/River_001/Land01/StaticBody3D" unique_id=1364894219]
 shape = SubResource("ConcavePolygonShape3D_m77w1")
 
-[node name="Water" parent="World/River_001" index="3"]
+[node name="Water" parent="World/River_001" index="3" unique_id=1023681480]
 transform = Transform3D(5.95303, 0, -1.1722, 0, 2.38547, 0, 2.67362, 0, 2.61, 24.7671, -2.60612, 26.8345)
 surface_material_override/0 = SubResource("StandardMaterial3D_00n6f")
 
-[node name="Plane" parent="World/River_001" index="4"]
+[node name="Plane" parent="World/River_001" index="4" unique_id=23701232]
 visible = false
 
-[node name="Plane_001" parent="World/River_001" index="5"]
+[node name="Plane_001" parent="World/River_001" index="5" unique_id=218685012]
 visible = false
 
-[node name="Plane_002" parent="World/River_001" index="6"]
+[node name="Plane_002" parent="World/River_001" index="6" unique_id=1775145320]
 visible = false
 
-[node name="Plane_003" parent="World/River_001" index="7"]
+[node name="Plane_003" parent="World/River_001" index="7" unique_id=639970206]
 visible = false
 
-[node name="Plane_005" parent="World/River_001" index="8"]
+[node name="Plane_005" parent="World/River_001" index="8" unique_id=806967322]
 visible = false
 
-[node name="Plane_008" parent="World/River_001" index="9"]
+[node name="Plane_008" parent="World/River_001" index="9" unique_id=1037786578]
 visible = false
 
-[node name="Player" parent="." node_paths=PackedStringArray("water_facing", "exploration_camera") groups=["player"] instance=ExtResource("4_1vxb6")]
+[node name="Player" parent="." unique_id=1798816298 node_paths=PackedStringArray("water_facing", "exploration_camera") groups=["player"] instance=ExtResource("4_1vxb6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.61472, 0, 0.211662)
 collision_mask = 9
 water_facing = NodePath("../Zones/FishZone/WaterFacing")
 exploration_camera = NodePath("../CameraRig/Cameras/PCam_Exploration")
 
-[node name="FishingMovementLock" parent="Player" index="0" node_paths=PackedStringArray("camera_controller", "movement_controller")]
+[node name="FishingMovementLock" parent="Player" index="0" unique_id=1127826431 node_paths=PackedStringArray("camera_controller", "movement_controller")]
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 movement_controller = NodePath("..")
 
-[node name="SpriteOrbitStepper" parent="Player" index="1" node_paths=PackedStringArray("sprite", "camera_controller")]
+[node name="SpriteOrbitStepper" parent="Player" index="1" unique_id=944296912 node_paths=PackedStringArray("sprite", "camera_controller")]
 sprite = NodePath("../AnimatedSprite3D")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 debug_log = true
 
-[node name="FishingStateMachine" parent="Player" index="2" node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera", "fishing_camera_controller", "bait_caster")]
+[node name="FishingStateMachine" parent="Player" index="2" unique_id=790228982 node_paths=PackedStringArray("direction_selector", "controller", "sprite", "player", "fishing_camera", "fishing_camera_controller", "bait_caster")]
 direction_selector = NodePath("../DirectionSelector")
 controller = NodePath("../FishingStateController")
 sprite = NodePath("../AnimatedSprite3D")
@@ -157,17 +154,17 @@ fishing_camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraContr
 bait_caster_path = NodePath("../BaitCaster")
 bait_caster = NodePath("../BaitCaster")
 
-[node name="AnimatedSprite3D" parent="Player" index="5"]
+[node name="AnimatedSprite3D" parent="Player" index="5" unique_id=477032395]
 no_depth_test = true
 render_priority = 1
 
-[node name="ShadowSprite3D" parent="Player/AnimatedSprite3D" index="0"]
+[node name="ShadowSprite3D" parent="Player/AnimatedSprite3D" index="0" unique_id=1206580126]
 transform = Transform3D(1.25, 0, 0, 0, -5.46392e-08, 1, 0, -1.25, -4.37114e-08, 0.01, 0.1, 0)
 sorting_offset = -0.1
 no_depth_test = true
 alpha_cut = 0
 
-[node name="BaitCaster" parent="Player" index="7"]
+[node name="BaitCaster" parent="Player" index="7" unique_id=1131969195]
 water_y_node_path = NodePath("../../Zones/FishZone/WaterFacing")
 direction_selector_path = NodePath("../DirectionSelector")
 power_max_value = 50.0
@@ -179,10 +176,10 @@ reel_speed = 1.0
 reel_kill_radius = 0.2
 cast_yaw_trim_deg = -60.0
 
-[node name="AxisGizmo" parent="Player" index="8"]
+[node name="AxisGizmo" parent="Player" index="8" unique_id=1447094981]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
-[node name="DirectionSelector" parent="Player" index="10" node_paths=PackedStringArray("follow_target", "fishing_camera", "camera_controller", "dots") groups=["direction_selector"]]
+[node name="DirectionSelector" parent="Player" index="10" unique_id=204852966 node_paths=PackedStringArray("follow_target", "fishing_camera", "camera_controller", "dots") groups=["direction_selector"]]
 follow_target = NodePath("..")
 fishing_camera = NodePath("../../CameraRig/Cameras/Cam_Fishing")
 camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
@@ -191,33 +188,33 @@ local_offset = Vector3(0.16, 0, 0)
 max_local_deg = 15.0
 max_total_deg = 45.0
 
-[node name="dot_0" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="0"]
+[node name="dot_0" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="0" unique_id=1906997880]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 
-[node name="dot_1" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="1"]
+[node name="dot_1" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="1" unique_id=994331386]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.08, 0.05, 0)
 
-[node name="dot_2" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="2"]
+[node name="dot_2" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="2" unique_id=1946118613]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.16, 0.1, 0)
 
-[node name="dot_3" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="3"]
+[node name="dot_3" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="3" unique_id=1346866379]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.24, 0.15, 0)
 
-[node name="dot_4" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="4"]
+[node name="dot_4" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="4" unique_id=926623448]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.32, 0.2, 0)
 
-[node name="dot_5" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="5"]
+[node name="dot_5" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="5" unique_id=454934136]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.4, 0.25, 0)
 
-[node name="dot_6" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="6"]
+[node name="dot_6" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="6" unique_id=470668161]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.48, 0.3, 0)
 
-[node name="dot_7" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" index="7"]
+[node name="dot_7" parent="Player/DirectionSelector/DS_ScreenFacing/DS_Aim" parent_id_path=PackedInt32Array(1798816298, 409890954) index="7" unique_id=1015744817]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.56, 0.35, 0)
 
-[node name="UI" type="Node3D" parent="."]
+[node name="UI" type="Node3D" parent="." unique_id=2081583770]
 
-[node name="PowerMeter" parent="UI" groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
+[node name="PowerMeter" parent="UI" unique_id=120232004 groups=["hud_power_meter"] instance=ExtResource("3_yj5gx")]
 layer = 50
 offset = Vector2(146, 200)
 scale = Vector2(0.8, 0.8)
@@ -229,7 +226,7 @@ target_3d_path = NodePath("../../Player")
 [node name="Root" parent="UI/PowerMeter" index="0"]
 scale = Vector2(0.45, 0.45)
 
-[node name="FishingHud" parent="UI" node_paths=PackedStringArray("fishing_camera_controller") instance=ExtResource("9_00n6f")]
+[node name="FishingHud" parent="UI" unique_id=837552999 node_paths=PackedStringArray("fishing_camera_controller") instance=ExtResource("9_00n6f")]
 camera_controller_path = NodePath("../../CameraRig/Cameras/FishingCameraController")
 fishing_camera_controller = NodePath("../../CameraRig/Cameras/FishingCameraController")
 compass_on = Vector2(26, 15)
@@ -293,40 +290,40 @@ z_index = 2
 [node name="DepthAnim" parent="UI/FishingHud/DepthMeter" index="3"]
 position = Vector2(-38.275, -0.885)
 
-[node name="PowerBarGate" type="Node" parent="UI"]
+[node name="PowerBarGate" type="Node" parent="UI" unique_id=1808339477]
 script = ExtResource("12_q0mti")
 caster_path = NodePath("../../Player/BaitCaster")
 power_meter_path = NodePath("../PowerMeter")
 power_root_path = NodePath("../PowerMeter/Root")
 
-[node name="DepthMeterGate" type="Node" parent="UI"]
+[node name="DepthMeterGate" type="Node" parent="UI" unique_id=1368328524]
 script = ExtResource("16_j8jxs")
 caster_path = NodePath("../../Player/BaitCaster")
 depth_meter_path = NodePath("../FishingHud/DepthMeter")
 appear_time = 0.4
 disappear_time = 0.3
 
-[node name="CameraRig" type="Node3D" parent="."]
+[node name="CameraRig" type="Node3D" parent="." unique_id=1920712778]
 script = ExtResource("12_emtsy")
 player_path = NodePath("../Player")
 fishing_controller_path = NodePath("Cameras/FishingCameraController")
 sprite_switch_progress = 0.3
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1745377678]
 physics_interpolation_mode = 1
-transform = Transform3D(0.959872, -0.142363, 0.241617, 0, 0.861566, 0.507645, -0.280439, -0.487274, 0.826993, -0.758, 1.8, 3.144)
+transform = Transform3D(0.9598719, -0.14236344, 0.24161658, 0, 0.8615662, 0.5076453, -0.2804388, -0.4872745, 0.82699317, -0.758, 1.8, 3.144)
 fov = 35.0
 
-[node name="PhantomCameraHost" type="Node" parent="CameraRig/Camera3D"]
+[node name="PhantomCameraHost" type="Node" parent="CameraRig/Camera3D" unique_id=408694379]
 process_priority = 300
 process_physics_priority = 300
 script = ExtResource("5_1a8ak")
 metadata/_custom_type_script = "uid://bd046eokvcnu2"
 
-[node name="Cameras" type="Node3D" parent="CameraRig"]
+[node name="Cameras" type="Node3D" parent="CameraRig" unique_id=1339641378]
 
-[node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" node_paths=PackedStringArray("look_at_target")]
-transform = Transform3D(0.959855, -0.142359, 0.24161, 0, 0.861541, 0.507632, -0.280434, -0.48726, 0.826972, -0.758, 1.8, 3.144)
+[node name="PCam_Exploration" type="Node3D" parent="CameraRig/Cameras" unique_id=1890119213 node_paths=PackedStringArray("look_at_target")]
+transform = Transform3D(0.95985496, -0.14235927, 0.24161035, 0, 0.861541, 0.5076322, -0.28043386, -0.48726022, 0.8269718, -0.758, 1.8, 3.144)
 top_level = true
 script = ExtResource("6_x75a5")
 priority = 10
@@ -339,11 +336,11 @@ inactive_update_mode = 1
 follow_offset = Vector3(0, 2.5, 2.5)
 metadata/_custom_type_script = "uid://csjccrhj5wnx7"
 
-[node name="Cam_Fishing" type="Camera3D" parent="CameraRig/Cameras"]
+[node name="Cam_Fishing" type="Camera3D" parent="CameraRig/Cameras" unique_id=1742428257]
 transform = Transform3D(-0.965926, -0.0427175, 0.25527, 0, 0.986286, 0.165048, -0.258819, 0.159424, -0.952679, -1.579, 0.845, -1.752)
 fov = 35.0
 
-[node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing", "fishing_state_controller")]
+[node name="FishingCameraController" type="Node" parent="CameraRig/Cameras" unique_id=89694812 node_paths=PackedStringArray("player", "pivot", "exploration_camera", "fishing_camera", "water_facing", "fishing_state_controller")]
 script = ExtResource("10_23y3w")
 player = NodePath("../../../Player")
 pivot = NodePath("../../../Player")
@@ -359,9 +356,9 @@ enter_v_offset = 0.74
 enter_focus_tween_time = 0.8
 exit_focus_tween_time = 0.8
 
-[node name="Zones" type="Node3D" parent="."]
+[node name="Zones" type="Node3D" parent="." unique_id=1365889250]
 
-[node name="FishZone" parent="Zones" node_paths=PackedStringArray("water_facing") groups=["fizh_zone"] instance=ExtResource("5_b0l47")]
+[node name="FishZone" parent="Zones" unique_id=283075990 node_paths=PackedStringArray("water_facing") groups=["fizh_zone"] instance=ExtResource("5_b0l47")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.66059, 0, 0.323252)
 water_facing = NodePath("WaterFacing")
 
@@ -371,13 +368,13 @@ transform = Transform3D(0.681641, 0, -0.731687, 0, 1, 0, 0.731687, 0, 0.681641, 
 [node name="CollisionShape3D" parent="Zones/FishZone" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.994958, -2.38419e-07, 0.923013)
 
-[node name="DepthZone" parent="Zones" instance=ExtResource("18_ahm77")]
+[node name="DepthZone" parent="Zones" unique_id=381108133 instance=ExtResource("18_ahm77")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.60318, 2.98958)
 
-[node name="DepthZone2" parent="Zones" instance=ExtResource("18_ahm77")]
+[node name="DepthZone2" parent="Zones" unique_id=199969172 instance=ExtResource("18_ahm77")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -1.20003, 1.66387)
 
-[node name="DepthZone3" parent="Zones" instance=ExtResource("18_ahm77")]
+[node name="DepthZone3" parent="Zones" unique_id=1781444244 instance=ExtResource("18_ahm77")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.77369, -0.838888, 0.347913)
 
 [connection signal="entered_fishing_view" from="CameraRig/Cameras/FishingCameraController" to="Player/FishingStateController" method="start_sequence"]
