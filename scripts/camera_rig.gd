@@ -1,5 +1,8 @@
 extends Node3D
 
+signal fishing_view_ready
+signal exploration_view_ready
+
 @export var target: Node3D
 
 @export var fishing_h_offset: float = 0.9
@@ -92,7 +95,11 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 		0.5
 	)
 
-
+	await tween.finished
+	fishing_view_ready.emit()
+	
+	print("Fishing camera ready")
+	
 func exit_fishing_view() -> void:
 	var camera: Camera3D = $Camera3D
 
@@ -124,3 +131,8 @@ func exit_fishing_view() -> void:
 		target_yaw,
 		0.7
 	)
+
+	await tween.finished
+	exploration_view_ready.emit()
+	
+	print("Exploration camera ready")

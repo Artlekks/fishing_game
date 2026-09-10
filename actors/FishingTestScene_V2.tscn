@@ -158,9 +158,11 @@ exploration_camera = NodePath("../../CameraRig/Camera3D")
 camera_rig = NodePath("../../CameraRig")
 fish_zone = NodePath("../../World/FishZone_V2")
 
-[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig")]
+[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director")]
 script = ExtResource("3_tf5uk")
 game_mode = NodePath("../GameMode")
 camera_rig = NodePath("../../CameraRig")
+sprite_director = NodePath("../../Player/CharacterBody3D/SpriteDirector")
 
 [editable path="World/River_001"]
+[editable path="Player/CharacterBody3D"]

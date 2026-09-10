@@ -4,12 +4,11 @@ extends CharacterBody3D
 @export var camera_reference: Node3D
 @export var movement_enabled: bool = true
 
-@onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
+@onready var sprite_director: Node = $SpriteDirector
 
 const DIRS := ["S", "SE", "E", "NE", "N", "NW", "W", "SW"]
 
 var last_dir: String = "S"
-var last_anim: String = ""
 
 
 func _physics_process(_delta: float) -> void:
@@ -18,7 +17,7 @@ func _physics_process(_delta: float) -> void:
 	if not movement_enabled:
 		velocity = Vector3.ZERO
 
-		if sprite.animation.begins_with("Idle_") or sprite.animation.begins_with("Walk_"):
+		if sprite_director.is_locomotion_animation():
 			_update_facing_from_world(global_transform.basis.z)
 			_play_animation("Idle", last_dir)
 
@@ -116,14 +115,4 @@ func _update_facing_from_world(world_direction: Vector3) -> void:
 
 
 func _play_animation(base_name: String, direction: String) -> void:
-	var animation_name := base_name + "_" + direction
-
-	if not sprite.sprite_frames.has_animation(animation_name):
-		return
-
-	if animation_name == last_anim:
-		return
-
-	sprite.flip_h = false
-	sprite.play(animation_name)
-	last_anim = animation_name
+	sprite_director.play_directional(base_name, direction)

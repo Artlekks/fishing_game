@@ -24,6 +24,7 @@
 [ext_resource type="Texture2D" uid="uid://rrq02x1f8oit" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopRight.png" id="26_nr6p8"]
 [ext_resource type="Texture2D" uid="uid://dhv70hn8tptnm" path="res://assets/sprites/anim_Ryu_fishing-Walking_TopLeft.png" id="27_56w0s"]
 [ext_resource type="Texture2D" uid="uid://xqfvokdcwo08" path="res://assets/sprites/anim_Ryu_fishing-Walking_Backward.png" id="28_1mvfn"]
+[ext_resource type="Script" uid="uid://qeewigw0xrig" path="res://scripts/sprite_director.gd" id="29_5cnmj"]
 [ext_resource type="Texture2D" uid="uid://c8h78n43dabea" path="res://assets/sprites/anim_Ryu_fishing-Walking_Bottom_Right.png" id="29_mdaqv"]
 [ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="30_2g808"]
 [ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="31_xrd2x"]
@@ -1620,6 +1621,10 @@ cast_shadow = 0
 alpha_cut = 2
 texture_filter = 0
 texture = SubResource("CompressedTexture2D_ajpwy")
+
+[node name="SpriteDirector" type="Node" parent="." unique_id=1803301219 node_paths=PackedStringArray("sprite")]
+script = ExtResource("29_5cnmj")
+sprite = NodePath("../AnimatedSprite3D")
 
 [node name="BaitSpawner" type="Marker3D" parent="." unique_id=175473048]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.554043, 0)
