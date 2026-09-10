@@ -1,4 +1,4 @@
-[gd_scene load_steps=237 format=3 uid="uid://sdh188exepwu"]
+[gd_scene format=3 uid="uid://sdh188exepwu"]
 
 [ext_resource type="Script" uid="uid://dh3cnd66n7h63" path="res://scripts/player_8dir_controller.gd" id="1_jdonv"]
 [ext_resource type="Texture2D" uid="uid://0hbus8embore" path="res://assets/sprites/anim_Ryu_fishing-End_Fishing.png" id="2_3qlfy"]
@@ -858,7 +858,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_o63wu")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Cancel_Fishing",
 "speed": 8.0
 }, {
@@ -899,7 +899,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jqd13")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Fishing_Catch",
 "speed": 8.0
 }, {
@@ -907,7 +907,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ab8qf")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Fishing_Idle",
 "speed": 8.0
 }, {
@@ -915,7 +915,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_okwl7")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_E",
 "speed": 5.0
 }, {
@@ -986,7 +986,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_r5pix")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_LookAt_Horizon",
 "speed": 5.0
 }, {
@@ -994,7 +994,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_dio7y")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_N",
 "speed": 5.0
 }, {
@@ -1002,7 +1002,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_t1pps")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_NE",
 "speed": 5.0
 }, {
@@ -1010,7 +1010,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xy7eu")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_NW",
 "speed": 5.0
 }, {
@@ -1018,7 +1018,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_g6chb")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_S",
 "speed": 5.0
 }, {
@@ -1026,7 +1026,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_1dt75")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_SE",
 "speed": 5.0
 }, {
@@ -1034,7 +1034,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_yrl0g")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_SW",
 "speed": 5.0
 }, {
@@ -1042,7 +1042,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j8b1y")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Idle_W",
 "speed": 5.0
 }, {
@@ -1098,7 +1098,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ylkf4")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Prep_Fishing",
 "speed": 8.0
 }, {
@@ -1130,7 +1130,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_f8cve")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Prep_Throw",
 "speed": 8.0
 }, {
@@ -1138,7 +1138,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ek33w")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Prep_Throw_Idle",
 "speed": 8.0
 }, {
@@ -1155,7 +1155,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c6d7y")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel",
 "speed": 8.0
 }, {
@@ -1172,7 +1172,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_nyima")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Back",
 "speed": 8.0
 }, {
@@ -1189,7 +1189,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_khe2x")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Back_Strong",
 "speed": 8.0
 }, {
@@ -1209,7 +1209,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ufpf8")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Bite",
 "speed": 8.0
 }, {
@@ -1235,7 +1235,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_o1ick")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Bite_Strong",
 "speed": 8.0
 }, {
@@ -1291,7 +1291,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_62r3e")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Reel_Broken_Rod",
 "speed": 8.0
 }, {
@@ -1308,7 +1308,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_m8t3e")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Front",
 "speed": 8.0
 }, {
@@ -1316,7 +1316,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_86uww")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Idle",
 "speed": 8.0
 }, {
@@ -1333,7 +1333,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_1kx7k")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Left",
 "speed": 8.0
 }, {
@@ -1341,7 +1341,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_4kj2x")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Left_Idle",
 "speed": 8.0
 }, {
@@ -1358,7 +1358,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_helwt")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Right",
 "speed": 8.0
 }, {
@@ -1366,7 +1366,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_op0m1")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Reel_Right_Idle",
 "speed": 8.0
 }, {
@@ -1398,7 +1398,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_cwbi6")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Throw",
 "speed": 12.0
 }, {
@@ -1406,7 +1406,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_40oio")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Throw_Idle",
 "speed": 8.0
 }, {
@@ -1429,7 +1429,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ajpwy")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_E",
 "speed": 5.0
 }, {
@@ -1452,7 +1452,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_so7a0")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_N",
 "speed": 5.0
 }, {
@@ -1475,7 +1475,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_kluas")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_NE",
 "speed": 5.0
 }, {
@@ -1498,7 +1498,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fv1g4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_NW",
 "speed": 5.0
 }, {
@@ -1521,7 +1521,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_upfbe")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_S",
 "speed": 5.0
 }, {
@@ -1544,7 +1544,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jdonv")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_SE",
 "speed": 5.0
 }, {
@@ -1567,7 +1567,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_8ist8")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_SW",
 "speed": 5.0
 }, {
@@ -1590,7 +1590,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_206jm")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Walk_W",
 "speed": 5.0
 }]
@@ -1606,28 +1606,28 @@ proximity_fade_distance = 0.01
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ajpwy"]
 load_path = "res://.godot/imported/Shadow.png-664d1acd115a01e78954003e46fe5e1c.s3tc.ctex"
 
-[node name="CharacterBody3D" type="CharacterBody3D"]
+[node name="CharacterBody3D" type="CharacterBody3D" unique_id=363575400]
 collision_layer = 2
 script = ExtResource("1_jdonv")
 move_speed = 1.0
 
-[node name="FishingMovementLock" type="Node" parent="."]
+[node name="FishingMovementLock" type="Node" parent="." unique_id=1127826431]
 script = ExtResource("2_y37r7")
 
-[node name="SpriteOrbitStepper" type="Node" parent="."]
+[node name="SpriteOrbitStepper" type="Node" parent="." unique_id=944296912]
 script = ExtResource("2_woub5")
 
-[node name="FishingStateMachine" type="Node" parent="."]
+[node name="FishingStateMachine" type="Node" parent="." unique_id=790228982]
 script = ExtResource("4_07bsd")
 
-[node name="FishingStateController" type="Node" parent="."]
+[node name="FishingStateController" type="Node" parent="." unique_id=1557467573]
 script = ExtResource("4_ejpxr")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1354831898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.223204, 0)
 shape = SubResource("CapsuleShape3D_jpo3w")
 
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="." unique_id=477032395]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0819474, 0)
 offset = Vector2(0, 11)
 billboard = 1
@@ -1635,7 +1635,7 @@ texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_6gvld")
 animation = &"Reel"
 
-[node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D"]
+[node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D" unique_id=1206580126]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, 0.075, 0)
 material_override = SubResource("StandardMaterial3D_ajpwy")
 cast_shadow = 0
@@ -1643,76 +1643,76 @@ alpha_cut = 2
 texture_filter = 0
 texture = SubResource("CompressedTexture2D_ajpwy")
 
-[node name="BaitSpawner" type="Marker3D" parent="."]
+[node name="BaitSpawner" type="Marker3D" parent="." unique_id=175473048]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.554043, 0)
 
-[node name="BaitCaster" type="Node3D" parent="."]
+[node name="BaitCaster" type="Node3D" parent="." unique_id=1131969195]
 script = ExtResource("33_dljik")
 bait_scene = ExtResource("34_y2vhc")
 
-[node name="AxisGizmo" type="Node3D" parent="."]
+[node name="AxisGizmo" type="Node3D" parent="." unique_id=1447094981]
 script = ExtResource("27_yhyju")
 
-[node name="CamFocus" type="Node3D" parent="."]
+[node name="CamFocus" type="Node3D" parent="." unique_id=1315424999]
 
-[node name="DirectionSelector" type="Node3D" parent="."]
+[node name="DirectionSelector" type="Node3D" parent="." unique_id=204852966]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.181921, 0.0610066, 0)
 script = ExtResource("34_bae3b")
 
-[node name="DS_ScreenFacing" type="Node3D" parent="DirectionSelector"]
+[node name="DS_ScreenFacing" type="Node3D" parent="DirectionSelector" unique_id=1735246285]
 
-[node name="DS_Aim" type="Node3D" parent="DirectionSelector/DS_ScreenFacing"]
+[node name="DS_Aim" type="Node3D" parent="DirectionSelector/DS_ScreenFacing" unique_id=409890954]
 
-[node name="dot_0" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_0" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=1906997880]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_1" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_1" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=994331386]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.1, 0.05, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_2" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_2" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=1946118613]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.2, 0.1, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_3" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_3" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=1346866379]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.3, 0.15, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_4" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_4" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=926623448]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.4, 0.2, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_5" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_5" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=454934136]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.5, 0.25, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_6" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_6" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=470668161]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.6, 0.3, 0)
 billboard = 1
 fixed_size = true
 texture_filter = 0
 texture = ExtResource("30_yrl0g")
 
-[node name="dot_7" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim"]
+[node name="dot_7" type="Sprite3D" parent="DirectionSelector/DS_ScreenFacing/DS_Aim" unique_id=1015744817]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.7, 0.35, 0)
 billboard = 1
 fixed_size = true
