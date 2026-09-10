@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://bsxg4tfsykf2o" path="res://assets/models/textures/River_Marsh.png" id="6_lyatm"]
 [ext_resource type="Script" uid="uid://c1bmrl5liik4y" path="res://scripts/fish_zone_v2.gd" id="7_k4i7q"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
+[ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 
@@ -171,6 +172,9 @@ player = NodePath("../../Player/CharacterBody3D")
 
 [node name="Aim" type="Node" parent="Game/Fishing" unique_id=1873530056]
 script = ExtResource("13_k4i7q")
+
+[node name="Power" type="Node" parent="Game/Fishing" unique_id=1465953422]
+script = ExtResource("14_c57dm")
 
 [editable path="World/River_001"]
 [editable path="Player/CharacterBody3D"]

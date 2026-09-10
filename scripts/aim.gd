@@ -59,3 +59,7 @@ func _emit_aim() -> void:
 	)
 
 	aim_changed.emit(direction)
+
+func resume() -> void:
+	active = true
+	_emit_aim()
