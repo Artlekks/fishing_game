@@ -4,10 +4,10 @@ extends Node
 @export var player: CharacterBody3D
 @export var exploration_camera: Camera3D
 @export var camera_rig: Node3D
+@export var fish_zone: Area3D
 
 func _ready() -> void:
 	player.camera_reference = exploration_camera
-	camera_rig.quarter_turned.connect(player.camera_quarter_turned)
 	game_mode.mode_changed.connect(_on_mode_changed)
 	_on_mode_changed(game_mode.current_mode)
 
@@ -22,8 +22,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.is_action_pressed("enter_fishing"):
-		game_mode.set_mode(game_mode.Mode.FISHING)
-		print("Mode:", game_mode.current_mode)
+		if fish_zone != null and fish_zone.can_player_fish(player):
+			game_mode.enter_fishing(fish_zone)
 
 	if event.is_action_pressed("cam_right"):
 		camera_rig.rotate_quarter_turn(1)

@@ -12,7 +12,12 @@ func _on_mode_changed(new_mode) -> void:
 	set_process_unhandled_input(active)
 
 	if active:
-		camera_rig.enter_fishing_view()
+		var zone = game_mode.active_fish_zone
+
+		if zone != null:
+			camera_rig.enter_fishing_view(zone.get_water_forward())
+	else:
+		camera_rig.exit_fishing_view()
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if game_mode == null:
@@ -22,5 +27,4 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.is_action_pressed("cancel_fishing"):
-		game_mode.set_mode(game_mode.Mode.EXPLORATION)
-		print("Mode:", game_mode.current_mode)
+		game_mode.exit_fishing()

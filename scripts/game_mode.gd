@@ -21,3 +21,13 @@ func is_exploration() -> bool:
 
 func is_fishing() -> bool:
 	return current_mode == Mode.FISHING
+	
+var active_fish_zone: Area3D = null
+
+func enter_fishing(zone: Area3D) -> void:
+	active_fish_zone = zone
+	set_mode(Mode.FISHING)
+
+func exit_fishing() -> void:
+	set_mode(Mode.EXPLORATION)
+	active_fish_zone = null

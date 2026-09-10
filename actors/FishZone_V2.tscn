@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://b7wqcq60h8vqv"]
+
+[ext_resource type="Script" uid="uid://c1bmrl5liik4y" path="res://scripts/fish_zone_v2.gd" id="1_5tdff"]
+[ext_resource type="Script" uid="uid://duiloslw7alif" path="res://scripts/axis_gizmo.gd" id="2_6woxv"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_mxd7y"]
+radius = 1.49364
+
+[node name="FishZone_V2" type="Area3D" unique_id=1206378130 groups=["fish_zone"]]
+script = ExtResource("1_5tdff")
+
+[node name="WaterFacing" type="Node3D" parent="." unique_id=346506334]
+
+[node name="AxisGizmo_Water" type="Node3D" parent="WaterFacing" unique_id=756428821]
+script = ExtResource("2_6woxv")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1425339664]
+shape = SubResource("SphereShape3D_mxd7y")
