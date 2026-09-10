@@ -140,7 +140,7 @@ script = ExtResource("2_0kejc")
 target = NodePath("../Player/CharacterBody3D")
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1229414820]
-transform = Transform3D(0.6028266, 0, 0.79787225, 0, 1, 0, -0.79787225, 0, 0.6028266, 1.0741632, 0.6620156, 0.6120614)
+transform = Transform3D(0.6028266, -0.24991225, 0.7577229, 0, 0.9496795, 0.3132234, -0.79787225, -0.1888194, 0.57249206, 1.0285962, 0.6620156, 0.67237175)
 current = true
 
 [node name="UI" type="Node" parent="." unique_id=551417241]
