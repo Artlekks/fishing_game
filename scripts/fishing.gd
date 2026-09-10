@@ -9,6 +9,8 @@ enum Phase {
 	EXIT
 }
 
+@onready var aim: Node = $Aim
+
 @export var game_mode: Node
 @export var camera_rig: Node
 @export var sprite_director: Node
@@ -19,7 +21,8 @@ var phase: int = Phase.INACTIVE
 
 func _ready() -> void:
 	game_mode.mode_changed.connect(_on_mode_changed)
-
+	aim.aim_changed.connect(_on_aim_changed)
+	
 	camera_rig.connect(
 		"fishing_view_ready",
 		Callable(self, "_on_fishing_view_ready")
@@ -42,14 +45,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not game_mode.is_fishing():
 		return
 
-	# No input allowed while entering or exiting.
-	if phase == Phase.ENTER or phase == Phase.PREP or phase == Phase.EXIT:
+	# Only AIM currently accepts fishing input.
+	if phase != Phase.AIM:
 		return
 
 	if event.is_action_pressed("cancel_fishing"):
-		if phase != Phase.AIM:
-			return
-
+		aim.stop()
+		camera_rig.stop_fishing_aim()
 		phase = Phase.PUT_AWAY
 		sprite_director.play_backwards(&"Prep_Fishing")
 
@@ -59,15 +61,18 @@ func _on_mode_changed(new_mode) -> void:
 
 	set_process_unhandled_input(active)
 
-	if active:
-		phase = Phase.ENTER
+	if not active:
+		return
 
-		var zone = game_mode.active_fish_zone
+	phase = Phase.ENTER
 
-		if zone != null:
-			camera_rig.enter_fishing_view(
-				zone.get_water_forward()
-			)
+	var zone = game_mode.active_fish_zone
+
+	if zone != null:
+		camera_rig.enter_fishing_view(
+			zone.get_water_forward()
+		)
+
 
 func _on_fishing_view_ready() -> void:
 	if phase != Phase.ENTER:
@@ -84,6 +89,18 @@ func _on_animation_finished(animation_name: StringName) -> void:
 	if phase == Phase.PREP:
 		phase = Phase.AIM
 		sprite_director.play(&"Fishing_Idle")
+
+		var zone = game_mode.active_fish_zone
+	
+		if zone != null:
+			camera_rig.start_fishing_aim(
+				zone.get_water_forward()
+			)
+
+			aim.start(
+				zone.get_water_forward()
+			)
+
 		return
 
 	if phase == Phase.PUT_AWAY:
@@ -99,3 +116,6 @@ func _on_exploration_view_ready() -> void:
 
 	phase = Phase.INACTIVE
 	game_mode.exit_fishing()
+
+func _on_aim_changed(direction: Vector3) -> void:
+	camera_rig.set_fishing_aim_direction(direction)

@@ -7,7 +7,10 @@ signal exploration_view_ready
 
 @export var fishing_h_offset: float = 0.9
 @export var fishing_v_offset: float = 0.6
+@export var aim_follow_speed: float = 6.0
 
+var fishing_aim_active: bool = false
+var fishing_aim_target_yaw: float = 0.0
 var exploration_h_offset: float = 0.0
 var exploration_v_offset: float = 0.0
 
@@ -28,6 +31,12 @@ func _process(_delta: float) -> void:
 
 	global_position = target.global_position
 
+	if fishing_aim_active:
+		rotation.y = lerp_angle(
+			rotation.y,
+			fishing_aim_target_yaw,
+			clamp(aim_follow_speed * _delta, 0.0, 1.0)
+		)
 
 func rotate_quarter_turn(direction: int) -> void:
 	if is_rotating:
@@ -132,3 +141,18 @@ func exit_fishing_view() -> void:
 
 	await tween.finished
 	exploration_view_ready.emit()
+
+func start_fishing_aim(direction: Vector3) -> void:
+	fishing_aim_active = true
+	set_fishing_aim_direction(direction)
+
+
+func set_fishing_aim_direction(direction: Vector3) -> void:
+	fishing_aim_target_yaw = atan2(
+		-direction.x,
+		-direction.z
+	)
+
+
+func stop_fishing_aim() -> void:
+	fishing_aim_active = false
