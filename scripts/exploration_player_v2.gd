@@ -113,6 +113,9 @@ func _update_facing_from_world(world_direction: Vector3) -> void:
 
 	last_dir = DIRS[index]
 
-
 func _play_animation(base_name: String, direction: String) -> void:
 	sprite_director.play_directional(base_name, direction)
+	
+func restore_exploration_idle() -> void:
+	_update_facing_from_world(global_transform.basis.z)
+	_play_animation("Idle", last_dir)

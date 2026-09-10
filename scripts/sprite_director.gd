@@ -41,3 +41,13 @@ func is_locomotion_animation() -> bool:
 		current.begins_with("Idle_")
 		or current.begins_with("Walk_")
 	)
+
+func play_backwards(animation_name: StringName) -> void:
+	if sprite == null:
+		return
+
+	if not sprite.sprite_frames.has_animation(animation_name):
+		return
+
+	sprite.flip_h = false
+	sprite.play_backwards(animation_name)

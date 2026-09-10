@@ -11,7 +11,7 @@ signal exploration_view_ready
 var exploration_h_offset: float = 0.0
 var exploration_v_offset: float = 0.0
 
-var fishing_entry_turn: float = 0.0
+var exploration_yaw_before_fishing: float = 0.0
 var is_rotating: bool = false
 
 
@@ -53,18 +53,19 @@ func rotate_quarter_turn(direction: int) -> void:
 
 
 func enter_fishing_view(water_forward: Vector3) -> void:
+	# Save the EXACT exploration angle.
+	exploration_yaw_before_fishing = rotation.y
+
 	var target_yaw := atan2(
 		-water_forward.x,
 		-water_forward.z
 	)
 
-	fishing_entry_turn = wrapf(
+	target_yaw = rotation.y + wrapf(
 		target_yaw - rotation.y,
 		-PI,
 		PI
 	)
-
-	target_yaw = rotation.y + fishing_entry_turn
 
 	var camera: Camera3D = $Camera3D
 
@@ -72,7 +73,7 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_IN_OUT)
 
-	# 1. Rotate behind Ryu.
+	# 1. Align behind Ryu.
 	tween.tween_property(
 		self,
 		"rotation:y",
@@ -80,7 +81,7 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 		0.7
 	)
 
-	# 2. Then shift the screen framing.
+	# 2. Shift Ryu into fishing framing.
 	tween.tween_property(
 		camera,
 		"h_offset",
@@ -97,9 +98,8 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 
 	await tween.finished
 	fishing_view_ready.emit()
-	
-	print("Fishing camera ready")
-	
+
+
 func exit_fishing_view() -> void:
 	var camera: Camera3D = $Camera3D
 
@@ -107,7 +107,7 @@ func exit_fishing_view() -> void:
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_IN_OUT)
 
-	# 1. Recenter Ryu on screen.
+	# 1. Put Ryu back in the center.
 	tween.tween_property(
 		camera,
 		"h_offset",
@@ -122,17 +122,13 @@ func exit_fishing_view() -> void:
 		0.5
 	)
 
-	# 2. Then reverse the exact entry rotation.
-	var target_yaw := rotation.y - fishing_entry_turn
-
+	# 2. Restore the EXACT exploration angle saved on entry.
 	tween.tween_property(
 		self,
 		"rotation:y",
-		target_yaw,
+		exploration_yaw_before_fishing,
 		0.7
 	)
 
 	await tween.finished
 	exploration_view_ready.emit()
-	
-	print("Exploration camera ready")

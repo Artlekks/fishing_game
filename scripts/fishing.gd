@@ -5,12 +5,14 @@ enum Phase {
 	ENTER,
 	PREP,
 	AIM,
+	PUT_AWAY,
 	EXIT
 }
 
 @export var game_mode: Node
 @export var camera_rig: Node
 @export var sprite_director: Node
+@export var player: CharacterBody3D
 
 var phase: int = Phase.INACTIVE
 
@@ -40,9 +42,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not game_mode.is_fishing():
 		return
 
+	# No input allowed while entering or exiting.
+	if phase == Phase.ENTER or phase == Phase.PREP or phase == Phase.EXIT:
+		return
+
 	if event.is_action_pressed("cancel_fishing"):
-		phase = Phase.EXIT
-		game_mode.exit_fishing()
+		if phase != Phase.AIM:
+			return
+
+		phase = Phase.PUT_AWAY
+		sprite_director.play_backwards(&"Prep_Fishing")
 
 
 func _on_mode_changed(new_mode) -> void:
@@ -59,9 +68,6 @@ func _on_mode_changed(new_mode) -> void:
 			camera_rig.enter_fishing_view(
 				zone.get_water_forward()
 			)
-	else:
-		camera_rig.exit_fishing_view()
-
 
 func _on_fishing_view_ready() -> void:
 	if phase != Phase.ENTER:
@@ -72,15 +78,24 @@ func _on_fishing_view_ready() -> void:
 
 
 func _on_animation_finished(animation_name: StringName) -> void:
-	if phase != Phase.PREP:
-		return
-
 	if animation_name != &"Prep_Fishing":
 		return
 
-	phase = Phase.AIM
-	sprite_director.play(&"Fishing_Idle")
+	if phase == Phase.PREP:
+		phase = Phase.AIM
+		sprite_director.play(&"Fishing_Idle")
+		return
+
+	if phase == Phase.PUT_AWAY:
+		player.restore_exploration_idle()
+
+		phase = Phase.EXIT
+		camera_rig.exit_fishing_view()
 
 
 func _on_exploration_view_ready() -> void:
+	if phase != Phase.EXIT:
+		return
+
 	phase = Phase.INACTIVE
+	game_mode.exit_fishing()
