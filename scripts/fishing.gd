@@ -35,6 +35,8 @@ func _ready() -> void:
 	caster.bait_returned.connect(_on_bait_returned)
 	encounter.fish_hooked.connect(_on_fish_hooked)
 	encounter.fish_exhausted.connect(_on_fish_exhausted)
+	encounter.bite_triggered.connect(_on_bite_triggered)
+	encounter.bite_missed.connect(_on_bite_missed)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -248,7 +250,7 @@ func _on_fish_hooked() -> void:
 		return
 
 	phase = Phase.FIGHT
-	sprite_director.play(&"Reel_Idle")
+	sprite_director.play(&"Reel")
 	caster.set_fight_mode(true)
 
 func _on_fish_exhausted() -> void:
@@ -256,3 +258,16 @@ func _on_fish_exhausted() -> void:
 		return
 
 	caster.set_fight_mode(false)
+	
+func _on_bite_triggered() -> void:
+	if phase != Phase.IN_WATER:
+		return
+
+	sprite_director.play(&"Reel_Bite")
+
+
+func _on_bite_missed() -> void:
+	if phase != Phase.IN_WATER:
+		return
+
+	sprite_director.play(&"Reel_Idle")
