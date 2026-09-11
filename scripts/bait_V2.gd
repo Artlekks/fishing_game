@@ -9,7 +9,9 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var data: BaitData
 @export var floor_collision_mask: int = 2048
 @export var floor_ray_depth: float = 100.0
+@export var fight_reel_multiplier: float = 0.2
 
+var fight_mode: bool = false
 var reel_steering: float = 0.0
 
 enum State {
@@ -133,7 +135,12 @@ func _update_reeling(delta: float) -> void:
 		+ side * reel_steering * data.reel_steer_strength * steering_fade
 	).normalized()
 
-	var move_distance := data.reel_speed * delta
+	var reel_speed := data.reel_speed
+
+	if fight_mode:
+		reel_speed *= fight_reel_multiplier
+
+	var move_distance := reel_speed * delta
 
 	# Never step past the target.
 	if move_distance >= distance:
@@ -195,3 +202,6 @@ func _update_bottom_from_world() -> void:
 
 	if global_position.y < bottom_y:
 		global_position.y = bottom_y
+		
+func set_fight_mode(active: bool) -> void:
+	fight_mode = active

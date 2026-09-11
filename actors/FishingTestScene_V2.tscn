@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="21_y5vpm"]
 [ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="22_f3f7x"]
 [ext_resource type="Texture2D" uid="uid://blcyb0vm20sk8" path="res://assets/sprites/anim_Depth-anim_Depth.png" id="23_t57di"]
+[ext_resource type="Script" uid="uid://b0gkhniyqm6nk" path="res://scripts/encounter.gd" id="24_cybga"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 
@@ -406,6 +407,9 @@ collision_layer = 1
 [node name="AnimatedSprite3D" parent="Player/CharacterBody3D" index="1" unique_id=477032395]
 animation = &"Fishing_Idle"
 
+[node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=2104398868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14756292, 0.09629911, -0.29346243)
+
 [node name="CameraRig" type="Node3D" parent="." unique_id=1419276622 node_paths=PackedStringArray("target")]
 script = ExtResource("2_0kejc")
 target = NodePath("../Player/CharacterBody3D")
@@ -502,13 +506,26 @@ script = ExtResource("13_k4i7q")
 [node name="Power" type="Node" parent="Game/Fishing" unique_id=1465953422]
 script = ExtResource("14_c57dm")
 
-[node name="Caster" type="Node3D" parent="Game/Fishing" unique_id=1862145617 node_paths=PackedStringArray("spawn_point")]
+[node name="Caster" type="Node3D" parent="Game/Fishing" unique_id=1862145617 node_paths=PackedStringArray("spawn_point", "reel_target")]
 script = ExtResource("15_hrkbp")
 bait_scene = ExtResource("16_cxlon")
 spawn_point = NodePath("../../../Player/CharacterBody3D/BaitSpawner")
 min_speed = 5.0
 max_speed = 15.0
 selected_bait_data = ExtResource("17_n1yj2")
+reel_target = NodePath("../../../Player/CharacterBody3D/ReelEndPoint")
+
+[node name="Encounter" type="Node" parent="Game/Fishing" unique_id=105265296 node_paths=PackedStringArray("caster")]
+script = ExtResource("24_cybga")
+caster = NodePath("../Caster")
+
+[node name="BiteTimer" type="Timer" parent="Game/Fishing/Encounter" unique_id=1520843133]
+wait_time = 2.0
+one_shot = true
+
+[node name="BiteWindowTimer" type="Timer" parent="Game/Fishing/Encounter" unique_id=302499080]
+wait_time = 0.8
+one_shot = true
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

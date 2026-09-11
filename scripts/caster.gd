@@ -11,6 +11,7 @@ signal bait_depth_changed(current_depth: float, total_depth: float)
 @export var max_speed: float = 10.0
 @export var launch_angle_degrees: float = 45.0
 @export var selected_bait_data: BaitData
+@export var reel_target: Node3D
 
 var active_bait: Node3D
 
@@ -54,7 +55,7 @@ func perform_cast(
 	active_bait.depth_changed.connect(_on_bait_depth_changed)
 	active_bait.returned.connect(_on_bait_returned)
 
-	active_bait.set_reel_target(spawn_point)
+	active_bait.set_reel_target(reel_target)
 
 	active_bait.launch(
 		spawn_point.global_position,
@@ -91,3 +92,7 @@ func set_reeling(active: bool) -> void:
 func set_reel_steering(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_reel_steering(value)
+
+func set_fight_mode(active: bool) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_fight_mode(active)

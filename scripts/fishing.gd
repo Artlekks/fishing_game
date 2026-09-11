@@ -10,6 +10,7 @@ enum Phase {
 	THROW,
 	BAIT_FLYING,
 	IN_WATER,
+	FIGHT,
 	PUT_AWAY,
 	EXIT
 }
@@ -17,6 +18,7 @@ enum Phase {
 @onready var aim: Node = $Aim
 @onready var power: Node = $Power
 @onready var caster: Node3D = $Caster
+@onready var encounter: Node = $Encounter
 
 @export var game_mode: Node
 @export var camera_rig: Node
@@ -31,6 +33,8 @@ func _ready() -> void:
 	aim.aim_changed.connect(_on_aim_changed)
 	caster.bait_landed.connect(_on_bait_landed)
 	caster.bait_returned.connect(_on_bait_returned)
+	encounter.fish_hooked.connect(_on_fish_hooked)
+	encounter.fish_exhausted.connect(_on_fish_exhausted)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -92,6 +96,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if phase == Phase.IN_WATER:
 		if event.is_action_pressed("enter_fishing"):
+			if encounter.try_hook():
+				encounter.set_player_reeling(true)
+				caster.set_reeling(true)
+				sprite_director.play(&"Reel")
+				return
+
 			caster.set_reeling(true)
 			sprite_director.play(&"Reel")
 			return
@@ -100,7 +110,30 @@ func _unhandled_input(event: InputEvent) -> void:
 			caster.set_reeling(false)
 			sprite_director.play(&"Reel_Idle")
 			return
+	
+	if phase == Phase.FIGHT:
+		if event.is_action_pressed("enter_fishing"):
+			caster.set_reeling(true)
+			sprite_director.play(&"Reel")
+			return
 
+		if event.is_action_released("enter_fishing"):
+			caster.set_reeling(false)
+			sprite_director.play(&"Reel_Idle")
+			return
+			
+		if event.is_action_pressed("enter_fishing"):
+			encounter.set_player_reeling(true)
+			caster.set_reeling(true)
+			sprite_director.play(&"Reel")
+			return
+
+		if event.is_action_released("enter_fishing"):
+			encounter.set_player_reeling(false)
+			caster.set_reeling(false)
+			sprite_director.play(&"Reel_Idle")
+			return
+			
 func _on_mode_changed(new_mode) -> void:
 	var active: bool = new_mode == game_mode.Mode.FISHING
 
@@ -191,8 +224,13 @@ func _enter_in_water() -> void:
 	sprite_director.play(&"Reel_Idle")
 
 func _on_bait_returned() -> void:
-	if phase != Phase.IN_WATER:
+	if phase != Phase.IN_WATER and phase != Phase.FIGHT:
 		return
+
+	var was_fighting := phase == Phase.FIGHT
+
+	if was_fighting:
+		encounter.catch_fish()
 
 	phase = Phase.AIM
 	sprite_director.play(&"Fishing_Idle")
@@ -204,3 +242,17 @@ func _process(_delta: float) -> void:
 
 	var steering := Input.get_axis("ds_left", "ds_right")
 	caster.set_reel_steering(steering)
+
+func _on_fish_hooked() -> void:
+	if phase != Phase.IN_WATER:
+		return
+
+	phase = Phase.FIGHT
+	sprite_director.play(&"Reel_Idle")
+	caster.set_fight_mode(true)
+
+func _on_fish_exhausted() -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.set_fight_mode(false)
