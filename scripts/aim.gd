@@ -63,3 +63,12 @@ func _emit_aim() -> void:
 func resume() -> void:
 	active = true
 	_emit_aim()
+	
+func get_direction() -> Vector3:
+	var aim_yaw := center_yaw + aim_offset
+
+	return Vector3(
+		sin(aim_yaw),
+		0.0,
+		cos(aim_yaw)
+	).normalized()

@@ -14,6 +14,7 @@ enum Phase {
 
 @onready var aim: Node = $Aim
 @onready var power: Node = $Power
+@onready var caster: Node3D = $Caster
 
 @export var game_mode: Node
 @export var camera_rig: Node
@@ -68,7 +69,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if phase == Phase.CHARGE:
 		if event.is_action_pressed("enter_fishing"):
 			var captured_power: float = power.capture()
-			print("Captured power: ", captured_power)
+
+			var zone = game_mode.active_fish_zone
+
+			if zone != null:
+				caster.perform_cast(
+					captured_power,
+					aim.get_direction(),
+					zone.get_water_y()
+				)
 
 			phase = Phase.THROW
 			sprite_director.play(&"Throw")

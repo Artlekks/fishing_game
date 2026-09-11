@@ -9,9 +9,11 @@
 [ext_resource type="Texture2D" uid="uid://cfv0c214fythq" path="res://assets/models/fbx/River_001_texpage-P8-AA4CF228BD76CD2E-5E1D486985273EC0-128x256-0-0-256x256-P0-189.png" id="4_ue5cn"]
 [ext_resource type="Texture2D" uid="uid://cetbvf5x64wb2" path="res://assets/models/fbx/River_001_texpage-P8-CF0473DC60ADC442-B2C13E420B9C1555-128x256-0-0-256x256-P0-190.png" id="5_10ljf"]
 [ext_resource type="Texture2D" uid="uid://bsxg4tfsykf2o" path="res://assets/models/textures/River_Marsh.png" id="6_lyatm"]
-[ext_resource type="Script" uid="uid://c1bmrl5liik4y" path="res://scripts/fish_zone_v2.gd" id="7_k4i7q"]
+[ext_resource type="PackedScene" uid="uid://b7wqcq60h8vqv" path="res://actors/FishZone_V2.tscn" id="8_n1yj2"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
+[ext_resource type="Script" uid="uid://boqng0bhxpde6" path="res://scripts/caster.gd" id="15_hrkbp"]
+[ext_resource type="PackedScene" uid="uid://b55g00mjd4bs" path="res://actors/bait_V2.tscn" id="16_cxlon"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 
@@ -51,9 +53,6 @@ data = PackedVector3Array(43.9825, -0.9431, 8.1032, 43.3211, -1.7481, 8.686, 43.
 shading_mode = 0
 albedo_texture = ExtResource("6_lyatm")
 texture_filter = 0
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_mxd7y"]
-radius = 1.49364
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -121,16 +120,11 @@ visible = false
 [node name="Plane_008" parent="World/River_001" index="9" unique_id=1037786578]
 visible = false
 
-[node name="FishZone_V2" type="Area3D" parent="World" unique_id=1206378130 groups=["fish_zone"]]
-transform = Transform3D(1.265, 0, 0, 0, 1.265, 0, 0, 0, 1.265, 0.15785956, 0.35349345, -1.1387099)
-script = ExtResource("7_k4i7q")
+[node name="FishZone_V3" parent="World" unique_id=503373627 instance=ExtResource("8_n1yj2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05233705, 0, -0.7409453)
 
-[node name="WaterFacing" type="Node3D" parent="World/FishZone_V2" unique_id=346506334]
-transform = Transform3D(-0.99999994, 0, 8.742277e-08, 0, 0.99999994, 0, -8.742277e-08, 0, -0.99999994, 0, 0, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World/FishZone_V2" unique_id=1425339664]
-shape = SubResource("SphereShape3D_mxd7y")
-debug_color = Color(0, 0.6, 0.69803923, 1)
+[node name="WaterFacing" parent="World/FishZone_V3" index="0" unique_id=346506334]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
 [node name="Player" type="Node" parent="." unique_id=1284942496]
 
@@ -138,7 +132,7 @@ debug_color = Color(0, 0.6, 0.69803923, 1)
 collision_layer = 1
 
 [node name="AnimatedSprite3D" parent="Player/CharacterBody3D" index="1" unique_id=477032395]
-animation = &"Prep_Fishing"
+animation = &"Fishing_Idle"
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1419276622 node_paths=PackedStringArray("target")]
 script = ExtResource("2_0kejc")
@@ -161,7 +155,7 @@ game_mode = NodePath("../GameMode")
 player = NodePath("../../Player/CharacterBody3D")
 exploration_camera = NodePath("../../CameraRig/Camera3D")
 camera_rig = NodePath("../../CameraRig")
-fish_zone = NodePath("../../World/FishZone_V2")
+fish_zone = NodePath("../../World/FishZone_V3")
 
 [node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player")]
 script = ExtResource("3_tf5uk")
@@ -176,5 +170,11 @@ script = ExtResource("13_k4i7q")
 [node name="Power" type="Node" parent="Game/Fishing" unique_id=1465953422]
 script = ExtResource("14_c57dm")
 
+[node name="Caster" type="Node3D" parent="Game/Fishing" unique_id=1862145617 node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("15_hrkbp")
+bait_scene = ExtResource("16_cxlon")
+spawn_point = NodePath("../../../Player/CharacterBody3D/BaitSpawner")
+
 [editable path="World/River_001"]
+[editable path="World/FishZone_V3"]
 [editable path="Player/CharacterBody3D"]
