@@ -37,6 +37,9 @@ func _ready() -> void:
 	encounter.fish_exhausted.connect(_on_fish_exhausted)
 	encounter.bite_triggered.connect(_on_bite_triggered)
 	encounter.bite_missed.connect(_on_bite_missed)
+	encounter.fish_resistance_changed.connect(_on_fish_resistance_changed)
+	encounter.fish_pull_changed.connect(_on_fish_pull_changed)
+	encounter.fish_movement_changed.connect(_on_fish_movement_changed)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -115,27 +118,22 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if phase == Phase.FIGHT:
 		if event.is_action_pressed("enter_fishing"):
-			caster.set_reeling(true)
-			sprite_director.play(&"Reel")
+			_set_fight_reeling(true)
 			return
 
 		if event.is_action_released("enter_fishing"):
-			caster.set_reeling(false)
-			sprite_director.play(&"Reel_Idle")
-			return
-			
-		if event.is_action_pressed("enter_fishing"):
-			encounter.set_player_reeling(true)
-			caster.set_reeling(true)
-			sprite_director.play(&"Reel")
+			_set_fight_reeling(false)
 			return
 
-		if event.is_action_released("enter_fishing"):
-			encounter.set_player_reeling(false)
-			caster.set_reeling(false)
-			sprite_director.play(&"Reel_Idle")
-			return
-			
+func _set_fight_reeling(active: bool) -> void:
+	encounter.set_player_reeling(active)
+	caster.set_reeling(active)
+
+	if active:
+		sprite_director.play(&"Reel")
+	else:
+		sprite_director.play(&"Reel_Idle")
+		
 func _on_mode_changed(new_mode) -> void:
 	var active: bool = new_mode == game_mode.Mode.FISHING
 
@@ -256,8 +254,6 @@ func _on_fish_hooked() -> void:
 func _on_fish_exhausted() -> void:
 	if phase != Phase.FIGHT:
 		return
-
-	caster.set_fight_mode(false)
 	
 func _on_bite_triggered() -> void:
 	if phase != Phase.IN_WATER:
@@ -271,3 +267,21 @@ func _on_bite_missed() -> void:
 		return
 
 	sprite_director.play(&"Reel_Idle")
+
+func _on_fish_resistance_changed(value: float) -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.set_fight_resistance(value)
+
+func _on_fish_pull_changed(value: float) -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.set_fish_pull_strength(value)
+
+func _on_fish_movement_changed(lateral: float) -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.set_fish_lateral(lateral)

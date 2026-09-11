@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_fp1ei")
+sink_speed = 0.2
 reel_speed = 1.0
 reel_rise_speed = 0.5
 metadata/_custom_type_script = "uid://t00bl10tj0xr"

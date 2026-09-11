@@ -10,9 +10,13 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var floor_collision_mask: int = 2048
 @export var floor_ray_depth: float = 100.0
 @export var fight_reel_multiplier: float = 0.2
+@export var max_fish_pull_speed: float = 1.5
 
+var fish_pull_strength: float = 0.0
 var fight_mode: bool = false
 var reel_steering: float = 0.0
+var fight_resistance: float = 1.0
+var fish_lateral: float = 0.0
 
 enum State {
 	IDLE,
@@ -51,6 +55,9 @@ func set_reel_target(target: Node3D) -> void:
 func set_reeling(active: bool) -> void:
 	reeling = active
 
+	if fight_mode:
+		return
+
 	if not reeling and global_position.y > bottom_y:
 		if state == State.IN_WATER:
 			state = State.SINKING
@@ -62,7 +69,10 @@ func set_reel_steering(value: float) -> void:
 func _physics_process(delta: float) -> void:
 	if state == State.SINKING or state == State.IN_WATER:
 		_update_bottom_from_world()
-		
+	
+	if fight_mode and not reeling and fish_pull_strength > 0.0:
+		_update_fish_pull(delta)
+	
 	match state:
 		State.FLYING:
 			_update_flying(delta)
@@ -138,7 +148,13 @@ func _update_reeling(delta: float) -> void:
 	var reel_speed := data.reel_speed
 
 	if fight_mode:
-		reel_speed *= fight_reel_multiplier
+		var multiplier := lerpf(
+			1.0,
+			fight_reel_multiplier,
+			fight_resistance
+		)
+
+		reel_speed *= multiplier
 
 	var move_distance := reel_speed * delta
 
@@ -205,3 +221,41 @@ func _update_bottom_from_world() -> void:
 		
 func set_fight_mode(active: bool) -> void:
 	fight_mode = active
+
+	if fight_mode and state == State.SINKING:
+		state = State.IN_WATER
+
+func set_fight_resistance(value: float) -> void:
+	fight_resistance = clampf(value, 0.0, 1.0)
+
+func set_fish_pull_strength(value: float) -> void:
+	fish_pull_strength = clampf(value, 0.0, 1.0)
+
+func _update_fish_pull(delta: float) -> void:
+	if reel_target == null:
+		return
+
+	var away := global_position - reel_target.global_position
+	away.y = 0.0
+
+	if away.length_squared() == 0.0:
+		return
+
+	away = away.normalized()
+
+	var side := Vector3.UP.cross(away).normalized()
+
+	var fish_direction := (
+		away
+		+ side * fish_lateral
+	).normalized()
+
+	global_position += (
+		fish_direction
+		* max_fish_pull_speed
+		* fish_pull_strength
+		* delta
+	)
+
+func set_fish_lateral(value: float) -> void:
+	fish_lateral = clampf(value, -1.0, 1.0)

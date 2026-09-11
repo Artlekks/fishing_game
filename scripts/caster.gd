@@ -96,3 +96,15 @@ func set_reel_steering(value: float) -> void:
 func set_fight_mode(active: bool) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_fight_mode(active)
+
+func set_fight_resistance(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_fight_resistance(value)
+
+func set_fish_pull_strength(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_fish_pull_strength(value)
+
+func set_fish_lateral(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_fish_lateral(value)
