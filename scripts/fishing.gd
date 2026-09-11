@@ -162,7 +162,7 @@ func _on_animation_finished(animation_name: StringName) -> void:
 			_enter_in_water()
 		else:
 			phase = Phase.BAIT_FLYING
-			sprite_director.play(&"Fishing_Idle")
+			sprite_director.play(&"Throw_Idle")
 
 		return
 	

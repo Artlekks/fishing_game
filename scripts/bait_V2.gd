@@ -4,15 +4,8 @@ signal landed(point: Vector3)
 signal returned
 
 @export var gravity: float = 24.0
-
-@export var sink_depth: float = 1.0
-@export var sink_speed: float = 0.8
-
-@export var reel_speed: float = 4.0
-@export var reel_rise_speed: float = 0.8
 @export var return_distance: float = 0.5
-
-@export var reel_steer_strength: float = 0.8
+@export var data: BaitData
 
 var reel_steering: float = 0.0
 
@@ -85,7 +78,7 @@ func _update_flying(delta: float) -> void:
 
 		landed.emit(global_position)
 
-		sink_target_y = water_y - sink_depth
+		sink_target_y = water_y - data.sink_depth
 		state = State.SINKING
 		return
 
@@ -96,7 +89,7 @@ func _update_sinking(delta: float) -> void:
 	global_position.y = move_toward(
 		global_position.y,
 		sink_target_y,
-		sink_speed * delta
+		data.sink_speed * delta
 	)
 
 	if is_equal_approx(global_position.y, sink_target_y):
@@ -131,10 +124,10 @@ func _update_reeling(delta: float) -> void:
 
 	var reel_direction := (
 		forward
-		+ side * reel_steering * reel_steer_strength * steering_fade
+		+ side * reel_steering * data.reel_steer_strength * steering_fade
 	).normalized()
 
-	var move_distance := reel_speed * delta
+	var move_distance := data.reel_speed * delta
 
 	# Never step past the target.
 	if move_distance >= distance:
@@ -150,5 +143,8 @@ func _update_reeling(delta: float) -> void:
 	global_position.y = move_toward(
 		global_position.y,
 		water_y,
-		reel_rise_speed * delta
+		data.reel_rise_speed * delta
 	)
+
+func set_data(new_data: BaitData) -> void:
+	data = new_data

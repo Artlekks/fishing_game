@@ -6,9 +6,10 @@ signal bait_returned
 @export var bait_scene: PackedScene
 @export var spawn_point: Node3D
 
-@export var min_speed: float = 8.0
-@export var max_speed: float = 22.0
+@export var min_speed: float = 1.0
+@export var max_speed: float = 10.0
 @export var launch_angle_degrees: float = 45.0
+@export var selected_bait_data: BaitData
 
 var active_bait: Node3D
 
@@ -38,6 +39,9 @@ func perform_cast(
 
 	active_bait = bait_scene.instantiate()
 	add_child(active_bait)
+	
+	if selected_bait_data != null:
+		active_bait.set_data(selected_bait_data)
 	
 	active_bait.landed.connect(_on_bait_landed)
 

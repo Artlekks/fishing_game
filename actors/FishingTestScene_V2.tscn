@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
 [ext_resource type="Script" uid="uid://boqng0bhxpde6" path="res://scripts/caster.gd" id="15_hrkbp"]
 [ext_resource type="PackedScene" uid="uid://b55g00mjd4bs" path="res://actors/bait_V2.tscn" id="16_cxlon"]
+[ext_resource type="Resource" uid="uid://c0dx7cuhpacd0" path="res://data/baits/default_bait.tres" id="17_n1yj2"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 
@@ -174,6 +175,8 @@ script = ExtResource("14_c57dm")
 script = ExtResource("15_hrkbp")
 bait_scene = ExtResource("16_cxlon")
 spawn_point = NodePath("../../../Player/CharacterBody3D/BaitSpawner")
+min_speed = 3.0
+selected_bait_data = ExtResource("17_n1yj2")
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V3"]
