@@ -8,6 +8,8 @@ enum Phase {
 	PREP_THROW,
 	CHARGE,
 	THROW,
+	BAIT_FLYING,
+	IN_WATER,
 	PUT_AWAY,
 	EXIT
 }
@@ -22,11 +24,13 @@ enum Phase {
 @export var player: CharacterBody3D
 
 var phase: int = Phase.INACTIVE
-
+var bait_landed_during_throw: bool = false
 
 func _ready() -> void:
 	game_mode.mode_changed.connect(_on_mode_changed)
 	aim.aim_changed.connect(_on_aim_changed)
+	caster.bait_landed.connect(_on_bait_landed)
+	caster.bait_returned.connect(_on_bait_returned)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -79,10 +83,21 @@ func _unhandled_input(event: InputEvent) -> void:
 					zone.get_water_y()
 				)
 
+			bait_landed_during_throw = false
 			phase = Phase.THROW
 			sprite_director.play(&"Throw")
 			return
+	
+	if phase == Phase.IN_WATER:
+		if event.is_action_pressed("enter_fishing"):
+			caster.set_reeling(true)
+			sprite_director.play(&"Reel")
+			return
 
+		if event.is_action_released("enter_fishing"):
+			caster.set_reeling(false)
+			sprite_director.play(&"Reel_Idle")
+			return
 
 func _on_mode_changed(new_mode) -> void:
 	var active: bool = new_mode == game_mode.Mode.FISHING
@@ -143,9 +158,12 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		power.start()
 
 	if animation_name == &"Throw" and phase == Phase.THROW:
-		phase = Phase.AIM
-		sprite_director.play(&"Fishing_Idle")
-		aim.resume()
+		if bait_landed_during_throw:
+			_enter_in_water()
+		else:
+			phase = Phase.BAIT_FLYING
+			sprite_director.play(&"Fishing_Idle")
+
 		return
 	
 func _on_exploration_view_ready() -> void:
@@ -157,3 +175,30 @@ func _on_exploration_view_ready() -> void:
 
 func _on_aim_changed(direction: Vector3) -> void:
 	camera_rig.set_fishing_aim_direction(direction)
+
+func _on_bait_landed(_point: Vector3) -> void:
+	if phase == Phase.THROW:
+		bait_landed_during_throw = true
+		return
+
+	if phase == Phase.BAIT_FLYING:
+		_enter_in_water()
+		
+func _enter_in_water() -> void:
+	phase = Phase.IN_WATER
+	sprite_director.play(&"Reel_Idle")
+
+func _on_bait_returned() -> void:
+	if phase != Phase.IN_WATER:
+		return
+
+	phase = Phase.AIM
+	sprite_director.play(&"Fishing_Idle")
+	aim.resume()
+	
+func _process(_delta: float) -> void:
+	if phase != Phase.IN_WATER:
+		return
+
+	var steering := Input.get_axis("ds_left", "ds_right")
+	caster.set_reel_steering(steering)

@@ -1,6 +1,7 @@
 extends Node3D
 
 signal bait_landed(point: Vector3)
+signal bait_returned
 
 @export var bait_scene: PackedScene
 @export var spawn_point: Node3D
@@ -37,7 +38,7 @@ func perform_cast(
 
 	active_bait = bait_scene.instantiate()
 	add_child(active_bait)
-
+	
 	active_bait.landed.connect(_on_bait_landed)
 
 	active_bait.launch(
@@ -45,7 +46,25 @@ func perform_cast(
 		initial_velocity,
 		water_y
 	)
-
+	
+	active_bait.set_reel_target(spawn_point)
+	active_bait.returned.connect(_on_bait_returned)
 
 func _on_bait_landed(point: Vector3) -> void:
 	bait_landed.emit(point)
+
+func set_reeling(active: bool) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_reeling(active)
+
+
+func _on_bait_returned() -> void:
+	if is_instance_valid(active_bait):
+		active_bait.queue_free()
+
+	active_bait = null
+	bait_returned.emit()
+
+func set_reel_steering(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_reel_steering(value)
