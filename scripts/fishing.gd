@@ -59,6 +59,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			aim.stop()
 
 			phase = Phase.PREP_THROW
+			power.start()
 			sprite_director.play(&"Prep_Throw")
 			return
 
@@ -155,7 +156,7 @@ func _on_animation_finished(animation_name: StringName) -> void:
 	if animation_name == &"Prep_Throw" and phase == Phase.PREP_THROW:
 		phase = Phase.CHARGE
 		sprite_director.play(&"Prep_Throw_Idle")
-		power.start()
+		return
 
 	if animation_name == &"Throw" and phase == Phase.THROW:
 		if bait_landed_during_throw:

@@ -2,6 +2,8 @@ extends Node
 
 signal power_changed(value: float)
 signal power_captured(value: float)
+signal started
+signal stopped
 
 @export var speed: float = 1.5
 
@@ -31,14 +33,20 @@ func start() -> void:
 	value = 0.0
 	direction = 1.0
 	active = true
+
+	started.emit()
 	power_changed.emit(value)
 
 
 func capture() -> float:
 	active = false
+
+	stopped.emit()
 	power_captured.emit(value)
+
 	return value
 
 
 func stop() -> void:
 	active = false
+	stopped.emit()
