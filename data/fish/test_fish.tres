@@ -5,4 +5,9 @@
 [resource]
 script = ExtResource("1_7n5k8")
 fish_name = "Test Fish"
+lateral_activity = 0.1
+direction_change_min = 0.3
+direction_change_max = 0.6
+resistance_rounds = 3
+recovery_time_min = 1.0
 metadata/_custom_type_script = "uid://bfofo6blwl0r8"

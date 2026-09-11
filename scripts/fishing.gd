@@ -40,6 +40,7 @@ func _ready() -> void:
 	encounter.fish_resistance_changed.connect(_on_fish_resistance_changed)
 	encounter.fish_pull_changed.connect(_on_fish_pull_changed)
 	encounter.fish_movement_changed.connect(_on_fish_movement_changed)
+	encounter.fish_depth_intent_changed.connect(_on_fish_depth_intent_changed)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -285,3 +286,9 @@ func _on_fish_movement_changed(lateral: float) -> void:
 		return
 
 	caster.set_fish_lateral(lateral)
+
+func _on_fish_depth_intent_changed(value: float) -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.set_fish_depth_intent(value)

@@ -11,7 +11,9 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var floor_ray_depth: float = 100.0
 @export var fight_reel_multiplier: float = 0.2
 @export var max_fish_pull_speed: float = 1.5
+@export var fish_vertical_speed: float = 0.8
 
+var fish_depth_intent: float = 0.0
 var fish_pull_strength: float = 0.0
 var fight_mode: bool = false
 var reel_steering: float = 0.0
@@ -256,6 +258,24 @@ func _update_fish_pull(delta: float) -> void:
 		* fish_pull_strength
 		* delta
 	)
+	
+	global_position.y += (
+	fish_depth_intent
+	* fish_vertical_speed
+	* fish_pull_strength
+	* delta
+)
+
+	global_position.y = clampf(
+		global_position.y,
+		bottom_y,
+		water_y
+	)
+
+	_emit_depth()
 
 func set_fish_lateral(value: float) -> void:
 	fish_lateral = clampf(value, -1.0, 1.0)
+
+func set_fish_depth_intent(value: float) -> void:
+	fish_depth_intent = clampf(value, -1.0, 1.0)

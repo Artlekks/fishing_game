@@ -108,3 +108,7 @@ func set_fish_pull_strength(value: float) -> void:
 func set_fish_lateral(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_fish_lateral(value)
+
+func set_fish_depth_intent(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_fish_depth_intent(value)
