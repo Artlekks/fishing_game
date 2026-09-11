@@ -4,6 +4,8 @@ extends Area3D
 
 @onready var water_facing: Node3D = $WaterFacing
 @onready var water_surface: Node3D = $WaterSurface
+@onready var water_bottom: Node3D = $WaterBottom
+
 
 func can_player_fish(player: Node3D) -> bool:
 	if not overlaps_body(player):
@@ -21,3 +23,9 @@ func get_water_forward() -> Vector3:
 	
 func get_water_y() -> float:
 	return water_surface.global_position.y
+
+func get_bottom_y() -> float:
+	return water_bottom.global_position.y
+
+func get_water_depth() -> float:
+	return water_surface.global_position.y - water_bottom.global_position.y

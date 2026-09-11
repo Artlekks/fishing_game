@@ -12,11 +12,15 @@
 [ext_resource type="PackedScene" uid="uid://b7wqcq60h8vqv" path="res://actors/FishZone_V2.tscn" id="8_n1yj2"]
 [ext_resource type="PackedScene" uid="uid://cocpfht6p4ai3" path="res://actors/PowerMeter_V2.tscn" id="10_r25je"]
 [ext_resource type="Script" uid="uid://c8vuaolv25gid" path="res://scripts/power_meter_view.gd" id="11_r25je"]
+[ext_resource type="Script" uid="uid://cb6v6f0ntyhvg" path="res://scripts/depth_meter_view.gd" id="12_7s285"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
 [ext_resource type="Script" uid="uid://boqng0bhxpde6" path="res://scripts/caster.gd" id="15_hrkbp"]
 [ext_resource type="PackedScene" uid="uid://b55g00mjd4bs" path="res://actors/bait_V2.tscn" id="16_cxlon"]
 [ext_resource type="Resource" uid="uid://c0dx7cuhpacd0" path="res://data/baits/default_bait.tres" id="17_n1yj2"]
+[ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="21_y5vpm"]
+[ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="22_f3f7x"]
+[ext_resource type="Texture2D" uid="uid://blcyb0vm20sk8" path="res://assets/sprites/anim_Depth-anim_Depth.png" id="23_t57di"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 
@@ -56,6 +60,241 @@ data = PackedVector3Array(43.9825, -0.9431, 8.1032, 43.3211, -1.7481, 8.686, 43.
 shading_mode = 0
 albedo_texture = ExtResource("6_lyatm")
 texture_filter = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bp5p2"]
+size = Vector3(4.4259, 1, 1.31738)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_67idb"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1891, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_msf0g"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1830, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iftfa"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1769, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dh6rh"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1708, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gln3a"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1647, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1wjtj"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1586, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ls0lh"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1525, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_26864"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1464, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eln23"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1403, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i5fp5"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1342, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rp8oj"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1281, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y7sg1"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1220, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e8cvj"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1159, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b7t2j"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1098, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gxu3e"]
+atlas = ExtResource("23_t57di")
+region = Rect2(1037, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_knm6l"]
+atlas = ExtResource("23_t57di")
+region = Rect2(976, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ocrt0"]
+atlas = ExtResource("23_t57di")
+region = Rect2(915, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6m2k3"]
+atlas = ExtResource("23_t57di")
+region = Rect2(854, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s8v02"]
+atlas = ExtResource("23_t57di")
+region = Rect2(793, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p74lh"]
+atlas = ExtResource("23_t57di")
+region = Rect2(732, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i2784"]
+atlas = ExtResource("23_t57di")
+region = Rect2(671, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4kwnw"]
+atlas = ExtResource("23_t57di")
+region = Rect2(610, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4wjol"]
+atlas = ExtResource("23_t57di")
+region = Rect2(549, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wo0g7"]
+atlas = ExtResource("23_t57di")
+region = Rect2(488, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7arwr"]
+atlas = ExtResource("23_t57di")
+region = Rect2(427, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10bth"]
+atlas = ExtResource("23_t57di")
+region = Rect2(366, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h0t2m"]
+atlas = ExtResource("23_t57di")
+region = Rect2(305, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1td2c"]
+atlas = ExtResource("23_t57di")
+region = Rect2(244, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vxb1l"]
+atlas = ExtResource("23_t57di")
+region = Rect2(183, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bh0hs"]
+atlas = ExtResource("23_t57di")
+region = Rect2(122, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nrykn"]
+atlas = ExtResource("23_t57di")
+region = Rect2(61, 0, 61, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_awkd7"]
+atlas = ExtResource("23_t57di")
+region = Rect2(0, 0, 61, 236)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yfqh0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_67idb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_msf0g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iftfa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dh6rh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gln3a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1wjtj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ls0lh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_26864")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eln23")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i5fp5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rp8oj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y7sg1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e8cvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b7t2j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gxu3e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_knm6l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ocrt0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6m2k3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s8v02")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p74lh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i2784")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4kwnw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4wjol")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wo0g7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7arwr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_10bth")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h0t2m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1td2c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vxb1l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bh0hs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nrykn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_awkd7")
+}],
+"loop": 1,
+"name": &"Depth",
+"speed": 5.0
+}]
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -123,11 +362,41 @@ visible = false
 [node name="Plane_008" parent="World/River_001" index="9" unique_id=1037786578]
 visible = false
 
-[node name="FishZone_V3" parent="World" unique_id=503373627 instance=ExtResource("8_n1yj2")]
+[node name="FishZone_V2" parent="World" unique_id=503373627 instance=ExtResource("8_n1yj2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05233705, 0, -0.7409453)
 
-[node name="WaterFacing" parent="World/FishZone_V3" index="0" unique_id=346506334]
+[node name="WaterFacing" parent="World/FishZone_V2" index="0" unique_id=346506334]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="WaterBottom" parent="World/FishZone_V2" index="2" unique_id=1747705196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48561275, 0)
+
+[node name="DepthZones_V2" type="Node3D" parent="World" unique_id=1945045358]
+
+[node name="DepthFloor_1" type="StaticBody3D" parent="World/DepthZones_V2" unique_id=1617723803]
+transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, -1.118, -1, -0.41699994)
+collision_layer = 2048
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/DepthZones_V2/DepthFloor_1" unique_id=677125476 groups=["depth_zone"]]
+shape = SubResource("BoxShape3D_bp5p2")
+
+[node name="DepthFloor_2" type="StaticBody3D" parent="World/DepthZones_V2" unique_id=1664922269]
+transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 1.5880017, -2, -1.9533314)
+collision_layer = 2048
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/DepthZones_V2/DepthFloor_2" unique_id=1040950059 groups=["depth_zone"]]
+shape = SubResource("BoxShape3D_bp5p2")
+
+[node name="DepthFloor_3" type="StaticBody3D" parent="World/DepthZones_V2" unique_id=1471380597]
+transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 0.37300003, -1.5, -1.1080002)
+collision_layer = 2048
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/DepthZones_V2/DepthFloor_3" unique_id=1518412877 groups=["depth_zone"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0069144964, 0)
+shape = SubResource("BoxShape3D_bp5p2")
 
 [node name="Player" type="Node" parent="." unique_id=1284942496]
 
@@ -169,6 +438,44 @@ grow_horizontal = 1
 grow_vertical = 1
 scale = Vector2(0.35, 0.3)
 
+[node name="FishingHud" type="CanvasLayer" parent="UI/FishingHud" unique_id=1124774769]
+layer = 40
+
+[node name="DepthMeter" type="Control" parent="UI/FishingHud/FishingHud" unique_id=282162998 node_paths=PackedStringArray("caster")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.4, 0.4)
+mouse_filter = 2
+script = ExtResource("12_7s285")
+caster = NodePath("../../../../Game/Fishing/Caster")
+
+[node name="Frame" type="TextureRect" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=957431851]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 92.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("21_y5vpm")
+stretch_mode = 2
+
+[node name="Arrow" type="TextureRect" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=1964792978]
+texture_filter = 1
+layout_mode = 0
+offset_right = 55.0
+offset_bottom = 35.0
+texture = ExtResource("22_f3f7x")
+stretch_mode = 2
+
+[node name="DepthAnim" type="AnimatedSprite2D" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=215648467]
+position = Vector2(69.445, 141.645)
+sprite_frames = SubResource("SpriteFrames_yfqh0")
+animation = &"Depth"
+
 [node name="Game" type="Node" parent="." unique_id=313999427]
 
 [node name="GameMode" type="Node" parent="Game" unique_id=886234017]
@@ -180,7 +487,7 @@ game_mode = NodePath("../GameMode")
 player = NodePath("../../Player/CharacterBody3D")
 exploration_camera = NodePath("../../CameraRig/Camera3D")
 camera_rig = NodePath("../../CameraRig")
-fish_zone = NodePath("../../World/FishZone_V3")
+fish_zone = NodePath("../../World/FishZone_V2")
 
 [node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player")]
 script = ExtResource("3_tf5uk")
@@ -204,6 +511,6 @@ max_speed = 15.0
 selected_bait_data = ExtResource("17_n1yj2")
 
 [editable path="World/River_001"]
-[editable path="World/FishZone_V3"]
+[editable path="World/FishZone_V2"]
 [editable path="Player/CharacterBody3D"]
 [editable path="UI/FishingHud/PowerMeter"]

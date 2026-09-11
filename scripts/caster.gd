@@ -2,6 +2,7 @@ extends Node3D
 
 signal bait_landed(point: Vector3)
 signal bait_returned
+signal bait_depth_changed(current_depth: float, total_depth: float)
 
 @export var bait_scene: PackedScene
 @export var spawn_point: Node3D
@@ -17,7 +18,8 @@ var active_bait: Node3D
 func perform_cast(
 	power: float,
 	direction: Vector3,
-	water_y: float
+	water_y: float,
+	bottom_y: float
 ) -> void:
 	if bait_scene == null or spawn_point == null:
 		return
@@ -28,7 +30,12 @@ func perform_cast(
 	direction.y = 0.0
 	direction = direction.normalized()
 
-	var speed := lerpf(min_speed, max_speed, clampf(power, 0.0, 1.0))
+	var speed := lerpf(
+		min_speed,
+		max_speed,
+		clampf(power, 0.0, 1.0)
+	)
+
 	var angle := deg_to_rad(launch_angle_degrees)
 
 	var initial_velocity := Vector3(
@@ -39,27 +46,33 @@ func perform_cast(
 
 	active_bait = bait_scene.instantiate()
 	add_child(active_bait)
-	
+
 	if selected_bait_data != null:
 		active_bait.set_data(selected_bait_data)
-	
+
 	active_bait.landed.connect(_on_bait_landed)
+	active_bait.depth_changed.connect(_on_bait_depth_changed)
+	active_bait.returned.connect(_on_bait_returned)
+
+	active_bait.set_reel_target(spawn_point)
 
 	active_bait.launch(
 		spawn_point.global_position,
 		initial_velocity,
-		water_y
+		water_y,
+		bottom_y
 	)
-	
-	active_bait.set_reel_target(spawn_point)
-	active_bait.returned.connect(_on_bait_returned)
+
 
 func _on_bait_landed(point: Vector3) -> void:
 	bait_landed.emit(point)
 
-func set_reeling(active: bool) -> void:
-	if is_instance_valid(active_bait):
-		active_bait.set_reeling(active)
+
+func _on_bait_depth_changed(
+	current_depth: float,
+	total_depth: float
+) -> void:
+	bait_depth_changed.emit(current_depth, total_depth)
 
 
 func _on_bait_returned() -> void:
@@ -68,6 +81,12 @@ func _on_bait_returned() -> void:
 
 	active_bait = null
 	bait_returned.emit()
+
+
+func set_reeling(active: bool) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_reeling(active)
+
 
 func set_reel_steering(value: float) -> void:
 	if is_instance_valid(active_bait):

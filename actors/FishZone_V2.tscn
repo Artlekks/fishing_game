@@ -12,6 +12,8 @@ script = ExtResource("1_5tdff")
 
 [node name="WaterSurface" type="Node3D" parent="." unique_id=1448358599]
 
+[node name="WaterBottom" type="Node3D" parent="." unique_id=1747705196]
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1425339664]
 shape = SubResource("SphereShape3D_mxd7y")
 debug_color = Color(0, 0.6, 0.69803923, 1)

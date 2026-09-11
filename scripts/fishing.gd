@@ -81,7 +81,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				caster.perform_cast(
 					captured_power,
 					aim.get_direction(),
-					zone.get_water_y()
+					zone.get_water_y(),
+					zone.get_bottom_y()
 				)
 
 			bait_landed_during_throw = false

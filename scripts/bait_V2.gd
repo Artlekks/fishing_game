@@ -2,10 +2,13 @@ extends Node3D
 
 signal landed(point: Vector3)
 signal returned
+signal depth_changed(current_depth: float, total_depth: float)
 
 @export var gravity: float = 24.0
 @export var return_distance: float = 0.5
 @export var data: BaitData
+@export var floor_collision_mask: int = 2048
+@export var floor_ray_depth: float = 100.0
 
 var reel_steering: float = 0.0
 
@@ -21,7 +24,7 @@ var state: int = State.IDLE
 var velocity: Vector3 = Vector3.ZERO
 
 var water_y: float = 0.0
-var sink_target_y: float = 0.0
+var bottom_y: float = 0.0
 
 var reel_target: Node3D = null
 var reeling: bool = false
@@ -30,13 +33,14 @@ var reeling: bool = false
 func launch(
 	start_position: Vector3,
 	initial_velocity: Vector3,
-	surface_y: float
+	surface_y: float,
+	water_bottom_y: float
 ) -> void:
 	global_position = start_position
 	velocity = initial_velocity
 	water_y = surface_y
+	bottom_y = water_bottom_y
 	state = State.FLYING
-
 
 func set_reel_target(target: Node3D) -> void:
 	reel_target = target
@@ -45,16 +49,18 @@ func set_reel_target(target: Node3D) -> void:
 func set_reeling(active: bool) -> void:
 	reeling = active
 
-	if not reeling and global_position.y > sink_target_y:
+	if not reeling and global_position.y > bottom_y:
 		if state == State.IN_WATER:
 			state = State.SINKING
-
 
 func set_reel_steering(value: float) -> void:
 	reel_steering = clampf(value, -1.0, 1.0)
 
 
 func _physics_process(delta: float) -> void:
+	if state == State.SINKING or state == State.IN_WATER:
+		_update_bottom_from_world()
+		
 	match state:
 		State.FLYING:
 			_update_flying(delta)
@@ -78,7 +84,6 @@ func _update_flying(delta: float) -> void:
 
 		landed.emit(global_position)
 
-		sink_target_y = water_y - data.sink_depth
 		state = State.SINKING
 		return
 
@@ -88,13 +93,14 @@ func _update_flying(delta: float) -> void:
 func _update_sinking(delta: float) -> void:
 	global_position.y = move_toward(
 		global_position.y,
-		sink_target_y,
+		bottom_y,
 		data.sink_speed * delta
 	)
 
-	if is_equal_approx(global_position.y, sink_target_y):
-		state = State.IN_WATER
+	_emit_depth()
 
+	if is_equal_approx(global_position.y, bottom_y):
+		state = State.IN_WATER
 
 func _update_reeling(delta: float) -> void:
 	if reel_target == null:
@@ -146,5 +152,46 @@ func _update_reeling(delta: float) -> void:
 		data.reel_rise_speed * delta
 	)
 
+	_emit_depth()
+	
 func set_data(new_data: BaitData) -> void:
 	data = new_data
+
+func _emit_depth() -> void:
+	var current_depth := water_y - global_position.y
+	var total_depth := water_y - bottom_y
+
+	depth_changed.emit(current_depth, total_depth)
+
+func _update_bottom_from_world() -> void:
+	var ray_from := Vector3(
+		global_position.x,
+		water_y + 0.5,
+		global_position.z
+	)
+
+	var ray_to := Vector3(
+		global_position.x,
+		water_y - floor_ray_depth,
+		global_position.z
+	)
+
+	var query := PhysicsRayQueryParameters3D.create(
+		ray_from,
+		ray_to,
+		floor_collision_mask
+	)
+
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+
+	if hit.is_empty():
+		return
+
+	var hit_position: Vector3 = hit["position"]
+	bottom_y = hit_position.y
+
+	if global_position.y < bottom_y:
+		global_position.y = bottom_y
