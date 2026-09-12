@@ -14,7 +14,8 @@ signal bait_depth_changed(current_depth: float, total_depth: float)
 @export var reel_target: Node3D
 
 var active_bait: Node3D
-
+var current_bait_depth: float = 0.0
+var current_total_depth: float = 0.0
 
 func perform_cast(
 	power: float,
@@ -73,8 +74,13 @@ func _on_bait_depth_changed(
 	current_depth: float,
 	total_depth: float
 ) -> void:
-	bait_depth_changed.emit(current_depth, total_depth)
+	current_bait_depth = current_depth
+	current_total_depth = total_depth
 
+	bait_depth_changed.emit(
+		current_depth,
+		total_depth
+	)
 
 func _on_bait_returned() -> void:
 	if is_instance_valid(active_bait):
@@ -112,3 +118,10 @@ func set_fish_lateral(value: float) -> void:
 func set_fish_depth_intent(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_fish_depth_intent(value)
+
+func get_current_bait_depth() -> float:
+	return current_bait_depth
+
+
+func get_current_total_depth() -> float:
+	return current_total_depth

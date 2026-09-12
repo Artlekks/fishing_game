@@ -61,7 +61,12 @@ func _on_bait_returned() -> void:
 	pending_fish_entry = null
 
 func _on_bite_timer_timeout() -> void:
-	pending_fish_entry = fish_selector.choose(fish_population)
+	pending_fish_entry = fish_selector.choose(
+		fish_population,
+		caster.selected_bait_data,
+		caster.get_current_bait_depth(),
+		caster.get_current_total_depth()
+	)
 
 	if pending_fish_entry == null:
 		return

@@ -41,3 +41,37 @@ var resistance_rounds: int = 2
 
 @export var recovery_time_min: float = 0.8
 @export var recovery_time_max: float = 1.5
+
+func get_lure_match_multiplier(bait: BaitData) -> float:
+	if bait == null:
+		return 1.0
+
+	if bait.lure_id != &"" and preferred_lure_ids.has(bait.lure_id):
+		return 1.5
+
+	if accepts_all_lures:
+		return 1.0
+
+	if preferred_lure_types.has(bait.lure_type):
+		return 1.0
+
+	return 0.15
+
+func get_depth_match_multiplier(
+	current_depth: float,
+	total_depth: float
+) -> float:
+	if total_depth <= 0.0:
+		return 1.0
+
+	var depth_ratio := clampf(
+		current_depth / total_depth,
+		0.0,
+		1.0
+	)
+
+	if depth_ratio >= preferred_depth_min \
+	and depth_ratio <= preferred_depth_max:
+		return 1.0
+
+	return 0.2

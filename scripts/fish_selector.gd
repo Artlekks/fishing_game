@@ -2,39 +2,70 @@ extends Node
 class_name FishSelector
 
 
-func choose(entries: Array[FishSpawnEntry]) -> FishSpawnEntry:
-	var total_weight := 0.0
+func choose(
+	entries: Array[FishSpawnEntry],
+	bait: BaitData,
+	current_depth: float,
+	total_depth: float
+) -> FishSpawnEntry:
+			var total_weight := 0.0
 
-	for entry in entries:
-		if entry == null:
-			continue
+			for entry in entries:
+				if entry == null:
+					continue
 
-		if entry.fish == null:
-			continue
+				if entry.fish == null:
+					continue
 
-		if entry.weight <= 0.0:
-			continue
+				if entry.weight <= 0.0:
+					continue
 
-		total_weight += entry.weight
+				var lure_multiplier := entry.fish.get_lure_match_multiplier(bait)
 
-	if total_weight <= 0.0:
-		return null
+				var depth_multiplier := entry.fish.get_depth_match_multiplier(
+					current_depth,
+					total_depth
+				)
 
-	var roll := randf() * total_weight
+				var effective_weight := (
+					entry.weight
+					* lure_multiplier
+					* depth_multiplier
+				)
 
-	for entry in entries:
-		if entry == null:
-			continue
+				total_weight += effective_weight
 
-		if entry.fish == null:
-			continue
+			if total_weight <= 0.0:
+				return null
 
-		if entry.weight <= 0.0:
-			continue
+			var roll := randf() * total_weight
 
-		roll -= entry.weight
+			for entry in entries:
+				if entry == null:
+					continue
 
-		if roll <= 0.0:
-			return entry
+				if entry.fish == null:
+					continue
 
-	return null
+				if entry.weight <= 0.0:
+					continue
+
+				var lure_multiplier := entry.fish.get_lure_match_multiplier(bait)
+
+				var depth_multiplier := entry.fish.get_depth_match_multiplier(
+					current_depth,
+					total_depth
+				)
+
+				var effective_weight := (
+					entry.weight
+					* lure_multiplier
+					* depth_multiplier
+				)
+
+				roll -= effective_weight
+
+				if roll <= 0.0:
+					return entry
+
+			return null

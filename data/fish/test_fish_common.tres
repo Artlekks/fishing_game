@@ -1,10 +1,12 @@
 [gd_resource type="Resource" script_class="FishData" format=3 uid="uid://c2tpksm5w3pir"]
 
-[ext_resource type="Script" uid="uid://bfofo6blwl0r8" path="res://scripts/fish_data.gd" id="1_7n5k8"]
+[ext_resource type="Script" uid="uid://bfofo6blwl0r8" path="res://scripts/fish_data.gd" id="1_7q5vc"]
 
 [resource]
-script = ExtResource("1_7n5k8")
-fish_name = "Test Fish"
+script = ExtResource("1_7q5vc")
+fish_name = "Common"
+preferred_depth_max = 0.3
+accepts_all_lures = true
 lateral_activity = 0.1
 direction_change_min = 0.3
 direction_change_max = 0.6
