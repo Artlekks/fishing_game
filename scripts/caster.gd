@@ -134,3 +134,8 @@ func cancel_bait() -> void:
 		active_bait.queue_free()
 
 	active_bait = null
+
+func set_reel_speed_multiplier(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_reel_speed_multiplier(value)
+		

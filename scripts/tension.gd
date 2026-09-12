@@ -71,7 +71,7 @@ func set_reel_gain_multiplier(value: float) -> void:
 	reel_gain_multiplier = maxf(value, 0.0)
 	
 func start() -> void:
-	value = start_tension
+	value = (safe_min + safe_max) * 0.5
 	active = true
 	failure_enabled = true
 	player_reeling = false

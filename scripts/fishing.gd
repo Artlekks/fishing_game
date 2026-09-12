@@ -149,6 +149,9 @@ func _on_strong_pull_started() -> void:
 	if phase != Phase.FIGHT:
 		return
 
+	if not Input.is_action_pressed("enter_fishing"):
+		return
+
 	if strong_pull_animation_active:
 		return
 
@@ -160,13 +163,13 @@ func _set_fight_reeling(active: bool) -> void:
 	encounter.set_player_reeling(active)
 	caster.set_reeling(active)
 
-	if strong_pull_animation_active:
-		return
+	if not active:
+		strong_pull_animation_active = false
+		current_reel_animation = &""
 
-	if active:
-		sprite_director.play(&"Reel")
-	else:
-		sprite_director.play(&"Reel_Idle")
+	_update_reel_animation(
+		Input.get_axis("ds_left", "ds_right")
+	)
 		
 func _on_mode_changed(new_mode) -> void:
 	var active: bool = new_mode == game_mode.Mode.FISHING
@@ -198,13 +201,13 @@ func _on_fishing_view_ready() -> void:
 	sprite_director.play(&"Prep_Fishing")
 
 func _update_reel_animation(steering: float) -> void:
+	if strong_pull_animation_active:
+		return
+
 	var is_reeling := Input.is_action_pressed("enter_fishing")
 	var desired_animation: StringName
 
-	if phase == Phase.FIGHT and not is_reeling and current_fish_pull > 0.15:
-		desired_animation = &"Reel_Back_Strong"
-
-	elif steering < -0.1:
+	if steering < -0.1:
 		desired_animation = &"Reel_Left" if is_reeling else &"Reel_Left_Idle"
 
 	elif steering > 0.1:
@@ -306,6 +309,9 @@ func _process(_delta: float) -> void:
 
 	var steering := Input.get_axis("ds_left", "ds_right")
 	caster.set_reel_steering(steering)
+	
+	if phase == Phase.FIGHT:
+		encounter.set_player_steering(steering)
 	
 	if phase == Phase.IN_WATER or phase == Phase.FIGHT:
 		_update_reel_animation(steering)

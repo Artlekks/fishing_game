@@ -579,8 +579,6 @@ script = ExtResource("31_v7stt")
 start_tension = 0.08
 safe_min = 0.32
 safe_max = 0.72
-reel_gain_speed = 0.12
-resistance_gain_speed = 0.05
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

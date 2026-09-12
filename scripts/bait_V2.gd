@@ -14,15 +14,20 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var fish_vertical_speed: float = 0.8
 @export var twitch_speed: float = 1.8
 @export var twitch_deceleration: float = 12.0
+@export var max_fight_escape_distance: float = 4.0
+@export_category("Fight Distance")
+@export var max_extra_fight_distance: float = 3.0
 
 var twitch_velocity: Vector3 = Vector3.ZERO
-
+var fight_max_distance: float = 0.0
 var fish_depth_intent: float = 0.0
 var fish_pull_strength: float = 0.0
 var fight_mode: bool = false
 var reel_steering: float = 0.0
 var fight_resistance: float = 1.0
 var fish_lateral: float = 0.0
+var fight_start_distance: float = 0.0
+var reel_speed_multiplier: float = 1.0
 
 enum State {
 	IDLE,
@@ -96,7 +101,9 @@ func _physics_process(delta: float) -> void:
 			Vector3.ZERO,
 			twitch_deceleration * delta
 		)
-
+	
+	_enforce_fight_distance()
+	
 func _update_flying(delta: float) -> void:
 	velocity.y -= gravity * delta
 
@@ -158,7 +165,7 @@ func _update_reeling(delta: float) -> void:
 		+ side * reel_steering * data.reel_steer_strength * steering_fade
 	).normalized()
 
-	var reel_speed := data.reel_speed
+	var reel_speed := data.reel_speed * reel_speed_multiplier
 
 	if fight_mode:
 		var multiplier := lerpf(
@@ -182,11 +189,12 @@ func _update_reeling(delta: float) -> void:
 
 	global_position += reel_direction * move_distance
 
-	global_position.y = move_toward(
-		global_position.y,
-		water_y,
-		data.reel_rise_speed * delta
-	)
+	if not fight_mode:
+		global_position.y = move_toward(
+			global_position.y,
+			water_y,
+			data.reel_rise_speed * delta
+		)
 
 	_emit_depth()
 	
@@ -235,9 +243,47 @@ func _update_bottom_from_world() -> void:
 func set_fight_mode(active: bool) -> void:
 	fight_mode = active
 
-	if fight_mode and state == State.SINKING:
-		state = State.IN_WATER
+	if fight_mode:
+		if reel_target != null:
+			var offset := global_position - reel_target.global_position
+			offset.y = 0.0
 
+			fight_max_distance = (
+				offset.length()
+				+ max_extra_fight_distance
+			)
+
+		if state == State.SINKING:
+			state = State.IN_WATER
+	else:
+		fight_max_distance = 0.0
+
+func _enforce_fight_distance() -> void:
+	if not fight_mode:
+		return
+
+	if reel_target == null:
+		return
+
+	if fight_max_distance <= 0.0:
+		return
+
+	var offset := global_position - reel_target.global_position
+	offset.y = 0.0
+
+	var distance := offset.length()
+
+	if distance <= fight_max_distance:
+		return
+
+	var clamped := (
+		reel_target.global_position
+		+ offset.normalized() * fight_max_distance
+	)
+
+	global_position.x = clamped.x
+	global_position.z = clamped.z
+	
 func set_fight_resistance(value: float) -> void:
 	fight_resistance = clampf(value, 0.0, 1.0)
 
@@ -303,6 +349,24 @@ func _update_fish_pull(delta: float) -> void:
 
 	_emit_depth()
 
+	if reel_target != null:
+		var from_player := global_position - reel_target.global_position
+		from_player.y = 0.0
+
+		var max_distance := (
+			fight_start_distance
+			+ max_fight_escape_distance
+		)
+
+		if from_player.length() > max_distance:
+			var clamped_position := (
+				reel_target.global_position
+				+ from_player.normalized() * max_distance
+			)
+
+			global_position.x = clamped_position.x
+			global_position.z = clamped_position.z
+			
 func set_fish_lateral(value: float) -> void:
 	fish_lateral = clampf(value, -1.0, 1.0)
 
@@ -333,3 +397,6 @@ func twitch_side(direction: float) -> void:
 		* clampf(direction, -1.0, 1.0)
 		* twitch_speed
 	)
+
+func set_reel_speed_multiplier(value: float) -> void:
+	reel_speed_multiplier = maxf(value, 0.0)

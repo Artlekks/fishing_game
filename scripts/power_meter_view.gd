@@ -10,6 +10,10 @@ extends CanvasLayer
 @export var tracked_target: Node3D
 @export var camera: Camera3D
 @export var screen_offset: Vector2 = Vector2(90.0, 50.0)
+@export_category("Bar Textures")
+@export var bar_green: Texture2D
+@export var bar_red: Texture2D
+@export var bar_blue: Texture2D
 
 var full_scale_x: float = 1.0
 var showing_tension: bool = false
@@ -26,7 +30,8 @@ func _ready() -> void:
 	encounter.hook_off.connect(_on_fishing_ended)
 	encounter.line_broken.connect(_on_fishing_ended)
 	encounter.fish_caught.connect(_on_fishing_ended)
-
+	encounter.tension_state_changed.connect(_on_tension_state_changed)
+	
 	caster.bait_returned.connect(_on_bait_returned)
 
 	root.visible = false
@@ -37,10 +42,9 @@ func _ready() -> void:
 
 func _on_power_started() -> void:
 	showing_tension = false
-
 	root.visible = true
 	tension_meter.visible = false
-
+	fill.texture = bar_green
 	_set_fill(0.0)
 
 
@@ -103,3 +107,14 @@ func _process(_delta: float) -> void:
 	)
 
 	root.position = screen_position + screen_offset
+
+func _on_tension_state_changed(state: int) -> void:
+	match state:
+		FishingTension.State.SLACK:
+			fill.texture = bar_blue
+
+		FishingTension.State.SAFE:
+			fill.texture = bar_green
+
+		FishingTension.State.OVERLOAD:
+			fill.texture = bar_red

@@ -26,13 +26,28 @@ signal line_broken
 @export var stamina_drain_speed: float = 30.0
 @export var stamina_recovery_speed: float = 10.0
 @export var caster: Node
-@export var first_bite_delay: float = 2.0
-@export var retry_bite_delay: float = 1.5
-@export_range(0.0, 1.0, 0.05)
 
-var max_bite_chance_per_check: float = 0.5
+@export_category("Spent Recovery")
+@export var spent_recovery_time: float = 5.0
+@export_range(0.0, 1.0, 0.05) var spent_recovery_stamina_ratio: float = 0.35
+@export_range(0.0, 1.0, 0.05) var spent_restart_intensity: float = 0.65
+@export var spent_tension_multiplier: float = 0.12
+@export var spent_reel_speed_multiplier: float = 4.0
+
+@export_category("Directional Fatigue")
+@export var counter_steer_fatigue_multiplier: float = 1.35
+@export var steering_deadzone: float = 0.2
+
+@export var first_bite_delay: float = 0.5
+@export var retry_bite_delay: float = 0.5
+
+@export_range(0.0, 1.0, 0.05)
+var max_bite_chance_per_check: float = 1.0
+
 var fish_behavior_pressure: float = 0.0
 var current_tension_state: int = FishingTension.State.SAFE
+var player_steering: float = 0.0
+var current_fish_lateral: float = 0.0
 
 enum FightState {
 	NONE,
@@ -71,7 +86,7 @@ func _ready() -> void:
 	
 func _on_bait_landed(_point: Vector3) -> void:
 	tension.start_free_reel()
-	bite_timer.start()
+	bite_timer.start(first_bite_delay)
 
 func _on_strong_pull_started() -> void:
 	if fight_state == FightState.NONE:
@@ -209,12 +224,13 @@ func _process(delta: float) -> void:
 		return
 
 	if fight_state == FightState.SPENT:
-		var spent_pull := 0.15
+		fish_pull_changed.emit(0.0)
 
-		if player_reeling:
-			spent_pull *= 0.35
+		recovery_time_left -= delta
 
-		fish_pull_changed.emit(spent_pull)
+		if recovery_time_left <= 0.0:
+			_restart_from_spent()
+
 		return
 
 	if fight_state == FightState.EXHAUSTED:
@@ -231,8 +247,21 @@ func _process(delta: float) -> void:
 
 	if player_reeling:
 		if current_tension_state == FishingTension.State.SAFE:
+			var drain_speed := stamina_drain_speed
+
+			var player_is_steering := absf(player_steering) > steering_deadzone
+			var fish_is_running_sideways := absf(current_fish_lateral) > steering_deadzone
+
+			if player_is_steering and fish_is_running_sideways:
+				var steering_against_fish := (
+					signf(player_steering) != signf(current_fish_lateral)
+				)
+
+				if steering_against_fish:
+					drain_speed *= counter_steer_fatigue_multiplier
+
 			fish_stamina = maxf(
-				fish_stamina - stamina_drain_speed * delta,
+				fish_stamina - drain_speed * delta,
 				0.0
 			)
 	else:
@@ -279,6 +308,9 @@ func set_player_reeling(active: bool) -> void:
 	player_reeling = active
 	tension.set_player_reeling(active)
 
+func set_player_steering(value: float) -> void:
+	player_steering = clampf(value, -1.0, 1.0)
+	
 func _get_max_stamina() -> float:
 	if active_fish != null:
 		return active_fish.max_stamina
@@ -296,6 +328,7 @@ func _on_fish_behavior_movement_changed(lateral: float) -> void:
 	if fight_state == FightState.NONE:
 		return
 
+	current_fish_lateral = lateral
 	fish_movement_changed.emit(lateral)
 
 func _on_fish_behavior_depth_changed(value: float) -> void:
@@ -307,7 +340,8 @@ func _on_fish_behavior_depth_changed(value: float) -> void:
 func _start_resistance_round() -> void:
 	fight_state = FightState.RESISTING
 	recovery_time_left = 0.0
-
+	caster.set_reel_speed_multiplier(1.0)
+	
 	fish_stamina = _get_max_stamina()
 
 	fish_stamina_changed.emit(
@@ -364,15 +398,44 @@ func _finish_resistance_round() -> void:
 func _enter_spent() -> void:
 	fight_state = FightState.SPENT
 
-	tension.set_fish_resistance(0.0)
-	tension.set_reel_gain_multiplier(0.25)
+	recovery_time_left = spent_recovery_time
 
-	fish_behavior.start(0.25)
+	tension.set_fish_resistance(0.0)
+	tension.set_reel_gain_multiplier(spent_tension_multiplier)
+
+	fish_behavior.stop()
 
 	fish_resistance_changed.emit(0.0)
+	fish_pull_changed.emit(0.0)
+
+	caster.set_reel_speed_multiplier(spent_reel_speed_multiplier)
 
 	print("FISH SPENT!")
 
+func _restart_from_spent() -> void:
+	fight_state = FightState.RESISTING
+	recovery_time_left = 0.0
+
+	rounds_remaining = 1
+
+	fish_stamina = (
+		_get_max_stamina()
+		* spent_recovery_stamina_ratio
+	)
+
+	fish_stamina_changed.emit(
+		fish_stamina,
+		_get_max_stamina()
+	)
+
+	tension.set_reel_gain_multiplier(1.0)
+
+	caster.set_reel_speed_multiplier(1.0)
+
+	fish_behavior.start(spent_restart_intensity)
+
+	print("FISH RECOVERED!")
+	
 func set_fish_population(entries: Array[FishSpawnEntry]) -> void:
 	fish_population = entries.duplicate()
 
