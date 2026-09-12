@@ -10,6 +10,7 @@ signal fish_resistance_changed(value: float)
 signal fish_pull_changed(value: float)
 signal fish_movement_changed(lateral: float)
 signal fish_depth_intent_changed(value: float)
+signal strong_pull_started
 
 @onready var bite_window_timer: Timer = $BiteWindowTimer
 @onready var bite_timer: Timer = $BiteTimer
@@ -20,6 +21,10 @@ signal fish_depth_intent_changed(value: float)
 @export var stamina_drain_speed: float = 30.0
 @export var stamina_recovery_speed: float = 10.0
 @export var caster: Node
+@export var first_bite_delay: float = 2.0
+@export var retry_bite_delay: float = 1.5
+@export_range(0.0, 1.0, 0.05)
+var max_bite_chance_per_check: float = 0.5
 
 enum FightState {
 	NONE,
@@ -49,11 +54,17 @@ func _ready() -> void:
 	bite_window_timer.timeout.connect(_on_bite_window_timeout)
 	fish_behavior.movement_changed.connect(_on_fish_behavior_movement_changed)
 	fish_behavior.depth_changed.connect(_on_fish_behavior_depth_changed)
+	fish_behavior.strong_pull_started.connect(_on_strong_pull_started)
 	
 func _on_bait_landed(_point: Vector3) -> void:
-	bite_timer.start()
+	bite_timer.start(first_bite_delay)
 
+func _on_strong_pull_started() -> void:
+	if fight_state == FightState.NONE:
+		return
 
+	strong_pull_started.emit()
+	
 func _on_bait_returned() -> void:
 	bite_timer.stop()
 	bite_window_timer.stop()
@@ -61,6 +72,26 @@ func _on_bait_returned() -> void:
 	pending_fish_entry = null
 
 func _on_bite_timer_timeout() -> void:
+	var attraction := fish_selector.get_attraction_ratio(
+		fish_population,
+		caster.selected_bait_data,
+		caster.get_current_bait_depth(),
+		caster.get_current_total_depth()
+	)
+
+	var bite_chance := attraction * max_bite_chance_per_check
+
+	if randf() > bite_chance:
+		print(
+			"NO BITE | Attraction: ",
+			attraction,
+			" | Chance: ",
+			bite_chance
+		)
+
+		bite_timer.start(retry_bite_delay)
+		return
+		
 	pending_fish_entry = fish_selector.choose(
 		fish_population,
 		caster.selected_bait_data,
@@ -125,10 +156,10 @@ func try_hook() -> bool:
 
 	rounds_remaining = total_rounds
 
-	_start_resistance_round()
-
 	print("HOOKED!")
 	fish_hooked.emit()
+
+	_start_resistance_round()
 
 	return true
 
@@ -138,6 +169,8 @@ func _on_bite_window_timeout() -> void:
 
 	print("MISSED!")
 	bite_missed.emit()
+
+	bite_timer.start(retry_bite_delay)
 
 func catch_fish() -> void:
 	bite_active = false

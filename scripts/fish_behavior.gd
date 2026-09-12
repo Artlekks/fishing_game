@@ -2,6 +2,8 @@ extends Node
 
 signal movement_changed(lateral: float)
 signal depth_changed(value: float)
+signal fight_back_started(fight_back_type: int)
+signal strong_pull_started
 
 @export var min_change_time: float = 0.8
 @export var max_change_time: float = 2.0
@@ -44,7 +46,11 @@ func start(new_intensity: float = 1.0) -> void:
 	)
 
 	side_direction = -1.0 if randf() < 0.5 else 1.0
-
+	fight_back_started.emit(current_fight_back)
+	
+	if current_fight_back == FightBackType.SURGE_AWAY:
+		strong_pull_started.emit()
+	
 	print(
 		"FIGHT BACK TYPE: ",
 		FightBackType.keys()[current_fight_back]

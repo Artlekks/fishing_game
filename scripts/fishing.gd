@@ -27,6 +27,9 @@ enum Phase {
 
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
+var current_reel_animation: StringName = &""
+var strong_pull_animation_active: bool = false
+var current_fish_pull: float = 0.0
 
 func _ready() -> void:
 	game_mode.mode_changed.connect(_on_mode_changed)
@@ -41,6 +44,7 @@ func _ready() -> void:
 	encounter.fish_pull_changed.connect(_on_fish_pull_changed)
 	encounter.fish_movement_changed.connect(_on_fish_movement_changed)
 	encounter.fish_depth_intent_changed.connect(_on_fish_depth_intent_changed)
+	encounter.strong_pull_started.connect(_on_strong_pull_started)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -126,9 +130,23 @@ func _unhandled_input(event: InputEvent) -> void:
 			_set_fight_reeling(false)
 			return
 
+func _on_strong_pull_started() -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	if strong_pull_animation_active:
+		return
+
+	strong_pull_animation_active = true
+	current_reel_animation = &"Reel_Back_Strong"
+	sprite_director.play(&"Reel_Back_Strong")
+	
 func _set_fight_reeling(active: bool) -> void:
 	encounter.set_player_reeling(active)
 	caster.set_reeling(active)
+
+	if strong_pull_animation_active:
+		return
 
 	if active:
 		sprite_director.play(&"Reel")
@@ -164,7 +182,28 @@ func _on_fishing_view_ready() -> void:
 	phase = Phase.PREP
 	sprite_director.play(&"Prep_Fishing")
 
+func _update_reel_animation(steering: float) -> void:
+	var is_reeling := Input.is_action_pressed("enter_fishing")
+	var desired_animation: StringName
 
+	if phase == Phase.FIGHT and not is_reeling and current_fish_pull > 0.15:
+		desired_animation = &"Reel_Back_Strong"
+
+	elif steering < -0.1:
+		desired_animation = &"Reel_Left" if is_reeling else &"Reel_Left_Idle"
+
+	elif steering > 0.1:
+		desired_animation = &"Reel_Right" if is_reeling else &"Reel_Right_Idle"
+
+	else:
+		desired_animation = &"Reel" if is_reeling else &"Reel_Idle"
+
+	if desired_animation == current_reel_animation:
+		return
+
+	current_reel_animation = desired_animation
+	sprite_director.play(desired_animation)
+	
 func _on_animation_finished(animation_name: StringName) -> void:
 	if animation_name == &"Prep_Fishing":
 		if phase == Phase.PREP:
@@ -206,6 +245,11 @@ func _on_animation_finished(animation_name: StringName) -> void:
 
 		return
 	
+	if animation_name == &"Reel_Back_Strong":
+		strong_pull_animation_active = false
+		current_reel_animation = &""
+		return
+		
 func _on_exploration_view_ready() -> void:
 	if phase != Phase.EXIT:
 		return
@@ -242,12 +286,15 @@ func _on_bait_returned() -> void:
 	aim.resume()
 	
 func _process(_delta: float) -> void:
-	if phase != Phase.IN_WATER:
+	if phase != Phase.IN_WATER and phase != Phase.FIGHT:
 		return
 
 	var steering := Input.get_axis("ds_left", "ds_right")
 	caster.set_reel_steering(steering)
-
+	
+	if phase == Phase.IN_WATER or phase == Phase.FIGHT:
+		_update_reel_animation(steering)
+	
 func _on_fish_hooked() -> void:
 	if phase != Phase.IN_WATER:
 		return
@@ -283,6 +330,7 @@ func _on_fish_pull_changed(value: float) -> void:
 	if phase != Phase.FIGHT:
 		return
 
+	current_fish_pull = value
 	caster.set_fish_pull_strength(value)
 
 func _on_fish_movement_changed(lateral: float) -> void:
