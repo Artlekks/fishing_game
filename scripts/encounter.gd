@@ -29,7 +29,9 @@ signal line_broken
 @export var first_bite_delay: float = 2.0
 @export var retry_bite_delay: float = 1.5
 @export_range(0.0, 1.0, 0.05)
+
 var max_bite_chance_per_check: float = 0.5
+var fish_behavior_pressure: float = 0.0
 
 enum FightState {
 	NONE,
@@ -64,7 +66,8 @@ func _ready() -> void:
 	tension.state_changed.connect(_on_tension_state_changed)
 	tension.hook_off.connect(_on_hook_off)
 	tension.line_broken.connect(_on_line_broken)
-
+	fish_behavior.pressure_changed.connect(_on_fish_behavior_pressure_changed)
+	
 func _on_bait_landed(_point: Vector3) -> void:
 	tension.start_free_reel()
 	bite_timer.start()
@@ -254,7 +257,9 @@ func _process(delta: float) -> void:
 		1.0
 	)
 	
-	tension.set_fish_resistance(resistance)
+	var tension_resistance := resistance * fish_behavior_pressure
+	
+	tension.set_fish_resistance(tension_resistance)
 	fish_resistance_changed.emit(resistance)
 
 	var pull_strength := lerpf(
@@ -417,3 +422,6 @@ func _fail_fight() -> void:
 
 	active_fish = null
 	pending_fish_entry = null
+
+func _on_fish_behavior_pressure_changed(value: float) -> void:
+	fish_behavior_pressure = clampf(value, 0.0, 1.0)

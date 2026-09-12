@@ -13,6 +13,7 @@ enum State {
 }
 
 @export_range(0.0, 1.0, 0.01) var start_tension: float = 0.45
+@export var free_reel_gain_speed: float = 0.08
 
 @export_category("Safe Zone")
 @export_range(0.0, 1.0, 0.01) var safe_min: float = 0.35
@@ -37,7 +38,10 @@ func _process(delta: float) -> void:
 	var change := 0.0
 
 	if player_reeling:
-		change += reel_gain_speed
+		if failure_enabled:
+			change += reel_gain_speed
+		else:
+			change += free_reel_gain_speed
 	else:
 		change -= release_loss_speed
 

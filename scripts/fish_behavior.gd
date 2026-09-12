@@ -4,6 +4,7 @@ signal movement_changed(lateral: float)
 signal depth_changed(value: float)
 signal fight_back_started(fight_back_type: int)
 signal strong_pull_started
+signal pressure_changed(value: float)
 
 @export var min_change_time: float = 0.8
 @export var max_change_time: float = 2.0
@@ -67,43 +68,36 @@ func stop() -> void:
 	movement_changed.emit(lateral)
 	depth = 0.0
 	depth_changed.emit(depth)
-
+	pressure_changed.emit(0.0)
+	
 func _choose_new_movement() -> void:
-	# Occasionally hold position instead of immediately choosing
-	# another movement.
-	if randf() < pause_chance:
-		lateral = 0.0
-		depth = 0.0
-
-		time_until_change = randf_range(
-			pause_time_min,
-			pause_time_max
-		)
-
-		movement_changed.emit(lateral)
-		depth_changed.emit(depth)
-		return
+	var pressure := 0.0
 
 	match current_fight_back:
 		FightBackType.SURGE_AWAY:
 			lateral = randf_range(-0.15, 0.15) * lateral_activity
 			depth = randf_range(-0.1, 0.1) * vertical_activity
+			pressure = 1.0
 
 		FightBackType.SIDE_RUN:
 			lateral = side_direction * lateral_activity
 			depth = randf_range(-0.2, 0.2) * vertical_activity
+			pressure = 0.6
 
 		FightBackType.DIVE:
 			lateral = randf_range(-0.3, 0.3) * lateral_activity
 			depth = -1.0 * vertical_activity
+			pressure = 0.8
 
 		FightBackType.RISE:
 			lateral = randf_range(-0.3, 0.3) * lateral_activity
 			depth = 1.0 * vertical_activity
+			pressure = 0.4
 
 		FightBackType.ERRATIC:
 			lateral = randf_range(-1.0, 1.0) * lateral_activity
 			depth = randf_range(-1.0, 1.0) * vertical_activity
+			pressure = 0.75
 
 	time_until_change = randf_range(
 		min_change_time,
@@ -112,9 +106,11 @@ func _choose_new_movement() -> void:
 
 	lateral *= intensity
 	depth *= intensity
+	pressure *= intensity
 
 	movement_changed.emit(lateral)
 	depth_changed.emit(depth)
+	pressure_changed.emit(pressure)
 
 func configure(fish: FishInstance) -> void:
 	lateral_activity = fish.lateral_activity
