@@ -92,7 +92,7 @@ weight = 1.5
 metadata/_custom_type_script = "uid://drtr8dooxsml8"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bp5p2"]
-size = Vector3(4.4259, 1, 1.31738)
+size = Vector3(4.426, 1, 2.172)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_67idb"]
 atlas = ExtResource("23_t57di")
@@ -413,7 +413,7 @@ collision_mask = 0
 shape = SubResource("BoxShape3D_bp5p2")
 
 [node name="DepthFloor_2" type="StaticBody3D" parent="World/DepthZones_V2" unique_id=1664922269]
-transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 1.5880017, -2, -1.9533314)
+transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 2.395353, -2, -3.4590933)
 collision_layer = 2048
 collision_mask = 0
 
@@ -421,12 +421,11 @@ collision_mask = 0
 shape = SubResource("BoxShape3D_bp5p2")
 
 [node name="DepthFloor_3" type="StaticBody3D" parent="World/DepthZones_V2" unique_id=1471380597]
-transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 0.37300003, -1.5, -1.1080002)
+transform = Transform3D(0.881311, 0, -0.47253674, 0, 1, 0, 0.47253674, 0, 0.881311, 0.7790371, -1.25, -1.8652849)
 collision_layer = 2048
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World/DepthZones_V2/DepthFloor_3" unique_id=1518412877 groups=["depth_zone"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0069144964, 0)
 shape = SubResource("BoxShape3D_bp5p2")
 
 [node name="Player" type="Node" parent="." unique_id=1284942496]
