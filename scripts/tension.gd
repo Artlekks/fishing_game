@@ -30,6 +30,7 @@ var player_reeling: bool = false
 var fish_resistance: float = 0.0
 var current_state: State = State.SAFE
 var failure_enabled: bool = false
+var reel_gain_multiplier: float = 1.0
 
 func _process(delta: float) -> void:
 	if not active:
@@ -39,7 +40,7 @@ func _process(delta: float) -> void:
 
 	if player_reeling:
 		if failure_enabled:
-			change += reel_gain_speed
+			change += reel_gain_speed * reel_gain_multiplier
 		else:
 			change += free_reel_gain_speed
 	else:
@@ -66,13 +67,16 @@ func _process(delta: float) -> void:
 		active = false
 		line_broken.emit()
 
-
+func set_reel_gain_multiplier(value: float) -> void:
+	reel_gain_multiplier = maxf(value, 0.0)
+	
 func start() -> void:
 	value = start_tension
 	active = true
 	failure_enabled = true
 	player_reeling = false
-
+	reel_gain_multiplier = 1.0
+	
 	_update_state()
 	tension_changed.emit(value)
 
@@ -118,3 +122,12 @@ func start_free_reel() -> void:
 
 	_update_state()
 	tension_changed.emit(value)
+
+func add_impulse(amount: float) -> void:
+	if not active:
+		return
+
+	value = clampf(value + amount, 0.0, 1.0)
+
+	tension_changed.emit(value)
+	_update_state()

@@ -105,8 +105,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			phase = Phase.THROW
 			sprite_director.play(&"Throw")
 			return
-	
+
+
 	if phase == Phase.IN_WATER:
+		if event.is_action_pressed("ds_left"):
+			caster.twitch_bait(-1.0)
+			encounter.add_lure_tension(0.05)
+			return
+
+		if event.is_action_pressed("ds_right"):
+			caster.twitch_bait(1.0)
+			encounter.add_lure_tension(0.05)
+			return
+
 		if event.is_action_pressed("enter_fishing"):
 			if encounter.try_hook():
 				encounter.set_player_reeling(true)

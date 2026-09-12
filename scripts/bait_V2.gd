@@ -12,6 +12,10 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var fight_reel_multiplier: float = 0.2
 @export var max_fish_pull_speed: float = 1.5
 @export var fish_vertical_speed: float = 0.8
+@export var twitch_speed: float = 1.8
+@export var twitch_deceleration: float = 12.0
+
+var twitch_velocity: Vector3 = Vector3.ZERO
 
 var fish_depth_intent: float = 0.0
 var fish_pull_strength: float = 0.0
@@ -72,7 +76,7 @@ func _physics_process(delta: float) -> void:
 	if state == State.SINKING or state == State.IN_WATER:
 		_update_bottom_from_world()
 	
-	if fight_mode and not reeling and fish_pull_strength > 0.0:
+	if fight_mode and fish_pull_strength > 0.0:
 		_update_fish_pull(delta)
 	
 	match state:
@@ -84,7 +88,14 @@ func _physics_process(delta: float) -> void:
 				_update_reeling(delta)
 			elif state == State.SINKING:
 				_update_sinking(delta)
+	
+	if twitch_velocity.length_squared() > 0.001:
+		global_position += twitch_velocity * delta
 
+		twitch_velocity = twitch_velocity.move_toward(
+			Vector3.ZERO,
+			twitch_deceleration * delta
+		)
 
 func _update_flying(delta: float) -> void:
 	velocity.y -= gravity * delta
@@ -297,3 +308,28 @@ func set_fish_lateral(value: float) -> void:
 
 func set_fish_depth_intent(value: float) -> void:
 	fish_depth_intent = clampf(value, -1.0, 1.0)
+
+func twitch_side(direction: float) -> void:
+	if fight_mode:
+		return
+
+	if state != State.SINKING and state != State.IN_WATER:
+		return
+
+	if reel_target == null:
+		return
+
+	var toward_player := reel_target.global_position - global_position
+	toward_player.y = 0.0
+
+	if toward_player.length_squared() == 0.0:
+		return
+
+	var forward := toward_player.normalized()
+	var side := Vector3.UP.cross(forward).normalized()
+
+	twitch_velocity = (
+		side
+		* clampf(direction, -1.0, 1.0)
+		* twitch_speed
+	)

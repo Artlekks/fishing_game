@@ -176,7 +176,7 @@ func try_hook() -> bool:
 
 	_start_resistance_round()
 	tension.start()
-
+	tension.set_reel_gain_multiplier(1.0)
 	return true
 
 func _on_bite_window_timeout() -> void:
@@ -269,9 +269,6 @@ func _process(delta: float) -> void:
 		1.0,
 		resistance
 	)
-
-	if player_reeling:
-		pull_strength = 0.0
 
 	fish_pull_changed.emit(pull_strength)
 
@@ -367,6 +364,9 @@ func _finish_resistance_round() -> void:
 func _enter_spent() -> void:
 	fight_state = FightState.SPENT
 
+	tension.set_fish_resistance(0.0)
+	tension.set_reel_gain_multiplier(0.25)
+
 	fish_behavior.start(0.25)
 
 	fish_resistance_changed.emit(0.0)
@@ -428,3 +428,6 @@ func _fail_fight() -> void:
 
 func _on_fish_behavior_pressure_changed(value: float) -> void:
 	fish_behavior_pressure = clampf(value, 0.0, 1.0)
+
+func add_lure_tension(amount: float) -> void:
+	tension.add_impulse(amount)

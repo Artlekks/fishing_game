@@ -570,7 +570,8 @@ script = ExtResource("30_lyatm")
 [node name="Tension" type="Node" parent="Game/Fishing/Encounter" unique_id=634102310]
 script = ExtResource("31_v7stt")
 start_tension = 0.08
-safe_max = 0.65
+safe_min = 0.3
+safe_max = 0.7
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

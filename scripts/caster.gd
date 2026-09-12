@@ -99,6 +99,10 @@ func set_reel_steering(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_reel_steering(value)
 
+func twitch_bait(direction: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.twitch_side(direction)
+		
 func set_fight_mode(active: bool) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_fight_mode(active)
