@@ -14,7 +14,13 @@ class_name FishData
 
 @export var max_points: int = 100
 
-@export var preferred_lures: Array[StringName] = []
+@export_category("Lure Preferences")
+
+@export var accepts_all_lures: bool = false
+
+@export var preferred_lure_types: Array[LureType.Type] = []
+
+@export var preferred_lure_ids: Array[StringName] = []
 @export var locations: Array[StringName] = []
 
 @export_category("Fight Behavior")

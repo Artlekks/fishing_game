@@ -148,6 +148,10 @@ func _on_mode_changed(new_mode) -> void:
 	var zone = game_mode.active_fish_zone
 
 	if zone != null:
+		encounter.set_fish_population(
+			zone.get_fish_population()
+		)
+
 		camera_rig.enter_fishing_view(
 			zone.get_water_forward()
 		)

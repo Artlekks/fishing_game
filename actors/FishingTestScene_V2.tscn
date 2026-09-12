@@ -9,9 +9,12 @@
 [ext_resource type="Texture2D" uid="uid://cfv0c214fythq" path="res://assets/models/fbx/River_001_texpage-P8-AA4CF228BD76CD2E-5E1D486985273EC0-128x256-0-0-256x256-P0-189.png" id="4_ue5cn"]
 [ext_resource type="Texture2D" uid="uid://cetbvf5x64wb2" path="res://assets/models/fbx/River_001_texpage-P8-CF0473DC60ADC442-B2C13E420B9C1555-128x256-0-0-256x256-P0-190.png" id="5_10ljf"]
 [ext_resource type="Texture2D" uid="uid://bsxg4tfsykf2o" path="res://assets/models/textures/River_Marsh.png" id="6_lyatm"]
+[ext_resource type="Script" uid="uid://drtr8dooxsml8" path="res://scripts/fish_spawn_entry.gd" id="8_10ljf"]
 [ext_resource type="PackedScene" uid="uid://b7wqcq60h8vqv" path="res://actors/FishZone_V2.tscn" id="8_n1yj2"]
+[ext_resource type="Resource" uid="uid://brj6rcwjearqv" path="res://data/fish/test_fish_uncommon.tres" id="10_lyatm"]
 [ext_resource type="PackedScene" uid="uid://cocpfht6p4ai3" path="res://actors/PowerMeter_V2.tscn" id="10_r25je"]
 [ext_resource type="Script" uid="uid://c8vuaolv25gid" path="res://scripts/power_meter_view.gd" id="11_r25je"]
+[ext_resource type="Resource" uid="uid://bliqlnu71ix85" path="res://data/fish/test_fish_rare.tres" id="11_v7stt"]
 [ext_resource type="Script" uid="uid://cb6v6f0ntyhvg" path="res://scripts/depth_meter_view.gd" id="12_7s285"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
@@ -24,8 +27,9 @@
 [ext_resource type="Script" uid="uid://b0gkhniyqm6nk" path="res://scripts/encounter.gd" id="24_cybga"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
-[ext_resource type="Resource" uid="uid://c2tpksm5w3pir" path="res://data/fish/test_fish.tres" id="25_jr3m6"]
+[ext_resource type="Resource" uid="uid://c2tpksm5w3pir" path="res://data/fish/test_fish_common.tres" id="25_jr3m6"]
 [ext_resource type="Script" uid="uid://b1bwrn2bluwr5" path="res://scripts/fish_behavior.gd" id="26_56g8v"]
+[ext_resource type="Script" uid="uid://dui1rve4te1sj" path="res://scripts/fish_selector.gd" id="30_lyatm"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -63,6 +67,23 @@ data = PackedVector3Array(43.9825, -0.9431, 8.1032, 43.3211, -1.7481, 8.686, 43.
 shading_mode = 0
 albedo_texture = ExtResource("6_lyatm")
 texture_filter = 0
+
+[sub_resource type="Resource" id="Resource_56g8v"]
+script = ExtResource("8_10ljf")
+fish = ExtResource("25_jr3m6")
+weight = 10.0
+metadata/_custom_type_script = "uid://drtr8dooxsml8"
+
+[sub_resource type="Resource" id="Resource_xqdmx"]
+script = ExtResource("8_10ljf")
+fish = ExtResource("10_lyatm")
+weight = 5.0
+metadata/_custom_type_script = "uid://drtr8dooxsml8"
+
+[sub_resource type="Resource" id="Resource_ue5cn"]
+script = ExtResource("8_10ljf")
+fish = ExtResource("11_v7stt")
+metadata/_custom_type_script = "uid://drtr8dooxsml8"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bp5p2"]
 size = Vector3(4.4259, 1, 1.31738)
@@ -367,6 +388,7 @@ visible = false
 
 [node name="FishZone_V2" parent="World" unique_id=503373627 instance=ExtResource("8_n1yj2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05233705, 0, -0.7409453)
+fish_population = Array[ExtResource("8_10ljf")]([SubResource("Resource_56g8v"), SubResource("Resource_xqdmx"), SubResource("Resource_ue5cn")])
 
 [node name="WaterFacing" parent="World/FishZone_V2" index="0" unique_id=346506334]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -520,7 +542,6 @@ reel_target = NodePath("../../../Player/CharacterBody3D/ReelEndPoint")
 [node name="Encounter" type="Node" parent="Game/Fishing" unique_id=105265296 node_paths=PackedStringArray("caster")]
 script = ExtResource("24_cybga")
 caster = NodePath("../Caster")
-fish_data = ExtResource("25_jr3m6")
 
 [node name="BiteTimer" type="Timer" parent="Game/Fishing/Encounter" unique_id=1520843133]
 wait_time = 2.0
@@ -532,6 +553,9 @@ one_shot = true
 
 [node name="FishBehavior" type="Node" parent="Game/Fishing/Encounter" unique_id=1395833630]
 script = ExtResource("26_56g8v")
+
+[node name="FishSelector" type="Node" parent="Game/Fishing/Encounter" unique_id=1339224065]
+script = ExtResource("30_lyatm")
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

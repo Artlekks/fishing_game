@@ -9,3 +9,5 @@ class_name BaitData
 @export var reel_steer_strength: float = 0.8
 
 @export var cast_weight: float = 1.0
+@export var lure_type: LureType.Type = LureType.Type.WORM
+@export var lure_id: StringName = &""

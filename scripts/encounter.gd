@@ -14,12 +14,12 @@ signal fish_depth_intent_changed(value: float)
 @onready var bite_window_timer: Timer = $BiteWindowTimer
 @onready var bite_timer: Timer = $BiteTimer
 @onready var fish_behavior: Node = $FishBehavior
+@onready var fish_selector: FishSelector = $FishSelector
 
 @export var max_fish_stamina: float = 100.0
 @export var stamina_drain_speed: float = 30.0
 @export var stamina_recovery_speed: float = 10.0
 @export var caster: Node
-@export var fish_data: FishData
 
 enum FightState {
 	NONE,
@@ -36,7 +36,8 @@ var active_fish: FishInstance = null
 var fight_state: int = FightState.NONE
 var rounds_remaining: int = 0
 var recovery_time_left: float = 0.0
-
+var fish_population: Array[FishSpawnEntry] = []
+var pending_fish_entry: FishSpawnEntry = null
 
 func _ready() -> void:
 	if caster == null:
@@ -57,10 +58,23 @@ func _on_bait_returned() -> void:
 	bite_timer.stop()
 	bite_window_timer.stop()
 	bite_active = false
+	pending_fish_entry = null
 
 func _on_bite_timer_timeout() -> void:
+	pending_fish_entry = fish_selector.choose(fish_population)
+
+	if pending_fish_entry == null:
+		return
+
+	if pending_fish_entry.fish == null:
+		return
+
 	bite_active = true
-	print("BITE!")
+
+	print(
+		"BITE! Candidate: ",
+		pending_fish_entry.fish.fish_name
+	)
 
 	bite_triggered.emit()
 	bite_window_timer.start()
@@ -69,46 +83,53 @@ func try_hook() -> bool:
 	if not bite_active:
 		return false
 
+	if pending_fish_entry == null:
+		return false
+
+	if pending_fish_entry.fish == null:
+		return false
+
 	bite_active = false
 	bite_window_timer.stop()
-	if fish_data != null:
-		active_fish = FishInstance.new()
-		active_fish.setup(fish_data)
-		fish_behavior.configure(active_fish)
-		print(
-	"FISH: ",
-	active_fish.species.fish_name,
-	" | Size: ",
-	active_fish.size,
-	" | Stamina: ",
-	active_fish.max_stamina,
-	" | Strength: ",
-	active_fish.strength
-)
-		fish_stamina = active_fish.max_stamina
-	else:
-		active_fish = null
-		fish_stamina = max_fish_stamina
 
+	active_fish = FishInstance.new()
+	active_fish.setup(pending_fish_entry.fish)
+
+	fish_behavior.configure(active_fish)
+
+	fish_stamina = active_fish.max_stamina
 	player_reeling = false
 
-	var total_rounds := 1
+	print(
+		"FISH: ",
+		active_fish.species.fish_name,
+		" | Size: ",
+		active_fish.size,
+		" | Stamina: ",
+		active_fish.max_stamina,
+		" | Strength: ",
+		active_fish.strength
+	)
 
-	if active_fish != null:
-		total_rounds = active_fish.resistance_rounds
+	pending_fish_entry = null
 
-	rounds_remaining = maxi(total_rounds, 1)
+	var total_rounds := maxi(
+		active_fish.resistance_rounds,
+		1
+	)
+
+	rounds_remaining = total_rounds
 
 	_start_resistance_round()
-	
+
 	print("HOOKED!")
 	fish_hooked.emit()
 
 	return true
 
-
 func _on_bite_window_timeout() -> void:
 	bite_active = false
+	pending_fish_entry = null
 
 	print("MISSED!")
 	bite_missed.emit()
@@ -122,6 +143,7 @@ func catch_fish() -> void:
 	recovery_time_left = 0.0
 	player_reeling = false
 	fish_behavior.stop()
+	pending_fish_entry = null
 	
 	print("CAUGHT!")
 	fish_caught.emit()
@@ -131,6 +153,12 @@ func _process(delta: float) -> void:
 		return
 
 	if fight_state == FightState.SPENT:
+		var spent_pull := 0.15
+
+		if player_reeling:
+			spent_pull *= 0.35
+
+		fish_pull_changed.emit(spent_pull)
 		return
 
 	if fight_state == FightState.EXHAUSTED:
@@ -229,7 +257,7 @@ func _start_resistance_round() -> void:
 		_get_max_stamina()
 	)
 
-	fish_behavior.start()
+	fish_behavior.start(1.0)
 
 	print(
 		"RESISTANCE STARTED | Rounds remaining: ",
@@ -278,8 +306,11 @@ func _finish_resistance_round() -> void:
 func _enter_spent() -> void:
 	fight_state = FightState.SPENT
 
-	fish_behavior.stop()
+	fish_behavior.start(0.25)
+
 	fish_resistance_changed.emit(0.0)
-	fish_pull_changed.emit(0.0)
 
 	print("FISH SPENT!")
+
+func set_fish_population(entries: Array[FishSpawnEntry]) -> void:
+	fish_population = entries.duplicate()

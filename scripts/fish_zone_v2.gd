@@ -5,7 +5,8 @@ extends Area3D
 @onready var water_facing: Node3D = $WaterFacing
 @onready var water_surface: Node3D = $WaterSurface
 @onready var water_bottom: Node3D = $WaterBottom
-
+@export_category("Fish Population")
+@export var fish_population: Array[FishSpawnEntry] = []
 
 func can_player_fish(player: Node3D) -> bool:
 	if not overlaps_body(player):
@@ -29,3 +30,6 @@ func get_bottom_y() -> float:
 
 func get_water_depth() -> float:
 	return water_surface.global_position.y - water_bottom.global_position.y
+
+func get_fish_population() -> Array[FishSpawnEntry]:
+	return fish_population

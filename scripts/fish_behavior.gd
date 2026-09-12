@@ -22,6 +22,7 @@ var lateral: float = 0.0
 var depth: float = 0.0
 var lateral_activity: float = 1.0
 var vertical_activity: float = 1.0
+var intensity: float = 1.0
 
 func _process(delta: float) -> void:
 	if not active:
@@ -33,7 +34,8 @@ func _process(delta: float) -> void:
 		_choose_new_movement()
 
 
-func start() -> void:
+func start(new_intensity: float = 1.0) -> void:
+	intensity = clampf(new_intensity, 0.0, 1.0)
 	active = true
 
 	current_fight_back = randi_range(
@@ -83,6 +85,9 @@ func _choose_new_movement() -> void:
 		min_change_time,
 		max_change_time
 	)
+	
+	lateral *= intensity
+	depth *= intensity
 
 	movement_changed.emit(lateral)
 	depth_changed.emit(depth)
