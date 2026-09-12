@@ -6,6 +6,16 @@ signal depth_changed(value: float)
 @export var min_change_time: float = 0.8
 @export var max_change_time: float = 2.0
 
+enum FightBackType {
+	SURGE_AWAY,
+	SIDE_RUN,
+	DIVE,
+	RISE,
+	ERRATIC
+}
+
+var current_fight_back: int = FightBackType.SURGE_AWAY
+var side_direction: float = 1.0
 var active: bool = false
 var time_until_change: float = 0.0
 var lateral: float = 0.0
@@ -25,8 +35,20 @@ func _process(delta: float) -> void:
 
 func start() -> void:
 	active = true
-	_choose_new_movement()
 
+	current_fight_back = randi_range(
+		FightBackType.SURGE_AWAY,
+		FightBackType.ERRATIC
+	)
+
+	side_direction = -1.0 if randf() < 0.5 else 1.0
+
+	print(
+		"FIGHT BACK TYPE: ",
+		FightBackType.keys()[current_fight_back]
+	)
+
+	_choose_new_movement()
 
 func stop() -> void:
 	active = false
@@ -36,18 +58,34 @@ func stop() -> void:
 	depth_changed.emit(depth)
 
 func _choose_new_movement() -> void:
-	lateral = randf_range(-1.0, 1.0) * lateral_activity
-	depth = randf_range(-1.0, 1.0) * vertical_activity
+	match current_fight_back:
+		FightBackType.SURGE_AWAY:
+			lateral = randf_range(-0.15, 0.15) * lateral_activity
+			depth = randf_range(-0.1, 0.1) * vertical_activity
 
-	movement_changed.emit(lateral)
-	depth_changed.emit(depth)
-	
+		FightBackType.SIDE_RUN:
+			lateral = side_direction * lateral_activity
+			depth = randf_range(-0.2, 0.2) * vertical_activity
+
+		FightBackType.DIVE:
+			lateral = randf_range(-0.3, 0.3) * lateral_activity
+			depth = -1.0 * vertical_activity
+
+		FightBackType.RISE:
+			lateral = randf_range(-0.3, 0.3) * lateral_activity
+			depth = 1.0 * vertical_activity
+
+		FightBackType.ERRATIC:
+			lateral = randf_range(-1.0, 1.0) * lateral_activity
+			depth = randf_range(-1.0, 1.0) * vertical_activity
+
 	time_until_change = randf_range(
 		min_change_time,
 		max_change_time
 	)
 
 	movement_changed.emit(lateral)
+	depth_changed.emit(depth)
 
 func configure(fish: FishInstance) -> void:
 	lateral_activity = fish.lateral_activity
