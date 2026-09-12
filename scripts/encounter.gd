@@ -32,6 +32,7 @@ signal line_broken
 
 var max_bite_chance_per_check: float = 0.5
 var fish_behavior_pressure: float = 0.0
+var current_tension_state: int = FishingTension.State.SAFE
 
 enum FightState {
 	NONE,
@@ -229,10 +230,11 @@ func _process(delta: float) -> void:
 	var max_stamina := _get_max_stamina()
 
 	if player_reeling:
-		fish_stamina = maxf(
-			fish_stamina - stamina_drain_speed * delta,
-			0.0
-		)
+		if current_tension_state == FishingTension.State.SAFE:
+			fish_stamina = maxf(
+				fish_stamina - stamina_drain_speed * delta,
+				0.0
+			)
 	else:
 		fish_stamina = minf(
 			fish_stamina + stamina_recovery_speed * delta,
@@ -379,6 +381,7 @@ func _on_tension_changed(value: float) -> void:
 
 
 func _on_tension_state_changed(state: int) -> void:
+	current_tension_state = state
 	tension_state_changed.emit(state)
 
 	match state:
