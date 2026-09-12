@@ -122,6 +122,11 @@ func set_fish_depth_intent(value: float) -> void:
 func get_current_bait_depth() -> float:
 	return current_bait_depth
 
-
 func get_current_total_depth() -> float:
 	return current_total_depth
+
+func cancel_bait() -> void:
+	if is_instance_valid(active_bait):
+		active_bait.queue_free()
+
+	active_bait = null

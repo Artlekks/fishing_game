@@ -7,6 +7,9 @@ signal strong_pull_started
 
 @export var min_change_time: float = 0.8
 @export var max_change_time: float = 2.0
+@export_range(0.0, 1.0, 0.05) var pause_chance: float = 0.25
+@export var pause_time_min: float = 0.3
+@export var pause_time_max: float = 0.7
 
 enum FightBackType {
 	SURGE_AWAY,
@@ -66,6 +69,21 @@ func stop() -> void:
 	depth_changed.emit(depth)
 
 func _choose_new_movement() -> void:
+	# Occasionally hold position instead of immediately choosing
+	# another movement.
+	if randf() < pause_chance:
+		lateral = 0.0
+		depth = 0.0
+
+		time_until_change = randf_range(
+			pause_time_min,
+			pause_time_max
+		)
+
+		movement_changed.emit(lateral)
+		depth_changed.emit(depth)
+		return
+
 	match current_fight_back:
 		FightBackType.SURGE_AWAY:
 			lateral = randf_range(-0.15, 0.15) * lateral_activity
@@ -91,7 +109,7 @@ func _choose_new_movement() -> void:
 		min_change_time,
 		max_change_time
 	)
-	
+
 	lateral *= intensity
 	depth *= intensity
 

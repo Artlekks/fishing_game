@@ -45,7 +45,9 @@ func _ready() -> void:
 	encounter.fish_movement_changed.connect(_on_fish_movement_changed)
 	encounter.fish_depth_intent_changed.connect(_on_fish_depth_intent_changed)
 	encounter.strong_pull_started.connect(_on_strong_pull_started)
-	
+	encounter.hook_off.connect(_on_fight_failed)
+	encounter.line_broken.connect(_on_fight_failed)
+
 	camera_rig.connect(
 		"fishing_view_ready",
 		Callable(self, "_on_fishing_view_ready")
@@ -344,3 +346,17 @@ func _on_fish_depth_intent_changed(value: float) -> void:
 		return
 
 	caster.set_fish_depth_intent(value)
+
+func _on_fight_failed() -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.cancel_bait()
+
+	current_fish_pull = 0.0
+	current_reel_animation = &""
+
+	phase = Phase.AIM
+
+	sprite_director.play(&"Fishing_Idle")
+	aim.resume()

@@ -30,6 +30,7 @@
 [ext_resource type="Resource" uid="uid://c2tpksm5w3pir" path="res://data/fish/test_fish_common.tres" id="25_jr3m6"]
 [ext_resource type="Script" uid="uid://b1bwrn2bluwr5" path="res://scripts/fish_behavior.gd" id="26_56g8v"]
 [ext_resource type="Script" uid="uid://dui1rve4te1sj" path="res://scripts/fish_selector.gd" id="30_lyatm"]
+[ext_resource type="Script" uid="uid://cksidtlpxlolp" path="res://scripts/tension.gd" id="31_v7stt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -431,6 +432,7 @@ collision_layer = 1
 
 [node name="AnimatedSprite3D" parent="Player/CharacterBody3D" index="1" unique_id=477032395]
 animation = &"Fishing_Idle"
+frame_progress = 0.0
 
 [node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=2104398868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14756292, 0.09629911, -0.29346243)
@@ -557,6 +559,9 @@ script = ExtResource("26_56g8v")
 
 [node name="FishSelector" type="Node" parent="Game/Fishing/Encounter" unique_id=1339224065]
 script = ExtResource("30_lyatm")
+
+[node name="Tension" type="Node" parent="Game/Fishing/Encounter" unique_id=634102310]
+script = ExtResource("31_v7stt")
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

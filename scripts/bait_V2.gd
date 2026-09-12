@@ -247,24 +247,42 @@ func _update_fish_pull(delta: float) -> void:
 
 	var side := Vector3.UP.cross(away).normalized()
 
-	var fish_direction := (
-		away
-		+ side * fish_lateral
-	).normalized()
+	var has_lateral := absf(fish_lateral) > 0.05
+	var has_vertical := absf(fish_depth_intent) > 0.05
 
-	global_position += (
-		fish_direction
-		* max_fish_pull_speed
+	var horizontal_direction := Vector3.ZERO
+
+	# No sideways or vertical intent = surge directly away.
+	if not has_lateral and not has_vertical:
+		horizontal_direction = away
+
+	# Side run = move sideways instead of constantly escaping.
+	elif has_lateral and not has_vertical:
+		horizontal_direction = side * fish_lateral
+
+	# Erratic movement = sideways + a small amount away.
+	elif has_lateral and has_vertical:
+		horizontal_direction = (
+			side * fish_lateral
+			+ away * 0.15
+		).normalized()
+
+	# Dive / rise intentionally has no horizontal movement.
+
+	if horizontal_direction.length_squared() > 0.0:
+		global_position += (
+			horizontal_direction.normalized()
+			* max_fish_pull_speed
+			* fish_pull_strength
+			* delta
+		)
+
+	global_position.y += (
+		fish_depth_intent
+		* fish_vertical_speed
 		* fish_pull_strength
 		* delta
 	)
-	
-	global_position.y += (
-	fish_depth_intent
-	* fish_vertical_speed
-	* fish_pull_strength
-	* delta
-)
 
 	global_position.y = clampf(
 		global_position.y,
