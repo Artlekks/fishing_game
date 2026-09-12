@@ -66,7 +66,8 @@ func _ready() -> void:
 	tension.line_broken.connect(_on_line_broken)
 
 func _on_bait_landed(_point: Vector3) -> void:
-	bite_timer.start(first_bite_delay)
+	tension.start_free_reel()
+	bite_timer.start()
 
 func _on_strong_pull_started() -> void:
 	if fight_state == FightState.NONE:
@@ -79,7 +80,8 @@ func _on_bait_returned() -> void:
 	bite_window_timer.stop()
 	bite_active = false
 	pending_fish_entry = null
-
+	tension.stop()
+	
 func _on_bite_timer_timeout() -> void:
 	var attraction := fish_selector.get_attraction_ratio(
 		fish_population,

@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
 [ext_resource type="Script" uid="uid://boqng0bhxpde6" path="res://scripts/caster.gd" id="15_hrkbp"]
 [ext_resource type="PackedScene" uid="uid://b55g00mjd4bs" path="res://actors/bait_V2.tscn" id="16_cxlon"]
+[ext_resource type="Texture2D" uid="uid://c7w6ts6bqr8yu" path="res://assets/sprites/TensionMeter.png" id="16_rxc8i"]
 [ext_resource type="Resource" uid="uid://c0dx7cuhpacd0" path="res://data/baits/default_bait.tres" id="17_n1yj2"]
 [ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="21_y5vpm"]
 [ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="22_f3f7x"]
@@ -450,9 +451,11 @@ current = true
 [node name="FishingHud" type="CanvasLayer" parent="UI" unique_id=837552999]
 layer = 40
 
-[node name="PowerMeter" parent="UI/FishingHud" unique_id=86211707 node_paths=PackedStringArray("power", "tracked_target", "camera") instance=ExtResource("10_r25je")]
+[node name="PowerMeter" parent="UI/FishingHud" unique_id=86211707 node_paths=PackedStringArray("power", "encounter", "caster", "tracked_target", "camera") instance=ExtResource("10_r25je")]
 script = ExtResource("11_r25je")
 power = NodePath("../../../Game/Fishing/Power")
+encounter = NodePath("../../../Game/Fishing/Encounter")
+caster = NodePath("../../../Game/Fishing/Caster")
 tracked_target = NodePath("../../../Player/CharacterBody3D")
 camera = NodePath("../../../CameraRig/Camera3D")
 screen_offset = Vector2(80, -30)
@@ -468,6 +471,10 @@ offset_bottom = 0.0
 grow_horizontal = 1
 grow_vertical = 1
 scale = Vector2(0.35, 0.3)
+
+[node name="TensionMeter" type="Sprite2D" parent="UI/FishingHud/PowerMeter/Root" index="3" unique_id=898071307]
+position = Vector2(400, 80)
+texture = ExtResource("16_rxc8i")
 
 [node name="FishingHud" type="CanvasLayer" parent="UI/FishingHud" unique_id=1124774769]
 layer = 40

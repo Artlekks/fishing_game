@@ -28,7 +28,7 @@ var active: bool = false
 var player_reeling: bool = false
 var fish_resistance: float = 0.0
 var current_state: State = State.SAFE
-
+var failure_enabled: bool = false
 
 func _process(delta: float) -> void:
 	if not active:
@@ -53,12 +53,12 @@ func _process(delta: float) -> void:
 
 	_update_state()
 
-	if value <= 0.0:
+	if failure_enabled and value <= 0.0:
 		active = false
 		hook_off.emit()
 		return
 
-	if value >= 1.0:
+	if failure_enabled and value >= 1.0:
 		active = false
 		line_broken.emit()
 
@@ -66,6 +66,7 @@ func _process(delta: float) -> void:
 func start() -> void:
 	value = start_tension
 	active = true
+	failure_enabled = true
 	player_reeling = false
 
 	_update_state()
@@ -76,7 +77,7 @@ func stop() -> void:
 	active = false
 	player_reeling = false
 	fish_resistance = 0.0
-
+	failure_enabled = false
 
 func set_player_reeling(reeling: bool) -> void:
 	player_reeling = reeling
@@ -103,3 +104,13 @@ func _update_state() -> void:
 
 	current_state = new_state
 	state_changed.emit(current_state)
+
+func start_free_reel() -> void:
+	value = 0.0
+	active = true
+	failure_enabled = false
+	player_reeling = false
+	fish_resistance = 0.0
+
+	_update_state()
+	tension_changed.emit(value)

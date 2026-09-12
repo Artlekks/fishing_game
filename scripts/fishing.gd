@@ -114,11 +114,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				sprite_director.play(&"Reel")
 				return
 
+			encounter.set_player_reeling(true)
 			caster.set_reeling(true)
 			sprite_director.play(&"Reel")
 			return
 
 		if event.is_action_released("enter_fishing"):
+			encounter.set_player_reeling(false)
 			caster.set_reeling(false)
 			sprite_director.play(&"Reel_Idle")
 			return
