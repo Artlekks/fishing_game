@@ -10,6 +10,9 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var floor_collision_mask: int = 2048
 @export var floor_ray_depth: float = 100.0
 @export var fight_reel_multiplier: float = 0.2
+@export_category("Fight Steering")
+@export_range(0.0, 1.0, 0.05)
+var min_fight_steer_authority: float = 0.20
 @export var max_fish_pull_speed: float = 1.5
 @export var fish_vertical_speed: float = 0.8
 @export var twitch_speed: float = 1.8
@@ -162,9 +165,20 @@ func _update_reeling(delta: float) -> void:
 	# Steering gradually disappears as the bait approaches Ryu.
 	var steering_fade := clampf(distance / 2.0, 0.0, 1.0)
 
+	var steering_strength := data.reel_steer_strength
+
+	if fight_mode:
+		var steer_authority := lerpf(
+			min_fight_steer_authority,
+			1.0,
+			1.0 - fight_resistance
+		)
+
+		steering_strength *= steer_authority
+
 	var reel_direction := (
 		forward
-		+ side * reel_steering * data.reel_steer_strength * steering_fade
+		+ side * reel_steering * steering_strength * steering_fade
 	).normalized()
 
 	var reel_speed := data.reel_speed * reel_speed_multiplier

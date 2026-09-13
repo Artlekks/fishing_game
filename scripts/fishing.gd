@@ -168,9 +168,7 @@ func _set_fight_reeling(active: bool) -> void:
 		strong_pull_animation_active = false
 		current_reel_animation = &""
 
-	_update_reel_animation(
-		Input.get_axis("ds_left", "ds_right")
-	)
+	_update_reel_animation()
 		
 func _on_mode_changed(new_mode) -> void:
 	var active: bool = new_mode == game_mode.Mode.FISHING
@@ -189,9 +187,7 @@ func _on_mode_changed(new_mode) -> void:
 			zone.get_fish_population()
 		)
 
-		camera_rig.enter_fishing_view(
-			zone.get_water_forward()
-		)
+		camera_rig.enter_fishing_view()
 
 
 func _on_fishing_view_ready() -> void:
@@ -201,21 +197,50 @@ func _on_fishing_view_ready() -> void:
 	phase = Phase.PREP
 	sprite_director.play(&"Prep_Fishing")
 
-func _update_reel_animation(steering: float) -> void:
+func _update_reel_animation() -> void:
 	if strong_pull_animation_active:
 		return
 
 	var is_reeling := Input.is_action_pressed("enter_fishing")
+
+	var horizontal := Input.get_axis(
+		"ds_left",
+		"ds_right"
+	)
+
+	var vertical := Input.get_axis(
+		"move_forward",
+		"move_back"
+	)
+
 	var desired_animation: StringName
 
-	if steering < -0.1:
-		desired_animation = &"Reel_Left" if is_reeling else &"Reel_Left_Idle"
+	if is_reeling and vertical < -0.1:
+		desired_animation = &"Reel_Front"
 
-	elif steering > 0.1:
-		desired_animation = &"Reel_Right" if is_reeling else &"Reel_Right_Idle"
+	elif is_reeling and vertical > 0.1:
+		desired_animation = &"Reel_Back"
+
+	elif horizontal < -0.1:
+		desired_animation = (
+			&"Reel_Left"
+			if is_reeling
+			else &"Reel_Left_Idle"
+		)
+
+	elif horizontal > 0.1:
+		desired_animation = (
+			&"Reel_Right"
+			if is_reeling
+			else &"Reel_Right_Idle"
+		)
 
 	else:
-		desired_animation = &"Reel" if is_reeling else &"Reel_Idle"
+		desired_animation = (
+			&"Reel"
+			if is_reeling
+			else &"Reel_Idle"
+		)
 
 	if desired_animation == current_reel_animation:
 		return
@@ -229,16 +254,12 @@ func _on_animation_finished(animation_name: StringName) -> void:
 			phase = Phase.AIM
 			sprite_director.play(&"Fishing_Idle")
 
-			var zone = game_mode.active_fish_zone
+			var fishing_forward := player.global_transform.basis.z
+			fishing_forward.y = 0.0
+			fishing_forward = fishing_forward.normalized()
 
-			if zone != null:
-				camera_rig.start_fishing_aim(
-					zone.get_water_forward()
-				)
-
-				aim.start(
-					zone.get_water_forward()
-				)
+			camera_rig.start_fishing_aim(fishing_forward)
+			aim.start(fishing_forward)
 
 			return
 
@@ -317,13 +338,19 @@ func _process(_delta: float) -> void:
 		return
 
 	var steering := Input.get_axis("ds_left", "ds_right")
+	var vertical := Input.get_axis(
+		"move_forward",
+		"move_back"
+	)
+
+	encounter.set_player_tension_bias(vertical)
 	caster.set_reel_steering(steering)
 	
 	if phase == Phase.FIGHT:
 		encounter.set_player_steering(steering)
 	
 	if phase == Phase.IN_WATER or phase == Phase.FIGHT:
-		_update_reel_animation(steering)
+		_update_reel_animation()
 	
 func _on_fish_hooked() -> void:
 	if phase != Phase.IN_WATER:

@@ -252,12 +252,15 @@ animation = &"Fishing_Idle"
 frame = 0
 frame_progress = 0.0
 
-[node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=2104398868]
+[node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14756292, 0.09629911, -0.29346243)
+anchor = NodePath("..")
+camera = NodePath("../../../CameraRig/Camera3D")
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1419276622 node_paths=PackedStringArray("target")]
 script = ExtResource("2_0kejc")
 target = NodePath("../Player/CharacterBody3D")
+fishing_yaw_offset_degrees = 40.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1229414820]
 transform = Transform3D(0.603208, -0.37812513, 0.7022546, 0, 0.88047737, 0.4740882, -0.79758394, -0.2859738, 0.531111, 1.029, 0.897, 0.672)

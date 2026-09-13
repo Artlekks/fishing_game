@@ -27,6 +27,7 @@
 [ext_resource type="Script" uid="uid://qeewigw0xrig" path="res://scripts/sprite_director.gd" id="29_5cnmj"]
 [ext_resource type="Texture2D" uid="uid://c8h78n43dabea" path="res://assets/sprites/anim_Ryu_fishing-Walking_Bottom_Right.png" id="29_mdaqv"]
 [ext_resource type="Texture2D" uid="uid://ckbkro2x8iq6u" path="res://assets/sprites/anim_Ryu_fishing-Walking_BottomLeft.png" id="30_2g808"]
+[ext_resource type="Script" uid="uid://c1nagc5sqiw7x" path="res://scripts/screen_space_marker.gd" id="30_wma1f"]
 [ext_resource type="Texture2D" uid="uid://7lc707yqavw7" path="res://assets/sprites/anim_Ryu_fishing-Walking_Left.png" id="31_xrd2x"]
 [ext_resource type="Texture2D" uid="uid://bnnpyo7ugjpxy" path="res://assets/sprites/Shadow.png" id="32_ny21r"]
 
@@ -1612,9 +1613,9 @@ offset = Vector2(0, 11)
 billboard = 1
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_6gvld")
-animation = &"Reel_Back_Strong"
-frame = 1
-frame_progress = 0.3896876
+animation = &"Reel"
+frame = 2
+frame_progress = 0.19636796
 
 [node name="ShadowSprite3D" type="Sprite3D" parent="AnimatedSprite3D" unique_id=1206580126]
 transform = Transform3D(1.125, 0, 0, 0, -4.91753e-08, 1, 0, -1.125, -4.37114e-08, 0.01, 0.075, 0)
@@ -1633,4 +1634,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.554043, 0)
 
 [node name="CamFocus" type="Node3D" parent="." unique_id=1315424999]
 
-[node name="ReelEndPoint" type="Node3D" parent="." unique_id=2104398868]
+[node name="ReelEndPoint" type="Marker3D" parent="." unique_id=1454488651]
+script = ExtResource("30_wma1f")

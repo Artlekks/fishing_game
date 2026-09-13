@@ -10,6 +10,7 @@ signal exploration_view_started
 @export var fishing_h_offset: float = 0.9
 @export var fishing_v_offset: float = 0.6
 @export var aim_follow_speed: float = 6.0
+@export var fishing_yaw_offset_degrees: float = -15.0
 
 var fishing_aim_active: bool = false
 var fishing_aim_target_yaw: float = 0.0
@@ -66,28 +67,35 @@ func rotate_quarter_turn(direction: int) -> void:
 	is_rotating = false
 
 
-func enter_fishing_view(water_forward: Vector3) -> void:
-	# Save the EXACT exploration angle.
+func enter_fishing_view() -> void:
 	exploration_yaw_before_fishing = rotation.y
 
-	var target_yaw := atan2(
-		-water_forward.x,
-		-water_forward.z
-	)
-
-	target_yaw = rotation.y + wrapf(
-		target_yaw - rotation.y,
-		-PI,
-		PI
-	)
+	if target == null:
+		fishing_view_ready.emit()
+		return
 
 	var camera: Camera3D = $Camera3D
 
+	var player_forward := target.global_transform.basis.z
+	player_forward.y = 0.0
+	player_forward = player_forward.normalized()
+
+	var camera_forward := -camera.global_transform.basis.z
+	camera_forward.y = 0.0
+	camera_forward = camera_forward.normalized()
+
+	var yaw_difference := camera_forward.signed_angle_to(
+		player_forward,
+		Vector3.UP
+	)
+
+	var target_yaw := rotation.y + yaw_difference
+	target_yaw += deg_to_rad(fishing_yaw_offset_degrees)
+	
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_IN_OUT)
 
-	# 1. Align behind Ryu.
 	tween.tween_property(
 		self,
 		"rotation:y",
@@ -95,7 +103,6 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 		0.7
 	)
 
-	# 2. Shift Ryu into fishing framing.
 	tween.tween_property(
 		camera,
 		"h_offset",
@@ -112,7 +119,6 @@ func enter_fishing_view(water_forward: Vector3) -> void:
 
 	await tween.finished
 	fishing_view_ready.emit()
-
 
 func exit_fishing_view() -> void:
 	var camera: Camera3D = $Camera3D
@@ -153,9 +159,33 @@ func start_fishing_aim(direction: Vector3) -> void:
 
 
 func set_fishing_aim_direction(direction: Vector3) -> void:
-	fishing_aim_target_yaw = atan2(
-		-direction.x,
-		-direction.z
+	var camera: Camera3D = $Camera3D
+
+	var desired_forward := direction
+	desired_forward.y = 0.0
+
+	if desired_forward.length_squared() == 0.0:
+		return
+
+	desired_forward = desired_forward.normalized()
+
+	var camera_forward := -camera.global_transform.basis.z
+	camera_forward.y = 0.0
+
+	if camera_forward.length_squared() == 0.0:
+		return
+
+	camera_forward = camera_forward.normalized()
+
+	var yaw_difference := camera_forward.signed_angle_to(
+		desired_forward,
+		Vector3.UP
+	)
+
+	fishing_aim_target_yaw = (
+		rotation.y
+		+ yaw_difference
+		+ deg_to_rad(fishing_yaw_offset_degrees)
 	)
 
 

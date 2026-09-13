@@ -28,6 +28,7 @@ enum State {
 @export var reel_gain_speed: float = 0.20
 @export var release_loss_speed: float = 0.18
 @export var resistance_gain_speed: float = 0.10
+@export var directional_tension_speed: float = 0.035
 
 var value: float = 0.45
 var active: bool = false
@@ -36,6 +37,7 @@ var fish_resistance: float = 0.0
 var current_state: State = State.SAFE
 var failure_enabled: bool = false
 var reel_gain_multiplier: float = 1.0
+var player_tension_bias: float = 0.0
 
 func _process(delta: float) -> void:
 	if not active:
@@ -53,7 +55,10 @@ func _process(delta: float) -> void:
 			change -= release_loss_speed
 		else:
 			change -= free_reel_loss_speed
-
+			
+	if player_reeling:
+		change += player_tension_bias * directional_tension_speed
+	
 	change += fish_resistance * resistance_gain_speed
 
 	var max_value := 1.0 if failure_enabled else free_reel_max
@@ -146,3 +151,7 @@ func add_impulse(amount: float) -> void:
 
 	tension_changed.emit(value)
 	_update_state()
+
+func set_player_tension_bias(bias: float) -> void:
+	player_tension_bias = clampf(bias, -1.0, 1.0)
+	

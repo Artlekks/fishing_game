@@ -494,3 +494,6 @@ func _on_fish_behavior_pressure_changed(value: float) -> void:
 
 func add_lure_tension(amount: float) -> void:
 	tension.add_impulse(amount)
+
+func set_player_tension_bias(value: float) -> void:
+	tension.set_player_tension_bias(value)
