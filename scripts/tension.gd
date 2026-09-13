@@ -114,8 +114,9 @@ func _update_state() -> void:
 	state_changed.emit(current_state)
 
 func start_free_reel() -> void:
-	value = 0.0
-	active = true
+	value = (safe_min + safe_max) * 0.5
+
+	active = false
 	failure_enabled = false
 	player_reeling = false
 	fish_resistance = 0.0

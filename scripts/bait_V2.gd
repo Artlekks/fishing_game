@@ -17,6 +17,8 @@ signal depth_changed(current_depth: float, total_depth: float)
 @export var max_fight_escape_distance: float = 4.0
 @export_category("Fight Distance")
 @export var max_extra_fight_distance: float = 3.0
+@export_category("Free Reeling")
+@export var free_reel_speed_multiplier: float = 2.5
 
 var twitch_velocity: Vector3 = Vector3.ZERO
 var fight_max_distance: float = 0.0
@@ -166,7 +168,10 @@ func _update_reeling(delta: float) -> void:
 	).normalized()
 
 	var reel_speed := data.reel_speed * reel_speed_multiplier
-
+	
+	if not fight_mode:
+		reel_speed *= free_reel_speed_multiplier
+	
 	if fight_mode:
 		var multiplier := lerpf(
 			1.0,

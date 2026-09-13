@@ -15,7 +15,8 @@ no_depth_test = true
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
 script = ExtResource("1_6d73u")
 data = ExtResource("2_gubwk")
-fight_reel_multiplier = 0.4
+fight_reel_multiplier = 0.5
+free_reel_speed_multiplier = 10.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=947979108]
 transform = Transform3D(0.1, -8.88178e-16, 0, 8.88178e-16, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
