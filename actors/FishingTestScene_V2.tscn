@@ -17,17 +17,25 @@
 [ext_resource type="Resource" uid="uid://bliqlnu71ix85" path="res://data/fish/test_fish_rare.tres" id="11_v7stt"]
 [ext_resource type="Script" uid="uid://cb6v6f0ntyhvg" path="res://scripts/depth_meter_view.gd" id="12_7s285"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
+[ext_resource type="Script" uid="uid://dphljovh5lu0g" path="res://scripts/exploration_hud.gd" id="14_04ybk"]
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
+[ext_resource type="Texture2D" uid="uid://bbthseaubq6v1" path="res://assets/sprites/Compass_Face.png" id="14_lu0sf"]
+[ext_resource type="Texture2D" uid="uid://cod3yh2ba75hv" path="res://assets/sprites/Compass_Needle.png" id="15_04ybk"]
 [ext_resource type="Script" uid="uid://boqng0bhxpde6" path="res://scripts/caster.gd" id="15_hrkbp"]
 [ext_resource type="Texture2D" uid="uid://dw03tio5j4wnt" path="res://assets/sprites/bar-bar.png" id="16_0e2yj"]
 [ext_resource type="PackedScene" uid="uid://b55g00mjd4bs" path="res://actors/bait_V2.tscn" id="16_cxlon"]
 [ext_resource type="Texture2D" uid="uid://c7w6ts6bqr8yu" path="res://assets/sprites/TensionMeter.png" id="16_rxc8i"]
+[ext_resource type="Texture2D" uid="uid://bybktjbfq40mh" path="res://assets/sprites/Fishing_Icon.png" id="16_y5vpm"]
 [ext_resource type="Texture2D" uid="uid://dtsus3jhrfnid" path="res://assets/sprites/bar-bar_Red.png" id="17_0qupg"]
+[ext_resource type="Texture2D" uid="uid://ci8te3gnaliuv" path="res://assets/sprites/Location.png" id="17_f3f7x"]
 [ext_resource type="Resource" uid="uid://c0dx7cuhpacd0" path="res://data/baits/default_bait.tres" id="17_n1yj2"]
 [ext_resource type="Texture2D" uid="uid://bah5u76hap23t" path="res://assets/sprites/bar-bar_Blue.png" id="18_mdf05"]
+[ext_resource type="Texture2D" uid="uid://u3tyt71m2h6" path="res://assets/sprites/Menu.png" id="18_t57di"]
+[ext_resource type="Texture2D" uid="uid://3llccm0knkks" path="res://assets/sprites/Menu_Cast.png" id="19_30w2a"]
 [ext_resource type="Texture2D" uid="uid://bjib07fpfjvsw" path="res://assets/sprites/Depth.png" id="21_0e2yj"]
 [ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="21_y5vpm"]
 [ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="22_f3f7x"]
+[ext_resource type="Script" uid="uid://4pvfc0hnnyim" path="res://scripts/hud_controller.gd" id="24_0qupg"]
 [ext_resource type="Script" uid="uid://b0gkhniyqm6nk" path="res://scripts/encounter.gd" id="24_cybga"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
@@ -93,6 +101,44 @@ metadata/_custom_type_script = "uid://drtr8dooxsml8"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bp5p2"]
 size = Vector3(4.426, 1, 2.172)
+
+[sub_resource type="Animation" id="Animation_lu0sf"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CastReadyOverlay:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_04ybk"]
+resource_name = "cast_ready"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CastReadyOverlay:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0009999999, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_y5vpm"]
+_data = {
+&"RESET": SubResource("Animation_lu0sf"),
+&"cast_ready": SubResource("Animation_04ybk")
+}
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -219,6 +265,129 @@ current = true
 
 [node name="UI" type="Node" parent="." unique_id=551417241]
 
+[node name="ExplorationHud" type="CanvasLayer" parent="UI" unique_id=981426337 node_paths=PackedStringArray("exploration")]
+layer = 40
+script = ExtResource("14_04ybk")
+exploration = NodePath("../../Game/Exploration")
+
+[node name="Root" type="Control" parent="UI/ExplorationHud" unique_id=677468345]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Compass" type="Control" parent="UI/ExplorationHud/Root" unique_id=915333708]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="CompassFace" type="TextureRect" parent="UI/ExplorationHud/Root/Compass" unique_id=241178075]
+texture_filter = 1
+layout_mode = 1
+offset_left = 26.0
+offset_top = 15.0
+offset_right = 90.0
+offset_bottom = 55.0
+scale = Vector2(2, 2)
+mouse_filter = 2
+texture = ExtResource("14_lu0sf")
+stretch_mode = 2
+
+[node name="CompassNeedle" type="TextureRect" parent="UI/ExplorationHud/Root/Compass" unique_id=579365457]
+z_index = 1
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -274.0
+offset_top = -207.0
+offset_right = -246.0
+offset_bottom = -177.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+pivot_offset = Vector2(14, 14.6)
+mouse_filter = 2
+texture = ExtResource("15_04ybk")
+stretch_mode = 2
+
+[node name="CastReadyOverlay" type="TextureRect" parent="UI/ExplorationHud/Root/Compass" unique_id=236963192]
+texture_filter = 1
+layout_mode = 1
+offset_left = 26.0
+offset_top = 15.0
+offset_right = 90.0
+offset_bottom = 55.0
+scale = Vector2(2, 2)
+mouse_filter = 2
+texture = ExtResource("16_y5vpm")
+stretch_mode = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UI/ExplorationHud/Root/Compass" unique_id=1187115211]
+libraries/ = SubResource("AnimationLibrary_y5vpm")
+
+[node name="Location" type="TextureRect" parent="UI/ExplorationHud/Root" unique_id=131616117]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -288.0
+offset_top = 22.0
+offset_right = -144.0
+offset_bottom = 62.0
+grow_horizontal = 0
+scale = Vector2(1.8, 1.8)
+mouse_filter = 2
+texture = ExtResource("17_f3f7x")
+stretch_mode = 2
+
+[node name="HelpPanel" type="Control" parent="UI/ExplorationHud/Root" unique_id=96601880]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Menu" type="TextureRect" parent="UI/ExplorationHud/Root/HelpPanel" unique_id=1990498829]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = 325.0
+offset_right = 94.0
+offset_bottom = 370.0
+grow_vertical = 0
+scale = Vector2(2, 2)
+mouse_filter = 2
+texture = ExtResource("18_t57di")
+stretch_mode = 2
+
+[node name="Menu_Cast" type="TextureRect" parent="UI/ExplorationHud/Root/HelpPanel" unique_id=404011370]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = 325.0
+offset_right = 94.0
+offset_bottom = 370.0
+grow_vertical = 0
+scale = Vector2(2, 2)
+mouse_filter = 2
+texture = ExtResource("19_30w2a")
+stretch_mode = 2
+
 [node name="FishingHud" type="CanvasLayer" parent="UI" unique_id=837552999]
 layer = 40
 
@@ -294,6 +463,12 @@ offset_right = 142.5
 offset_bottom = 35.0
 texture = ExtResource("22_f3f7x")
 stretch_mode = 2
+
+[node name="HudController" type="Node" parent="UI" unique_id=106858415 node_paths=PackedStringArray("game_mode", "exploration_hud", "fishing_hud")]
+script = ExtResource("24_0qupg")
+game_mode = NodePath("../../Game/GameMode")
+exploration_hud = NodePath("../ExplorationHud")
+fishing_hud = NodePath("../FishingHud")
 
 [node name="Game" type="Node" parent="." unique_id=313999427]
 
