@@ -13,7 +13,12 @@ enum State {
 }
 
 @export_range(0.0, 1.0, 0.01) var start_tension: float = 0.45
+
+@export_category("Free Reel")
+@export_range(0.0, 1.0, 0.01) var free_reel_start: float = 0.05
+@export_range(0.0, 1.0, 0.01) var free_reel_max: float = 0.18
 @export var free_reel_gain_speed: float = 0.08
+@export var free_reel_loss_speed: float = 0.10
 
 @export_category("Safe Zone")
 @export_range(0.0, 1.0, 0.01) var safe_min: float = 0.35
@@ -44,14 +49,19 @@ func _process(delta: float) -> void:
 		else:
 			change += free_reel_gain_speed
 	else:
-		change -= release_loss_speed
+		if failure_enabled:
+			change -= release_loss_speed
+		else:
+			change -= free_reel_loss_speed
 
 	change += fish_resistance * resistance_gain_speed
+
+	var max_value := 1.0 if failure_enabled else free_reel_max
 
 	value = clampf(
 		value + change * delta,
 		0.0,
-		1.0
+		max_value
 	)
 
 	tension_changed.emit(value)
@@ -98,7 +108,10 @@ func set_fish_resistance(resistance: float) -> void:
 func _update_state() -> void:
 	var new_state: State
 
-	if value < safe_min:
+	if not failure_enabled:
+		new_state = State.SAFE
+
+	elif value < safe_min:
 		new_state = State.SLACK
 
 	elif value > safe_max:
@@ -114,9 +127,9 @@ func _update_state() -> void:
 	state_changed.emit(current_state)
 
 func start_free_reel() -> void:
-	value = (safe_min + safe_max) * 0.5
+	value = free_reel_start
 
-	active = false
+	active = true
 	failure_enabled = false
 	player_reeling = false
 	fish_resistance = 0.0
@@ -128,7 +141,8 @@ func add_impulse(amount: float) -> void:
 	if not active:
 		return
 
-	value = clampf(value + amount, 0.0, 1.0)
+	var max_value := 1.0 if failure_enabled else free_reel_max
+	value = clampf(value + amount, 0.0, max_value)
 
 	tension_changed.emit(value)
 	_update_state()

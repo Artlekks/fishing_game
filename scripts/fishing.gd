@@ -11,6 +11,7 @@ enum Phase {
 	BAIT_FLYING,
 	IN_WATER,
 	FIGHT,
+	CATCH,
 	PUT_AWAY,
 	EXIT
 }
@@ -263,6 +264,12 @@ func _on_animation_finished(animation_name: StringName) -> void:
 
 		return
 	
+	if animation_name == &"Fishing_Catch" and phase == Phase.CATCH:
+		phase = Phase.AIM
+		sprite_director.play(&"Fishing_Idle")
+		aim.resume()
+		return
+		
 	if animation_name == &"Reel_Back_Strong":
 		strong_pull_animation_active = false
 		current_reel_animation = &""
@@ -294,10 +301,12 @@ func _on_bait_returned() -> void:
 	if phase != Phase.IN_WATER and phase != Phase.FIGHT:
 		return
 
-	var was_fighting := phase == Phase.FIGHT
-
-	if was_fighting:
+	if phase == Phase.FIGHT:
 		encounter.catch_fish()
+
+		phase = Phase.CATCH
+		sprite_director.play(&"Fishing_Catch")
+		return
 
 	phase = Phase.AIM
 	sprite_director.play(&"Fishing_Idle")

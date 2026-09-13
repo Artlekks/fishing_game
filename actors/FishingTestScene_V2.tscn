@@ -516,9 +516,8 @@ stamina_recovery_speed = 0.0
 caster = NodePath("../Caster")
 spent_recovery_time = 20.0
 spent_reel_speed_multiplier = 6.0
-first_bite_delay = 5.0
-retry_bite_delay = 6.0
-max_bite_chance_per_check = 0.1
+first_bite_delay = 2.0
+retry_bite_delay = 3.0
 
 [node name="BiteTimer" type="Timer" parent="Game/Fishing/Encounter" unique_id=1520843133]
 wait_time = 3.0
