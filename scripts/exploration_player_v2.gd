@@ -72,6 +72,7 @@ func _physics_process(_delta: float) -> void:
 
 	rotation.y = yaw
 
+
 	# Choose sprite according to actual camera angle
 	_update_facing_from_world(move_direction)
 

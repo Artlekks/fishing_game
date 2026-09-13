@@ -18,10 +18,9 @@ func _ready() -> void:
 func _on_mode_changed(_new_mode: int) -> void:
 	_refresh_hud()
 
-
 func _refresh_hud() -> void:
 	if exploration_hud != null:
-		exploration_hud.visible = game_mode.is_exploration()
+		exploration_hud.visible = true
 
 	if fishing_hud != null:
 		fishing_hud.visible = game_mode.is_fishing()

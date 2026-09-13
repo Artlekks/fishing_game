@@ -260,15 +260,18 @@ script = ExtResource("2_0kejc")
 target = NodePath("../Player/CharacterBody3D")
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1229414820]
-transform = Transform3D(0.6028266, -0.24991225, 0.7577229, 0, 0.9496795, 0.3132234, -0.79787225, -0.1888194, 0.57249206, 1.0285962, 0.6620156, 0.67237175)
+transform = Transform3D(0.603208, -0.37812513, 0.7022546, 0, 0.88047737, 0.4740882, -0.79758394, -0.2859738, 0.531111, 1.029, 0.897, 0.672)
 current = true
 
 [node name="UI" type="Node" parent="." unique_id=551417241]
 
-[node name="ExplorationHud" type="CanvasLayer" parent="UI" unique_id=981426337 node_paths=PackedStringArray("exploration")]
+[node name="ExplorationHud" type="CanvasLayer" parent="UI" unique_id=981426337 node_paths=PackedStringArray("exploration", "camera_rig", "game_mode")]
 layer = 40
 script = ExtResource("14_04ybk")
 exploration = NodePath("../../Game/Exploration")
+camera_rig = NodePath("../../CameraRig")
+game_mode = NodePath("../../Game/GameMode")
+show_delay = 0.2
 
 [node name="Root" type="Control" parent="UI/ExplorationHud" unique_id=677468345]
 layout_mode = 3
