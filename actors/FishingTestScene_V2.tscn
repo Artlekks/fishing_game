@@ -482,10 +482,7 @@ scale = Vector2(0.35, 0.3)
 position = Vector2(400, 80)
 texture = ExtResource("16_rxc8i")
 
-[node name="FishingHud" type="CanvasLayer" parent="UI/FishingHud" unique_id=1124774769]
-layer = 40
-
-[node name="DepthMeter" type="Control" parent="UI/FishingHud/FishingHud" unique_id=282162998 node_paths=PackedStringArray("caster")]
+[node name="DepthMeter" type="Control" parent="UI/FishingHud" unique_id=282162998 node_paths=PackedStringArray("caster", "power_meter_root")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -493,9 +490,13 @@ offset_bottom = 40.0
 scale = Vector2(0.4, 0.4)
 mouse_filter = 2
 script = ExtResource("12_7s285")
-caster = NodePath("../../../../Game/Fishing/Caster")
+caster = NodePath("../../../Game/Fishing/Caster")
+power_meter_root = NodePath("../PowerMeter/Root")
+screen_offset = Vector2(352.5, -68.5)
+arrow_top_y = 15.0
+arrow_bottom_y = 200.0
 
-[node name="Frame" type="TextureRect" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=957431851]
+[node name="Frame" type="TextureRect" parent="UI/FishingHud/DepthMeter" unique_id=957431851]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -507,18 +508,19 @@ grow_vertical = 2
 texture = ExtResource("21_y5vpm")
 stretch_mode = 2
 
-[node name="Arrow" type="TextureRect" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=1964792978]
-texture_filter = 1
-layout_mode = 0
-offset_right = 55.0
-offset_bottom = 35.0
-texture = ExtResource("22_f3f7x")
-stretch_mode = 2
-
-[node name="DepthAnim" type="AnimatedSprite2D" parent="UI/FishingHud/FishingHud/DepthMeter" unique_id=215648467]
+[node name="DepthAnim" type="AnimatedSprite2D" parent="UI/FishingHud/DepthMeter" unique_id=215648467]
 position = Vector2(69.445, 141.645)
 sprite_frames = SubResource("SpriteFrames_yfqh0")
 animation = &"Depth"
+
+[node name="Arrow" type="TextureRect" parent="UI/FishingHud/DepthMeter" unique_id=1964792978]
+texture_filter = 1
+layout_mode = 0
+offset_left = 87.5
+offset_right = 142.5
+offset_bottom = 35.0
+texture = ExtResource("22_f3f7x")
+stretch_mode = 2
 
 [node name="Game" type="Node" parent="." unique_id=313999427]
 
@@ -558,6 +560,7 @@ reel_target = NodePath("../../../Player/CharacterBody3D/ReelEndPoint")
 [node name="Encounter" type="Node" parent="Game/Fishing" unique_id=105265296 node_paths=PackedStringArray("caster")]
 script = ExtResource("24_cybga")
 caster = NodePath("../Caster")
+first_bite_delay = 2.0
 
 [node name="BiteTimer" type="Timer" parent="Game/Fishing/Encounter" unique_id=1520843133]
 wait_time = 3.0
