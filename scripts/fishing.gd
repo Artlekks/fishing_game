@@ -341,6 +341,15 @@ func _on_bait_returned() -> void:
 	aim.resume()
 	
 func _process(_delta: float) -> void:
+	if phase == Phase.THROW or phase == Phase.BAIT_FLYING:
+		var air_curve := Input.get_axis(
+			"ds_left",
+			"ds_right"
+		)
+
+		caster.set_air_curve(air_curve)
+		return
+		
 	if phase != Phase.IN_WATER and phase != Phase.FIGHT:
 		return
 

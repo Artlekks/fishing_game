@@ -22,6 +22,9 @@ var min_fight_steer_authority: float = 0.20
 @export var max_extra_fight_distance: float = 3.0
 @export_category("Free Reeling")
 @export var free_reel_speed_multiplier: float = 2.5
+@export_category("Air Curve")
+@export var air_curve_speed_degrees: float = 35.0
+@export var max_air_curve_degrees: float = 30.0
 
 var twitch_velocity: Vector3 = Vector3.ZERO
 var fight_max_distance: float = 0.0
@@ -33,6 +36,8 @@ var fight_resistance: float = 1.0
 var fish_lateral: float = 0.0
 var fight_start_distance: float = 0.0
 var reel_speed_multiplier: float = 1.0
+var air_curve_input: float = 0.0
+var air_curve_angle: float = 0.0
 
 enum State {
 	IDLE,
@@ -62,8 +67,51 @@ func launch(
 	velocity = initial_velocity
 	water_y = surface_y
 	bottom_y = water_bottom_y
+	air_curve_input = 0.0
+	air_curve_angle = 0.0
 	state = State.FLYING
 
+func set_air_curve(value: float) -> void:
+	air_curve_input = clampf(value, -1.0, 1.0)
+
+func _update_air_curve(delta: float) -> void:
+	if absf(air_curve_input) < 0.01:
+		return
+
+	var horizontal_velocity := Vector3(
+		velocity.x,
+		0.0,
+		velocity.z
+	)
+
+	if horizontal_velocity.length_squared() < 0.001:
+		return
+
+	var max_angle := deg_to_rad(max_air_curve_degrees)
+
+	var requested_change := (
+		deg_to_rad(air_curve_speed_degrees)
+		* air_curve_input
+		* delta
+	)
+
+	var new_angle := clampf(
+		air_curve_angle + requested_change,
+		-max_angle,
+		max_angle
+	)
+
+	var applied_change := new_angle - air_curve_angle
+	air_curve_angle = new_angle
+
+	horizontal_velocity = horizontal_velocity.rotated(
+		Vector3.UP,
+		applied_change
+	)
+
+	velocity.x = horizontal_velocity.x
+	velocity.z = horizontal_velocity.z
+	
 func set_reel_target(target: Node3D) -> void:
 	reel_target = target
 
@@ -110,6 +158,8 @@ func _physics_process(delta: float) -> void:
 	_enforce_fight_distance()
 	
 func _update_flying(delta: float) -> void:
+	_update_air_curve(delta)
+	
 	velocity.y -= gravity * delta
 
 	var previous_position := global_position

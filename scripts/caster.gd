@@ -138,4 +138,7 @@ func cancel_bait() -> void:
 func set_reel_speed_multiplier(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_reel_speed_multiplier(value)
-		
+
+func set_air_curve(value: float) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_air_curve(value)
