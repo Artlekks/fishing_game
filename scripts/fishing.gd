@@ -12,6 +12,7 @@ enum Phase {
 	IN_WATER,
 	FIGHT,
 	CATCH,
+	LINE_BROKEN,
 	PUT_AWAY,
 	EXIT
 }
@@ -47,7 +48,7 @@ func _ready() -> void:
 	encounter.fish_depth_intent_changed.connect(_on_fish_depth_intent_changed)
 	encounter.strong_pull_started.connect(_on_strong_pull_started)
 	encounter.hook_off.connect(_on_fight_failed)
-	encounter.line_broken.connect(_on_fight_failed)
+	encounter.line_broken.connect(_on_line_broken)
 
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -290,7 +291,13 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		sprite_director.play(&"Fishing_Idle")
 		aim.resume()
 		return
-		
+	
+	if animation_name == &"Reel_Broken_Rod" and phase == Phase.LINE_BROKEN:
+		phase = Phase.AIM
+		sprite_director.play(&"Fishing_Idle")
+		aim.resume()
+		return
+	
 	if animation_name == &"Reel_Back_Strong":
 		strong_pull_animation_active = false
 		current_reel_animation = &""
@@ -402,6 +409,19 @@ func _on_fish_depth_intent_changed(value: float) -> void:
 
 	caster.set_fish_depth_intent(value)
 
+func _on_line_broken() -> void:
+	if phase != Phase.FIGHT:
+		return
+
+	caster.cancel_bait()
+
+	current_fish_pull = 0.0
+	current_reel_animation = &""
+	strong_pull_animation_active = false
+
+	phase = Phase.LINE_BROKEN
+	sprite_director.play(&"Reel_Broken_Rod")
+	
 func _on_fight_failed() -> void:
 	if phase != Phase.FIGHT:
 		return

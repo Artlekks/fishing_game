@@ -29,6 +29,8 @@ enum State {
 @export var release_loss_speed: float = 0.18
 @export var resistance_gain_speed: float = 0.10
 @export var directional_tension_speed: float = 0.035
+@export_category("Failure")
+@export var line_break_delay: float = 1.5
 
 var value: float = 0.45
 var active: bool = false
@@ -38,6 +40,7 @@ var current_state: State = State.SAFE
 var failure_enabled: bool = false
 var reel_gain_multiplier: float = 1.0
 var player_tension_bias: float = 0.0
+var overload_time: float = 0.0
 
 func _process(delta: float) -> void:
 	if not active:
@@ -78,9 +81,17 @@ func _process(delta: float) -> void:
 		hook_off.emit()
 		return
 
-	if failure_enabled and value >= 1.0:
-		active = false
-		line_broken.emit()
+	if failure_enabled:
+		if current_state == State.OVERLOAD:
+			overload_time += delta
+
+			if overload_time >= line_break_delay:
+				active = false
+				overload_time = 0.0
+				line_broken.emit()
+				return
+		else:
+			overload_time = 0.0
 
 func set_reel_gain_multiplier(value: float) -> void:
 	reel_gain_multiplier = maxf(value, 0.0)
@@ -91,6 +102,7 @@ func start() -> void:
 	failure_enabled = true
 	player_reeling = false
 	reel_gain_multiplier = 1.0
+	overload_time = 0.0
 	
 	_update_state()
 	tension_changed.emit(value)
@@ -101,7 +113,8 @@ func stop() -> void:
 	player_reeling = false
 	fish_resistance = 0.0
 	failure_enabled = false
-
+	overload_time = 0.0
+	
 func set_player_reeling(reeling: bool) -> void:
 	player_reeling = reeling
 
