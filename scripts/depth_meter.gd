@@ -13,6 +13,10 @@ extends Control
 @export var track_bottom_inset_px: float = 0.0
 @export var arrow_tip_offset_px: float = 18.0
 
+# --- Transition ----------------------------------------------------------------
+@export var slide_time: float = 0.25
+@export var slide_padding_px: float = 12.0
+
 # Optional shallow/mid/deep textures
 @export var shallow_tex: Texture2D
 @export var mid_tex: Texture2D
@@ -40,6 +44,9 @@ var _last_bait_y: float = 0.0
 
 var _lane_top_px: float = 0.0
 var _lane_bottom_px: float = 0.0
+
+var _rest_position: Vector2 = Vector2.ZERO
+var _slide_tween: Tween = null
 
 # ------------------------------------------------------------------------------
 func _ready() -> void:
@@ -69,12 +76,14 @@ func _ready() -> void:
 	if _frame != null and not _frame.resized.is_connected(_on_frame_resized):
 		_frame.resized.connect(_on_frame_resized)
 
+	_rest_position = position
+	visible = false
+
 # === Public API ================================================================
 func show_with_bounds(surface_y: float, bottom_y: float) -> void:
 	_surface_y = surface_y
 	_bottom_y  = bottom_y
 	_rebuild_lane_from_settings()
-	visible = true
 
 	if _ground != null and _ground.texture == null and shallow_tex != null:
 		_apply_ground_tex(shallow_tex)
@@ -86,16 +95,103 @@ func show_with_bounds(surface_y: float, bottom_y: float) -> void:
 		else:
 			_play_depth_anim()
 
+	_slide_in_from_right()
+
+
 func hide_meter() -> void:
-	visible = false
 	if use_animated_sprite2d:
 		_stop_depth_anim()
+
+	_slide_out_to_right()
 
 func set_bait_y(y: float) -> void:
 	_last_bait_y = y
 	_update_arrow_immediate()
 	if use_animated_sprite2d and anim_follow_bait:
 		_update_animated_sprite_by_bait()
+
+
+func _slide_in_from_right() -> void:
+	_kill_slide_tween()
+
+	position = _get_offscreen_right_position()
+	visible = true
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(
+		self,
+		"position",
+		_rest_position,
+		slide_time
+	)
+
+	_slide_tween = tween
+
+
+func _slide_out_to_right() -> void:
+	_kill_slide_tween()
+
+	if not visible:
+		position = _rest_position
+		return
+
+	var end_position := _get_offscreen_right_position()
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		self,
+		"position",
+		end_position,
+		slide_time
+	)
+	tween.tween_callback(_finish_slide_out)
+
+	_slide_tween = tween
+
+
+func _finish_slide_out() -> void:
+	visible = false
+	position = _rest_position
+	_slide_tween = null
+
+
+func _kill_slide_tween() -> void:
+	if _slide_tween != null and _slide_tween.is_valid():
+		_slide_tween.kill()
+
+	_slide_tween = null
+
+
+func _get_offscreen_right_position() -> Vector2:
+	# Calculate the right-side exit from the approved resting position.
+	var current_position := position
+	position = _rest_position
+	var rest_global_x := global_position.x
+	position = current_position
+
+	var viewport_rect := get_viewport().get_visible_rect()
+	var viewport_right := (
+		float(viewport_rect.position.x)
+		+ float(viewport_rect.size.x)
+	)
+
+	var visual_width := maxf(size.x, 1.0)
+	var shift_x := (
+		viewport_right
+		- rest_global_x
+		+ visual_width
+		+ slide_padding_px
+	)
+
+	return _rest_position + Vector2(
+		maxf(shift_x, slide_padding_px),
+		0.0
+	)
+
 
 # === Arrow mapping =============================================================
 func _rebuild_lane_from_settings() -> void:

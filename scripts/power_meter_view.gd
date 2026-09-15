@@ -7,20 +7,27 @@ extends CanvasLayer
 @export var power: Node
 @export var encounter: Node
 @export var caster: Node
-@export var tracked_target: Node3D
-@export var camera: Camera3D
-@export var screen_offset: Vector2 = Vector2(90.0, 50.0)
+
 @export_category("Bar Textures")
 @export var bar_green: Texture2D
 @export var bar_red: Texture2D
 @export var bar_blue: Texture2D
 
+@export_category("Transitions")
+@export var slide_time: float = 0.25
+@export var slide_padding_px: float = 12.0
+
 var full_scale_x: float = 1.0
 var showing_tension: bool = false
+
+var _rest_position: Vector2 = Vector2.ZERO
+var _slide_tween: Tween = null
+var _cancel_to_aim_pending: bool = false
 
 
 func _ready() -> void:
 	full_scale_x = fill.scale.x
+	_rest_position = root.position
 
 	power.power_changed.connect(_on_power_changed)
 	power.started.connect(_on_power_started)
@@ -31,7 +38,7 @@ func _ready() -> void:
 	encounter.line_broken.connect(_on_fishing_ended)
 	encounter.fish_caught.connect(_on_fishing_ended)
 	encounter.tension_state_changed.connect(_on_tension_state_changed)
-	
+
 	caster.bait_returned.connect(_on_bait_returned)
 
 	root.visible = false
@@ -41,14 +48,22 @@ func _ready() -> void:
 
 
 func _on_power_started() -> void:
+	_cancel_to_aim_pending = false
 	showing_tension = false
-	root.visible = true
+
 	tension_meter.visible = false
 	fill.texture = bar_green
 	_set_fill(0.0)
 
+	_slide_in_from_bottom()
+
 
 func _on_power_stopped() -> void:
+	# A cancel also stops the power mechanic, but it must NOT switch
+	# the HUD into tension mode.
+	if _cancel_to_aim_pending:
+		return
+
 	# The cast has been confirmed.
 	# The same gauge now becomes the fishing/tension gauge.
 	showing_tension = true
@@ -57,6 +72,17 @@ func _on_power_stopped() -> void:
 	tension_meter.visible = true
 
 	_set_fill(0.0)
+
+
+func cancel_to_aim() -> void:
+	_cancel_to_aim_pending = true
+	showing_tension = false
+
+	tension_meter.visible = false
+	fill.texture = bar_green
+	_set_fill(0.0)
+
+	_slide_out_to_bottom()
 
 
 func _on_power_changed(value: float) -> void:
@@ -74,39 +100,28 @@ func _on_tension_changed(value: float) -> void:
 
 
 func _on_fishing_ended() -> void:
+	_cancel_to_aim_pending = false
 	showing_tension = false
 
 	_set_fill(0.0)
 
 	tension_meter.visible = false
-	root.visible = false
+	_slide_out_to_bottom()
 
 
 func _on_bait_returned() -> void:
+	_cancel_to_aim_pending = false
 	showing_tension = false
 
 	_set_fill(0.0)
 
 	tension_meter.visible = false
-	root.visible = false
+	_slide_out_to_bottom()
 
 
 func _set_fill(value: float) -> void:
 	fill.scale.x = full_scale_x * clampf(value, 0.0, 1.0)
 
-
-func _process(_delta: float) -> void:
-	if tracked_target == null or camera == null:
-		return
-
-	if camera.is_position_behind(tracked_target.global_position):
-		return
-
-	var screen_position := camera.unproject_position(
-		tracked_target.global_position
-	)
-
-	root.position = screen_position + screen_offset
 
 func _on_tension_state_changed(state: int) -> void:
 	match state:
@@ -118,3 +133,96 @@ func _on_tension_state_changed(state: int) -> void:
 
 		FishingTension.State.OVERLOAD:
 			fill.texture = bar_red
+
+
+func _slide_in_from_bottom() -> void:
+	_kill_slide_tween()
+
+	var start_position := _get_offscreen_bottom_position()
+
+	root.position = start_position
+	root.visible = true
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(
+		root,
+		"position",
+		_rest_position,
+		slide_time
+	)
+
+	_slide_tween = tween
+
+
+func _slide_out_to_bottom() -> void:
+	_kill_slide_tween()
+
+	if not root.visible:
+		_cancel_to_aim_pending = false
+		root.position = _rest_position
+		return
+
+	var end_position := _get_offscreen_bottom_position()
+
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		root,
+		"position",
+		end_position,
+		slide_time
+	)
+	tween.tween_callback(_finish_cancel_slide_out)
+
+	_slide_tween = tween
+
+
+func _finish_cancel_slide_out() -> void:
+	root.visible = false
+	root.position = _rest_position
+	_cancel_to_aim_pending = false
+	_slide_tween = null
+
+
+func _hide_immediate() -> void:
+	_kill_slide_tween()
+	root.visible = false
+	root.position = _rest_position
+
+
+func _kill_slide_tween() -> void:
+	if _slide_tween != null and _slide_tween.is_valid():
+		_slide_tween.kill()
+
+	_slide_tween = null
+
+
+func _get_offscreen_bottom_position() -> Vector2:
+	# Work from the approved resting position, even if a tween is
+	# currently part-way through.
+	var current_position := root.position
+	root.position = _rest_position
+	var rest_global_y := root.global_position.y
+	root.position = current_position
+
+	var viewport_rect := get_viewport().get_visible_rect()
+	var viewport_bottom := (
+		float(viewport_rect.position.y)
+		+ float(viewport_rect.size.y)
+	)
+
+	var visual_height := maxf(root.size.y, 1.0)
+	var shift_y := (
+		viewport_bottom
+		- rest_global_y
+		+ visual_height
+		+ slide_padding_px
+	)
+
+	return _rest_position + Vector2(
+		0.0,
+		maxf(shift_y, slide_padding_px)
+	)

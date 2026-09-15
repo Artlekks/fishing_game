@@ -11,10 +11,17 @@ extends Control
 @export_range(0.0, 1.0, 0.01)
 var ground_line_ratio: float = 0.5
 
+@export_category("Transition")
+@export var slide_time: float = 0.55
+@export var slide_padding: float = 20.0
+
 @onready var depth_window: Control = $DepthWindow
 @onready var depth_strip: Control = $DepthWindow/DepthStrip
 @onready var arrow: Control = $Arrow
 
+var rest_position: Vector2
+var slide_tween: Tween
+var is_shown: bool = false
 
 func _ready() -> void:
 	if caster == null:
@@ -26,6 +33,7 @@ func _ready() -> void:
 
 	depth_window.clip_contents = true
 
+	rest_position = position
 	visible = false
 
 
@@ -33,7 +41,8 @@ func _on_depth_changed(
 	current_depth: float,
 	total_depth: float
 ) -> void:
-	visible = true
+	if not is_shown:
+		_slide_in()
 
 	current_depth = maxf(current_depth, 0.0)
 	total_depth = maxf(total_depth, 0.0)
@@ -109,4 +118,62 @@ func _update_arrow(
 
 
 func _on_bait_returned() -> void:
+	_slide_out()
+
+func _slide_in() -> void:
+	if slide_tween != null and slide_tween.is_valid():
+		slide_tween.kill()
+
+	is_shown = true
+	visible = true
+
+	var viewport_width := get_viewport_rect().size.x
+	position = Vector2(
+		viewport_width + slide_padding,
+		rest_position.y
+	)
+
+	slide_tween = create_tween()
+	slide_tween.set_trans(Tween.TRANS_SINE)
+	slide_tween.set_ease(Tween.EASE_OUT)
+
+	slide_tween.tween_property(
+		self,
+		"position",
+		rest_position,
+		slide_time
+	)
+
+
+func _slide_out() -> void:
+	if not is_shown:
+		return
+
+	if slide_tween != null and slide_tween.is_valid():
+		slide_tween.kill()
+
+	is_shown = false
+
+	var viewport_width := get_viewport_rect().size.x
+	var offscreen_position := Vector2(
+		viewport_width + slide_padding,
+		rest_position.y
+	)
+
+	slide_tween = create_tween()
+	slide_tween.set_trans(Tween.TRANS_SINE)
+	slide_tween.set_ease(Tween.EASE_IN)
+
+	slide_tween.tween_property(
+		self,
+		"position",
+		offscreen_position,
+		slide_time
+	)
+
+	slide_tween.tween_callback(_finish_slide_out)
+
+
+func _finish_slide_out() -> void:
 	visible = false
+	position = rest_position

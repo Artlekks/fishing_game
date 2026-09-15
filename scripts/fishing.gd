@@ -7,6 +7,7 @@ enum Phase {
 	AIM,
 	PREP_THROW,
 	CHARGE,
+	CANCEL_THROW,
 	THROW,
 	BAIT_FLYING,
 	IN_WATER,
@@ -26,6 +27,7 @@ enum Phase {
 @export var camera_rig: Node
 @export var sprite_director: Node
 @export var player: CharacterBody3D
+@export var power_meter_view: Node
 
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
@@ -88,7 +90,23 @@ func _unhandled_input(event: InputEvent) -> void:
 			phase = Phase.PUT_AWAY
 			sprite_director.play_backwards(&"Prep_Fishing")
 			return
+	
+	if phase == Phase.PREP_THROW or phase == Phase.CHARGE:
+		if event.is_action_pressed("cancel_fishing"):
+			if (
+				power_meter_view != null
+				and power_meter_view.has_method("cancel_to_aim")
+			):
+				power_meter_view.cancel_to_aim()
 
+			# Stop the power mechanic. The HUD has already been told
+			# that this stop is a cancel, not a confirmed cast.
+			power.capture()
+
+			phase = Phase.CANCEL_THROW
+			sprite_director.play_backwards(&"Prep_Throw")
+			return
+			
 	if phase == Phase.CHARGE:
 		if event.is_action_pressed("enter_fishing"):
 			var captured_power: float = power.capture()
@@ -281,10 +299,17 @@ func _on_animation_finished(animation_name: StringName) -> void:
 			return
 
 
-	if animation_name == &"Prep_Throw" and phase == Phase.PREP_THROW:
-		phase = Phase.CHARGE
-		sprite_director.play(&"Prep_Throw_Idle")
-		return
+	if animation_name == &"Prep_Throw":
+		if phase == Phase.PREP_THROW:
+			phase = Phase.CHARGE
+			sprite_director.play(&"Prep_Throw_Idle")
+			return
+
+		if phase == Phase.CANCEL_THROW:
+			phase = Phase.AIM
+			sprite_director.play(&"Fishing_Idle")
+			aim.resume()
+			return
 
 	if animation_name == &"Throw" and phase == Phase.THROW:
 		if bait_landed_during_throw:
