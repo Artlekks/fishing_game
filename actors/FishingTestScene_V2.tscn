@@ -260,6 +260,8 @@ camera = NodePath("../../../CameraRig/Camera3D")
 [node name="CameraRig" type="Node3D" parent="." unique_id=1419276622 node_paths=PackedStringArray("target")]
 script = ExtResource("2_0kejc")
 target = NodePath("../Player/CharacterBody3D")
+fishing_h_offset = 1.0
+fishing_v_offset = 0.7
 fishing_yaw_offset_degrees = 40.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1229414820]
@@ -397,12 +399,11 @@ stretch_mode = 2
 [node name="FishingHud" type="CanvasLayer" parent="UI" unique_id=837552999]
 layer = 40
 
-[node name="PowerMeter" parent="UI/FishingHud" unique_id=86211707 node_paths=PackedStringArray("power", "encounter", "caster", "tracked_target", "camera") instance=ExtResource("10_r25je")]
+[node name="PowerMeter" parent="UI/FishingHud" unique_id=86211707 node_paths=PackedStringArray("power", "encounter", "caster", "camera") instance=ExtResource("10_r25je")]
 script = ExtResource("11_r25je")
 power = NodePath("../../../Game/Fishing/Power")
 encounter = NodePath("../../../Game/Fishing/Encounter")
 caster = NodePath("../../../Game/Fishing/Caster")
-tracked_target = NodePath("../../../Player/CharacterBody3D")
 camera = NodePath("../../../CameraRig/Camera3D")
 screen_offset = Vector2(80, -30)
 bar_green = ExtResource("16_0e2yj")
@@ -410,16 +411,16 @@ bar_red = ExtResource("17_0qupg")
 bar_blue = ExtResource("18_mdf05")
 
 [node name="Root" parent="UI/FishingHud/PowerMeter" index="0" unique_id=591532728]
-anchors_preset = 0
+anchors_preset = 2
+anchor_top = 1.0
 anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+offset_left = 175.0
+offset_top = -75.0
+offset_right = 175.0
+offset_bottom = -75.0
 grow_horizontal = 1
-grow_vertical = 1
-scale = Vector2(0.35, 0.3)
+grow_vertical = 0
+scale = Vector2(0.35, 0.35)
 
 [node name="TensionMeter" type="Sprite2D" parent="UI/FishingHud/PowerMeter/Root" index="3" unique_id=898071307]
 position = Vector2(400, 80)

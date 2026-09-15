@@ -22,9 +22,9 @@ func perform_cast(
 	direction: Vector3,
 	water_y: float,
 	bottom_y: float
-) -> void:
+) -> Node3D:
 	if bait_scene == null or spawn_point == null:
-		return
+		return null
 
 	if is_instance_valid(active_bait):
 		active_bait.queue_free()
@@ -64,6 +64,7 @@ func perform_cast(
 		water_y,
 		bottom_y
 	)
+	return active_bait
 
 
 func _on_bait_landed(point: Vector3) -> void:
