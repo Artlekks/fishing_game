@@ -33,10 +33,14 @@
 [ext_resource type="Texture2D" uid="uid://u3tyt71m2h6" path="res://assets/sprites/Menu.png" id="18_t57di"]
 [ext_resource type="Texture2D" uid="uid://3llccm0knkks" path="res://assets/sprites/Menu_Cast.png" id="19_30w2a"]
 [ext_resource type="Texture2D" uid="uid://bjib07fpfjvsw" path="res://assets/sprites/Depth.png" id="21_0e2yj"]
+[ext_resource type="Script" uid="uid://cpg2t5ap4pljp" path="res://scripts/fishing_character_view.gd" id="21_f3f7x"]
 [ext_resource type="Texture2D" uid="uid://bg1hs3yossh0p" path="res://assets/sprites/DepthMeter.png" id="21_y5vpm"]
 [ext_resource type="Texture2D" uid="uid://d10owiins2pky" path="res://assets/sprites/DepthMeter_Arrow.png" id="22_f3f7x"]
+[ext_resource type="SpriteFrames" uid="uid://dsfp4gvdeeesr" path="res://assets/animations/player_frames.tres" id="22_t57di"]
+[ext_resource type="Texture2D" uid="uid://bnnpyo7ugjpxy" path="res://assets/sprites/Shadow.png" id="23_30w2a"]
 [ext_resource type="Script" uid="uid://4pvfc0hnnyim" path="res://scripts/hud_controller.gd" id="24_0qupg"]
 [ext_resource type="Script" uid="uid://b0gkhniyqm6nk" path="res://scripts/encounter.gd" id="24_cybga"]
+[ext_resource type="Texture2D" uid="uid://d024dksf47073" path="res://assets/sprites/BottomSquare.png" id="24_gdibe"]
 [ext_resource type="Script" uid="uid://bmb64s3aug01v" path="res://scripts/game_mode.gd" id="24_w618w"]
 [ext_resource type="Script" uid="uid://0oqq3o4ncao8" path="res://scripts/exploration.gd" id="25_gdibe"]
 [ext_resource type="Resource" uid="uid://c2tpksm5w3pir" path="res://data/fish/test_fish_common.tres" id="25_jr3m6"]
@@ -139,6 +143,9 @@ _data = {
 &"RESET": SubResource("Animation_lu0sf"),
 &"cast_ready": SubResource("Animation_04ybk")
 }
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_gdibe"]
+blend_mode = 2
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -247,15 +254,17 @@ shape = SubResource("BoxShape3D_bp5p2")
 [node name="CharacterBody3D" parent="Player" unique_id=363575400 instance=ExtResource("1_43krk")]
 collision_layer = 1
 
-[node name="AnimatedSprite3D" parent="Player/CharacterBody3D" index="1" unique_id=477032395]
-animation = &"Fishing_Idle"
-frame = 0
-frame_progress = 0.0
+[node name="ShadowSprite3D" parent="Player/CharacterBody3D/AnimatedSprite3D" parent_id_path=PackedInt32Array(363575400, 477032395) index="0" unique_id=1206580126]
+texture = ExtResource("23_30w2a")
 
 [node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14756292, 0.09629911, -0.29346243)
 anchor = NodePath("..")
 camera = NodePath("../../../CameraRig/Camera3D")
+
+[node name="RyuScreenNotifier" type="VisibleOnScreenNotifier3D" parent="Player/CharacterBody3D" unique_id=2104172510]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27968735, -0.11015487)
+aabb = AABB(-0.15072826, -0.35128146, -0.25026277, 0.39227682, 0.7025629, 0.50052553)
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1419276622 node_paths=PackedStringArray("target")]
 script = ExtResource("2_0kejc")
@@ -391,6 +400,51 @@ stretch_mode = 2
 
 [node name="FishingHud" type="CanvasLayer" parent="UI" unique_id=837552999]
 layer = 40
+
+[node name="CharacterView" type="Control" parent="UI/FishingHud" unique_id=495136122 node_paths=PackedStringArray("source_sprite", "caster", "player_screen_notifier")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 102.0
+offset_top = 231.0
+offset_right = 142.0
+offset_bottom = 271.0
+script = ExtResource("21_f3f7x")
+source_sprite = NodePath("../../../Player/CharacterBody3D/AnimatedSprite3D")
+caster = NodePath("../../../Game/Fishing/Caster")
+player_screen_notifier = NodePath("../../../Player/CharacterBody3D/RyuScreenNotifier")
+slide_in_time = 0.2
+slide_out_time = 0.2
+
+[node name="Grid" type="TextureRect" parent="UI/FishingHud/CharacterView" unique_id=5134481]
+layout_mode = 0
+offset_left = -52.000004
+offset_top = 178.0
+offset_right = 256.0
+offset_bottom = 331.0
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("24_gdibe")
+stretch_mode = 4
+
+[node name="Shadow" type="TextureRect" parent="UI/FishingHud/CharacterView" unique_id=252039481]
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_gdibe")
+layout_mode = 0
+offset_left = 36.0
+offset_top = 178.0
+offset_right = 76.0
+offset_bottom = 218.0
+rotation = 1.5707964
+scale = Vector2(1.238, 1.964)
+texture = ExtResource("23_30w2a")
+stretch_mode = 5
+flip_h = true
+
+[node name="Character" type="AnimatedSprite2D" parent="UI/FishingHud/CharacterView" unique_id=1582790252]
+texture_filter = 1
+position = Vector2(-6, 191)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("22_t57di")
+animation = &"Reel"
 
 [node name="PowerMeter" parent="UI/FishingHud" unique_id=86211707 node_paths=PackedStringArray("power", "encounter", "caster") instance=ExtResource("10_r25je")]
 script = ExtResource("11_r25je")

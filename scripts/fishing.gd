@@ -130,6 +130,7 @@ func _unhandled_input(event: InputEvent) -> void:
 						zone.get_water_y()
 					)
 
+
 			bait_landed_during_throw = false
 			phase = Phase.THROW
 			sprite_director.play(&"Throw")
@@ -321,6 +322,7 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		return
 	
 	if animation_name == &"Fishing_Catch" and phase == Phase.CATCH:
+
 		camera_rig.reset_fishing_follow()
 
 		phase = Phase.AIM
@@ -329,6 +331,7 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		return
 	
 	if animation_name == &"Reel_Broken_Rod" and phase == Phase.LINE_BROKEN:
+
 		camera_rig.reset_fishing_follow()
 
 		phase = Phase.AIM
@@ -373,7 +376,7 @@ func _on_bait_returned() -> void:
 		phase = Phase.CATCH
 		sprite_director.play(&"Fishing_Catch")
 		return
-
+	
 	camera_rig.reset_fishing_follow()
 
 	phase = Phase.AIM
@@ -476,6 +479,7 @@ func _on_fight_failed() -> void:
 		return
 
 	caster.cancel_bait()
+		
 	camera_rig.reset_fishing_follow()
 
 	current_fish_pull = 0.0
