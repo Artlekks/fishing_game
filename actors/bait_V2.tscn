@@ -13,7 +13,6 @@ no_depth_test = true
 
 [node name="Bait" type="Node3D" unique_id=321479873 groups=["bait"]]
 transform = Transform3D(0.6, 0, 0, 0, -2.62268e-08, -0.6, 0, 0.6, -2.62268e-08, 0, 0, 0)
-visible = false
 script = ExtResource("1_6d73u")
 data = ExtResource("2_gubwk")
 fight_reel_multiplier = 0.5
