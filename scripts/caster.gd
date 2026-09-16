@@ -3,6 +3,7 @@ extends Node3D
 signal bait_landed(point: Vector3)
 signal bait_returned
 signal bait_depth_changed(current_depth: float, total_depth: float)
+signal bait_distance_changed(distance_meters: float)
 
 @export var bait_scene: PackedScene
 @export var spawn_point: Node3D
@@ -12,11 +13,37 @@ signal bait_depth_changed(current_depth: float, total_depth: float)
 @export var launch_angle_degrees: float = 45.0
 @export var selected_bait_data: BaitData
 @export var reel_target: Node3D
+@export_category("Distance Display")
+@export var distance_meter_scale: float = 2.0
 
 var active_bait: Node3D
 var current_bait_depth: float = 0.0
 var current_total_depth: float = 0.0
 
+func _process(_delta: float) -> void:
+	if not is_instance_valid(active_bait):
+		return
+
+	if not is_instance_valid(reel_target):
+		return
+
+	var bait_flat := Vector2(
+		active_bait.global_position.x,
+		active_bait.global_position.z
+	)
+
+	var target_flat := Vector2(
+		reel_target.global_position.x,
+		reel_target.global_position.z
+	)
+
+	var distance_meters := (
+		bait_flat.distance_to(target_flat)
+		* distance_meter_scale
+	)
+
+	bait_distance_changed.emit(distance_meters)
+	
 func perform_cast(
 	power: float,
 	direction: Vector3,
@@ -88,6 +115,7 @@ func _on_bait_returned() -> void:
 		active_bait.queue_free()
 
 	active_bait = null
+	bait_distance_changed.emit(0.0)
 	bait_returned.emit()
 
 
@@ -135,6 +163,7 @@ func cancel_bait() -> void:
 		active_bait.queue_free()
 
 	active_bait = null
+	bait_distance_changed.emit(0.0)
 
 func set_reel_speed_multiplier(value: float) -> void:
 	if is_instance_valid(active_bait):

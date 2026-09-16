@@ -47,6 +47,8 @@
 [ext_resource type="Script" uid="uid://b1bwrn2bluwr5" path="res://scripts/fish_behavior.gd" id="26_56g8v"]
 [ext_resource type="Script" uid="uid://dui1rve4te1sj" path="res://scripts/fish_selector.gd" id="30_lyatm"]
 [ext_resource type="Script" uid="uid://cksidtlpxlolp" path="res://scripts/tension.gd" id="31_v7stt"]
+[ext_resource type="Texture2D" uid="uid://bsukwqrtcgkxc" path="res://assets/sprites/DistanceNumbers.png" id="32_gdibe"]
+[ext_resource type="Script" uid="uid://hcvmop3q460c" path="res://scripts/bitmap_text.gd" id="35_gdibe"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -258,9 +260,11 @@ collision_layer = 1
 texture = ExtResource("23_30w2a")
 
 [node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14756292, 0.09629911, -0.29346243)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+gizmo_extents = 0.1
 anchor = NodePath("..")
 camera = NodePath("../../../CameraRig/Camera3D")
+screen_offset = Vector2(10, 10)
 
 [node name="RyuScreenNotifier" type="VisibleOnScreenNotifier3D" parent="Player/CharacterBody3D" unique_id=2104172510]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27968735, -0.11015487)
@@ -471,6 +475,48 @@ scale = Vector2(0.35, 0.35)
 position = Vector2(400, 80)
 texture = ExtResource("16_rxc8i")
 
+[node name="DistanceValue" type="Control" parent="UI/FishingHud/PowerMeter/Root" index="4" unique_id=1939578697]
+texture_filter = 1
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 865.0
+offset_top = 36.0
+offset_right = 877.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(5.346, 5.995)
+script = ExtResource("35_gdibe")
+font_texture = ExtResource("32_gdibe")
+right_aligned = true
+letter_spacing = -10
+line_spacing = 0
+
+[node name="DistanceDecimal" type="Control" parent="UI/FishingHud/PowerMeter/Root" index="5" unique_id=1524384151]
+texture_filter = 1
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 831.428
+offset_top = 36.0
+offset_right = 843.428
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(5.346, 5.995)
+script = ExtResource("35_gdibe")
+font_texture = ExtResource("32_gdibe")
+line_spacing = 0
+
 [node name="DepthMeter" type="Control" parent="UI/FishingHud/PowerMeter" unique_id=282162998 node_paths=PackedStringArray("caster")]
 layout_mode = 3
 anchors_preset = 0
@@ -560,6 +606,7 @@ min_speed = 5.0
 max_speed = 15.0
 selected_bait_data = ExtResource("17_n1yj2")
 reel_target = NodePath("../../../Player/CharacterBody3D/ReelEndPoint")
+distance_meter_scale = 4.0
 
 [node name="Encounter" type="Node" parent="Game/Fishing" unique_id=105265296 node_paths=PackedStringArray("caster")]
 script = ExtResource("24_cybga")

@@ -3,6 +3,8 @@ extends CanvasLayer
 @onready var root: Control = $Root
 @onready var fill: Sprite2D = $Root/PowerBarFill
 @onready var tension_meter: Sprite2D = $Root/TensionMeter
+@onready var distance_value: Control = $Root/DistanceValue
+@onready var distance_decimal: Control = $Root/DistanceDecimal
 
 @export var power: Node
 @export var encounter: Node
@@ -40,14 +42,26 @@ func _ready() -> void:
 	encounter.tension_state_changed.connect(_on_tension_state_changed)
 
 	caster.bait_returned.connect(_on_bait_returned)
-
+	caster.bait_distance_changed.connect(_on_bait_distance_changed)
+	
 	root.visible = false
 	tension_meter.visible = false
+	
+func _on_bait_distance_changed(distance_meters: float) -> void:
+	var scaled_distance := maxi(
+		int(round(maxf(distance_meters, 0.0) * 10.0)),
+		0
+	)
 
-	_set_fill(0.0)
+	var whole := int(scaled_distance / 10)
+	var decimal := scaled_distance % 10
 
+	distance_value.set_text(str(whole))
+	distance_decimal.set_text(str(decimal))
 
 func _on_power_started() -> void:
+	distance_value.set_text("0")
+	distance_decimal.set_text("0")
 	_cancel_to_aim_pending = false
 	showing_tension = false
 
