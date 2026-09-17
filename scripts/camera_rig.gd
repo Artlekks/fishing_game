@@ -13,6 +13,7 @@ signal exploration_view_started
 @export var fishing_yaw_offset_degrees: float = -15.0
 @export_category("Fishing Follow")
 @export_range(0.1, 0.9, 0.05)
+
 var fishing_follow_trigger_y_ratio: float = 0.50
 var fishing_aim_active: bool = false
 var fishing_aim_target_yaw: float = 0.0
@@ -33,6 +34,7 @@ var fishing_follow_offset: float = 0.0
 
 var fishing_follow_armed: bool = false
 var fishing_follow_active: bool = false
+var fishing_camera_frozen: bool = false
 
 func _ready() -> void:
 	var camera: Camera3D = $Camera3D
@@ -41,6 +43,9 @@ func _ready() -> void:
 	exploration_v_offset = camera.v_offset
 
 func _process(_delta: float) -> void:
+	if fishing_camera_frozen:
+		return
+
 	if target == null:
 		return
 
@@ -322,6 +327,8 @@ func set_fishing_aim_direction(direction: Vector3) -> void:
 		+ deg_to_rad(fishing_yaw_offset_degrees)
 	)
 
-
 func stop_fishing_aim() -> void:
 	fishing_aim_active = false
+
+func set_fishing_camera_frozen(active: bool) -> void:
+	fishing_camera_frozen = active

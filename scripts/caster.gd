@@ -172,3 +172,7 @@ func set_reel_speed_multiplier(value: float) -> void:
 func set_air_curve(value: float) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_air_curve(value)
+
+func set_bait_frozen(active: bool) -> void:
+	if is_instance_valid(active_bait):
+		active_bait.set_simulation_frozen(active)

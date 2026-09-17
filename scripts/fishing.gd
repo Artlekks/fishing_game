@@ -14,6 +14,8 @@ enum Phase {
 	FIGHT,
 	CATCH,
 	LINE_BROKEN,
+	WAIT_RESULT,
+	RESULT_TRANSITION,
 	PUT_AWAY,
 	EXIT
 }
@@ -322,21 +324,11 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		return
 	
 	if animation_name == &"Fishing_Catch" and phase == Phase.CATCH:
-
-		camera_rig.reset_fishing_follow()
-
-		phase = Phase.AIM
-		sprite_director.play(&"Fishing_Idle")
-		aim.resume()
+		phase = Phase.WAIT_RESULT
 		return
 	
 	if animation_name == &"Reel_Broken_Rod" and phase == Phase.LINE_BROKEN:
-
-		camera_rig.reset_fishing_follow()
-
-		phase = Phase.AIM
-		sprite_director.play(&"Fishing_Idle")
-		aim.resume()
+		phase = Phase.WAIT_RESULT
 		return
 	
 	if animation_name == &"Reel_Back_Strong":
@@ -465,7 +457,7 @@ func _on_line_broken() -> void:
 	if phase != Phase.FIGHT:
 		return
 
-	caster.cancel_bait()
+	_freeze_failed_fight()
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
@@ -473,19 +465,21 @@ func _on_line_broken() -> void:
 
 	phase = Phase.LINE_BROKEN
 	sprite_director.play(&"Reel_Broken_Rod")
+
+func _freeze_failed_fight() -> void:
+	caster.set_reeling(false)
+	caster.set_bait_frozen(true)
+	camera_rig.set_fishing_camera_frozen(true)
 	
 func _on_fight_failed() -> void:
 	if phase != Phase.FIGHT:
 		return
 
-	caster.cancel_bait()
-		
-	camera_rig.reset_fishing_follow()
+	_freeze_failed_fight()
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
+	strong_pull_animation_active = false
 
-	phase = Phase.AIM
-
-	sprite_director.play(&"Fishing_Idle")
-	aim.resume()
+	phase = Phase.LINE_BROKEN
+	sprite_director.play(&"Reel_Broken_Rod")

@@ -49,6 +49,12 @@
 [ext_resource type="Script" uid="uid://cksidtlpxlolp" path="res://scripts/tension.gd" id="31_v7stt"]
 [ext_resource type="Texture2D" uid="uid://bsukwqrtcgkxc" path="res://assets/sprites/DistanceNumbers.png" id="32_gdibe"]
 [ext_resource type="Script" uid="uid://hcvmop3q460c" path="res://scripts/bitmap_text.gd" id="35_gdibe"]
+[ext_resource type="Script" uid="uid://piu46y2lbq42" path="res://scripts/fishing_feedback_view.gd" id="37_egn4m"]
+[ext_resource type="Texture2D" uid="uid://bv6h6knqvusbw" path="res://assets/sprites/Hit!.png" id="38_m07ff"]
+[ext_resource type="Texture2D" uid="uid://t3tf0egp07qw" path="res://assets/sprites/HookOff.png" id="39_n6fh7"]
+[ext_resource type="Texture2D" uid="uid://dqbj4e1uc210l" path="res://assets/sprites/Miss!.png" id="40_jf01x"]
+[ext_resource type="Texture2D" uid="uid://blke7hksrp77l" path="res://assets/sprites/LineBreak.png" id="41_1hrhd"]
+[ext_resource type="Texture2D" uid="uid://ubhb1n6rftl1" path="res://assets/sprites/Catch!.png" id="42_wnbcf"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -564,6 +570,31 @@ offset_right = 142.5
 offset_bottom = 35.0
 texture = ExtResource("22_f3f7x")
 stretch_mode = 2
+
+[node name="FishingFeedbackView" type="CanvasLayer" parent="UI/FishingHud" unique_id=1387392026 node_paths=PackedStringArray("encounter")]
+script = ExtResource("37_egn4m")
+encounter = NodePath("../../../Game/Fishing/Encounter")
+hit_texture = ExtResource("38_m07ff")
+hook_off_texture = ExtResource("39_n6fh7")
+miss_texture = ExtResource("40_jf01x")
+line_break_texture = ExtResource("41_1hrhd")
+catch_texture = ExtResource("42_wnbcf")
+
+[node name="FeedbackTexture" type="TextureRect" parent="UI/FishingHud/FishingFeedbackView" unique_id=805338122]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -220.0
+offset_right = -53.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2.4, 2.4)
+stretch_mode = 3
 
 [node name="HudController" type="Node" parent="UI" unique_id=106858415 node_paths=PackedStringArray("game_mode", "exploration_hud", "fishing_hud")]
 script = ExtResource("24_0qupg")

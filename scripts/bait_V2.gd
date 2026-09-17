@@ -55,7 +55,7 @@ var bottom_y: float = 0.0
 
 var reel_target: Node3D = null
 var reeling: bool = false
-
+var simulation_frozen: bool = false
 
 func launch(
 	start_position: Vector3,
@@ -131,6 +131,9 @@ func set_reel_steering(value: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if simulation_frozen:
+		return
+
 	if state == State.SINKING or state == State.IN_WATER:
 		_update_bottom_from_world()
 	
@@ -270,6 +273,9 @@ func _update_reeling(delta: float) -> void:
 func set_data(new_data: BaitData) -> void:
 	data = new_data
 
+func set_simulation_frozen(active: bool) -> void:
+	simulation_frozen = active
+	
 func _emit_depth() -> void:
 	var current_depth := water_y - global_position.y
 	var total_depth := water_y - bottom_y

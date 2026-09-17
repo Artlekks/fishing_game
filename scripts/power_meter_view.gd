@@ -36,9 +36,6 @@ func _ready() -> void:
 	power.stopped.connect(_on_power_stopped)
 
 	encounter.tension_changed.connect(_on_tension_changed)
-	encounter.hook_off.connect(_on_fishing_ended)
-	encounter.line_broken.connect(_on_fishing_ended)
-	encounter.fish_caught.connect(_on_fishing_ended)
 	encounter.tension_state_changed.connect(_on_tension_state_changed)
 
 	caster.bait_returned.connect(_on_bait_returned)
