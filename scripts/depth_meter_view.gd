@@ -177,3 +177,12 @@ func _slide_out() -> void:
 func _finish_slide_out() -> void:
 	visible = false
 	position = rest_position
+
+func reset_to_aim() -> void:
+	if slide_tween != null and slide_tween.is_valid():
+		slide_tween.kill()
+
+	slide_tween = null
+	is_shown = false
+	visible = false
+	position = rest_position

@@ -55,6 +55,7 @@
 [ext_resource type="Texture2D" uid="uid://dqbj4e1uc210l" path="res://assets/sprites/Miss!.png" id="40_jf01x"]
 [ext_resource type="Texture2D" uid="uid://blke7hksrp77l" path="res://assets/sprites/LineBreak.png" id="41_1hrhd"]
 [ext_resource type="Texture2D" uid="uid://ubhb1n6rftl1" path="res://assets/sprites/Catch!.png" id="42_wnbcf"]
+[ext_resource type="Script" uid="uid://df3lc2dpk1rx7" path="res://scripts/screen_transition.gd" id="43_n6fh7"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -596,6 +597,20 @@ grow_vertical = 2
 scale = Vector2(2.4, 2.4)
 stretch_mode = 3
 
+[node name="ScreenTransition" type="CanvasLayer" parent="UI/FishingHud" unique_id=515018801]
+layer = 100
+script = ExtResource("43_n6fh7")
+fade_time = 0.4
+
+[node name="BlackOverlay" type="ColorRect" parent="UI/FishingHud/ScreenTransition" unique_id=151908909]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
 [node name="HudController" type="Node" parent="UI" unique_id=106858415 node_paths=PackedStringArray("game_mode", "exploration_hud", "fishing_hud")]
 script = ExtResource("24_0qupg")
 game_mode = NodePath("../../Game/GameMode")
@@ -615,13 +630,15 @@ exploration_camera = NodePath("../../CameraRig/Camera3D")
 camera_rig = NodePath("../../CameraRig")
 fish_zone = NodePath("../../World/FishZone_V2")
 
-[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player", "power_meter_view")]
+[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player", "power_meter_view", "depth_meter_view", "screen_transition")]
 script = ExtResource("3_tf5uk")
 game_mode = NodePath("../GameMode")
 camera_rig = NodePath("../../CameraRig")
 sprite_director = NodePath("../../Player/CharacterBody3D/SpriteDirector")
 player = NodePath("../../Player/CharacterBody3D")
 power_meter_view = NodePath("../../UI/FishingHud/PowerMeter")
+depth_meter_view = NodePath("../../UI/FishingHud/PowerMeter/DepthMeter")
+screen_transition = NodePath("../../UI/FishingHud/ScreenTransition")
 
 [node name="Aim" type="Node" parent="Game/Fishing" unique_id=1873530056]
 script = ExtResource("13_k4i7q")

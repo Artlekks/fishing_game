@@ -30,6 +30,8 @@ enum Phase {
 @export var sprite_director: Node
 @export var player: CharacterBody3D
 @export var power_meter_view: Node
+@export var depth_meter_view: Node
+@export var screen_transition: Node
 
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
@@ -53,7 +55,7 @@ func _ready() -> void:
 	encounter.strong_pull_started.connect(_on_strong_pull_started)
 	encounter.hook_off.connect(_on_fight_failed)
 	encounter.line_broken.connect(_on_line_broken)
-
+	
 	camera_rig.connect(
 		"fishing_view_ready",
 		Callable(self, "_on_fishing_view_ready")
@@ -71,11 +73,24 @@ func _ready() -> void:
 
 	_on_mode_changed(game_mode.current_mode)
 
+	screen_transition.covered.connect(
+		_on_result_screen_covered
+	)
+
+	screen_transition.revealed.connect(
+		_on_result_screen_revealed
+	)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not game_mode.is_fishing():
 		return
 
+	if phase == Phase.WAIT_RESULT:
+		if event.is_action_pressed("enter_fishing"):
+			_begin_result_transition()
+
+		return
+		
 	if phase == Phase.AIM:
 		if event.is_action_pressed("enter_fishing"):
 			aim.stop()
@@ -483,3 +498,43 @@ func _on_fight_failed() -> void:
 
 	phase = Phase.LINE_BROKEN
 	sprite_director.play(&"Reel_Broken_Rod")
+
+func _begin_result_transition() -> void:
+	if phase != Phase.WAIT_RESULT:
+		return
+
+	phase = Phase.RESULT_TRANSITION
+	screen_transition.fade_to_black()
+
+
+func _on_result_screen_covered() -> void:
+	if phase != Phase.RESULT_TRANSITION:
+		return
+
+	# We are completely black now.
+	# Everything ugly happens here where the player cannot see it.
+
+	caster.set_reeling(false)
+	caster.cancel_bait()
+
+	camera_rig.set_fishing_camera_frozen(false)
+	camera_rig.reset_fishing_follow()
+
+	power_meter_view.reset_to_aim()
+	depth_meter_view.reset_to_aim()
+
+	current_fish_pull = 0.0
+	current_reel_animation = &""
+	strong_pull_animation_active = false
+
+	sprite_director.play(&"Fishing_Idle")
+
+	screen_transition.fade_from_black()
+
+
+func _on_result_screen_revealed() -> void:
+	if phase != Phase.RESULT_TRANSITION:
+		return
+
+	phase = Phase.AIM
+	aim.resume()

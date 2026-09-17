@@ -237,3 +237,17 @@ func _get_offscreen_bottom_position() -> Vector2:
 		0.0,
 		maxf(shift_y, slide_padding_px)
 	)
+
+func reset_to_aim() -> void:
+	_cancel_to_aim_pending = false
+	showing_tension = false
+
+	fill.texture = bar_green
+	_set_fill(0.0)
+
+	distance_value.set_text("0")
+	distance_decimal.set_text("0")
+
+	tension_meter.visible = false
+
+	_hide_immediate()
