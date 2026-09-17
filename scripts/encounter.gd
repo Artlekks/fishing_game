@@ -16,6 +16,8 @@ signal tension_changed(value: float)
 signal tension_state_changed(state: int)
 signal hook_off
 signal line_broken
+signal fish_resistance_started
+signal fish_spent
 
 @onready var bite_window_timer: Timer = $BiteWindowTimer
 @onready var bite_timer: Timer = $BiteTimer
@@ -359,6 +361,7 @@ func _on_fish_behavior_depth_changed(value: float) -> void:
 
 func _start_resistance_round() -> void:
 	fight_state = FightState.RESISTING
+	fish_resistance_started.emit()
 	recovery_time_left = 0.0
 	caster.set_reel_speed_multiplier(1.0)
 	
@@ -417,7 +420,8 @@ func _finish_resistance_round() -> void:
 
 func _enter_spent() -> void:
 	fight_state = FightState.SPENT
-
+	fish_spent.emit()
+	
 	recovery_time_left = spent_recovery_time
 
 	tension.set_fish_resistance(0.0)

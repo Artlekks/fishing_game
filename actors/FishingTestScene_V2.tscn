@@ -55,7 +55,9 @@
 [ext_resource type="Texture2D" uid="uid://dqbj4e1uc210l" path="res://assets/sprites/Miss!.png" id="40_jf01x"]
 [ext_resource type="Texture2D" uid="uid://blke7hksrp77l" path="res://assets/sprites/LineBreak.png" id="41_1hrhd"]
 [ext_resource type="Texture2D" uid="uid://ubhb1n6rftl1" path="res://assets/sprites/Catch!.png" id="42_wnbcf"]
+[ext_resource type="Script" uid="uid://b55i7dk41uy35" path="res://scripts/fishing_info_view.gd" id="43_jf01x"]
 [ext_resource type="Script" uid="uid://df3lc2dpk1rx7" path="res://scripts/screen_transition.gd" id="43_n6fh7"]
+[ext_resource type="Script" uid="uid://bikrpbvei4d02" path="res://scripts/fishing_info_controller.gd" id="58_1hrhd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
 shading_mode = 0
@@ -597,12 +599,39 @@ grow_vertical = 2
 scale = Vector2(2.4, 2.4)
 stretch_mode = 3
 
+[node name="FishingInfoView" type="CanvasLayer" parent="UI/FishingHud" unique_id=2062759245]
+script = ExtResource("43_jf01x")
+
+[node name="Root" type="Control" parent="UI/FishingHud/FishingInfoView" unique_id=23403449]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 600.0
+offset_bottom = 100.0
+
+[node name="InfoFrame" type="TextureRect" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1141065130]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="InfoTitle" type="TextureRect" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1634986098]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MessageLabel" type="Label" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1168696638]
+layout_mode = 0
+offset_right = 560.0
+offset_bottom = 60.0
+
 [node name="ScreenTransition" type="CanvasLayer" parent="UI/FishingHud" unique_id=515018801]
 layer = 100
 script = ExtResource("43_n6fh7")
 fade_time = 0.4
 
 [node name="BlackOverlay" type="ColorRect" parent="UI/FishingHud/ScreenTransition" unique_id=151908909]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -689,6 +718,11 @@ safe_max = 0.72
 reel_gain_speed = 0.12
 resistance_gain_speed = 0.05
 line_break_delay = 1.0
+
+[node name="FishingInfoController" type="Node" parent="Game/Fishing" unique_id=661892573 node_paths=PackedStringArray("encounter", "info_view")]
+script = ExtResource("58_1hrhd")
+encounter = NodePath("../Encounter")
+info_view = NodePath("../../../UI/FishingHud/FishingInfoView")
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]
