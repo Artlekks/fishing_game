@@ -57,6 +57,7 @@
 [ext_resource type="Texture2D" uid="uid://ubhb1n6rftl1" path="res://assets/sprites/Catch!.png" id="42_wnbcf"]
 [ext_resource type="Script" uid="uid://b55i7dk41uy35" path="res://scripts/fishing_info_view.gd" id="43_jf01x"]
 [ext_resource type="Script" uid="uid://df3lc2dpk1rx7" path="res://scripts/screen_transition.gd" id="43_n6fh7"]
+[ext_resource type="Texture2D" uid="uid://biwb03lpmn68q" path="res://assets/sprites/info_frame.png" id="44_wnbcf"]
 [ext_resource type="Script" uid="uid://bikrpbvei4d02" path="res://scripts/fishing_info_controller.gd" id="58_1hrhd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
@@ -612,13 +613,11 @@ offset_bottom = 100.0
 
 [node name="InfoFrame" type="TextureRect" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1141065130]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="InfoTitle" type="TextureRect" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1634986098]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -20.0
+offset_right = 186.0
+scale = Vector2(3, 3)
+texture = ExtResource("44_wnbcf")
+stretch_mode = 4
 
 [node name="MessageLabel" type="Label" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1168696638]
 layout_mode = 0
