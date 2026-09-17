@@ -1,5 +1,6 @@
 extends Node
 
+signal bite_opportunity_started
 signal bite_triggered
 signal bite_missed
 signal fish_hooked
@@ -40,6 +41,8 @@ signal line_broken
 
 @export var first_bite_delay: float = 0.5
 @export var retry_bite_delay: float = 0.5
+@export_range(0.0, 1.0, 0.05)
+var direct_hit_chance: float = 0.5
 
 @export_range(0.0, 1.0, 0.05)
 var max_bite_chance_per_check: float = 1.0
@@ -135,20 +138,33 @@ func _on_bite_timer_timeout() -> void:
 	if pending_fish_entry.fish == null:
 		return
 
+	if randf() < direct_hit_chance:
+		print(
+			"DIRECT HIT! Candidate: ",
+			pending_fish_entry.fish.fish_name
+		)
+
+		_confirm_hit()
+		return
+
+
 	bite_active = true
 
 	print(
-		"BITE! Candidate: ",
+		"BITE OPPORTUNITY! Candidate: ",
 		pending_fish_entry.fish.fish_name
 	)
 
-	bite_triggered.emit()
+	bite_opportunity_started.emit()
 	bite_window_timer.start()
 
 func try_hook() -> bool:
 	if not bite_active:
 		return false
 
+	return _confirm_hit()
+
+func _confirm_hit() -> bool:
 	if pending_fish_entry == null:
 		return false
 
@@ -186,14 +202,18 @@ func try_hook() -> bool:
 
 	rounds_remaining = total_rounds
 
-	print("HOOKED!")
-	fish_hooked.emit()
-
 	_start_resistance_round()
+
 	tension.start()
 	tension.set_reel_gain_multiplier(1.0)
-	return true
 
+	print("HIT!")
+
+	bite_triggered.emit()
+	fish_hooked.emit()
+
+	return true
+	
 func _on_bite_window_timeout() -> void:
 	bite_active = false
 	pending_fish_entry = null
