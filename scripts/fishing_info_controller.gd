@@ -1,8 +1,8 @@
 extends Node
 
 @export var encounter: Node
-@export var info_view: Node
-
+@export var info_view: Node	
+@export var screen_transition: Node
 
 func _ready() -> void:
 	encounter.fish_resistance_started.connect(
@@ -21,6 +21,10 @@ func _ready() -> void:
 		_on_line_broken
 	)
 
+	screen_transition.covered.connect(
+	_on_screen_covered
+	)
+	
 func _on_fish_resistance_started() -> void:
 	info_view.show_message(
 		"The fish is thrashing about!"
@@ -46,3 +50,7 @@ func _on_line_broken() -> void:
 		2.0,
 		FishingInfoView.Priority.CRITICAL
 	)
+
+func _on_screen_covered() -> void:
+	info_view.clear()
+	

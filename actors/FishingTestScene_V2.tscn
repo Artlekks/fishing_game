@@ -719,10 +719,11 @@ reel_gain_speed = 0.12
 resistance_gain_speed = 0.05
 line_break_delay = 1.0
 
-[node name="FishingInfoController" type="Node" parent="Game/Fishing" unique_id=661892573 node_paths=PackedStringArray("encounter", "info_view")]
+[node name="FishingInfoController" type="Node" parent="Game/Fishing" unique_id=661892573 node_paths=PackedStringArray("encounter", "info_view", "screen_transition")]
 script = ExtResource("58_1hrhd")
 encounter = NodePath("../Encounter")
 info_view = NodePath("../../../UI/FishingHud/FishingInfoView")
+screen_transition = NodePath("../../../UI/FishingHud/ScreenTransition")
 
 [editable path="World/River_001"]
 [editable path="World/FishZone_V2"]

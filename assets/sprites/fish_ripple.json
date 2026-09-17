@@ -1,0 +1,401 @@
+{ "frames": {
+   "fish_ripple 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 1.aseprite": {
+    "frame": { "x": 248, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 2.aseprite": {
+    "frame": { "x": 496, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 3.aseprite": {
+    "frame": { "x": 744, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 4.aseprite": {
+    "frame": { "x": 992, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 5.aseprite": {
+    "frame": { "x": 1240, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 6.aseprite": {
+    "frame": { "x": 1488, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 7.aseprite": {
+    "frame": { "x": 1736, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 8.aseprite": {
+    "frame": { "x": 1984, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 9.aseprite": {
+    "frame": { "x": 2232, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 10.aseprite": {
+    "frame": { "x": 2480, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 11.aseprite": {
+    "frame": { "x": 2728, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 12.aseprite": {
+    "frame": { "x": 2976, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 13.aseprite": {
+    "frame": { "x": 3224, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 14.aseprite": {
+    "frame": { "x": 3472, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 15.aseprite": {
+    "frame": { "x": 3720, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 16.aseprite": {
+    "frame": { "x": 3968, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 17.aseprite": {
+    "frame": { "x": 4216, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 18.aseprite": {
+    "frame": { "x": 4464, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 19.aseprite": {
+    "frame": { "x": 4712, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 20.aseprite": {
+    "frame": { "x": 4960, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 21.aseprite": {
+    "frame": { "x": 5208, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 22.aseprite": {
+    "frame": { "x": 5456, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 23.aseprite": {
+    "frame": { "x": 5704, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 24.aseprite": {
+    "frame": { "x": 5952, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 25.aseprite": {
+    "frame": { "x": 6200, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 26.aseprite": {
+    "frame": { "x": 6448, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 27.aseprite": {
+    "frame": { "x": 6696, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 28.aseprite": {
+    "frame": { "x": 6944, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 29.aseprite": {
+    "frame": { "x": 7192, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 30.aseprite": {
+    "frame": { "x": 7440, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 31.aseprite": {
+    "frame": { "x": 7688, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 32.aseprite": {
+    "frame": { "x": 7936, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 33.aseprite": {
+    "frame": { "x": 8184, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 34.aseprite": {
+    "frame": { "x": 8432, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 35.aseprite": {
+    "frame": { "x": 8680, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 36.aseprite": {
+    "frame": { "x": 8928, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 37.aseprite": {
+    "frame": { "x": 9176, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 38.aseprite": {
+    "frame": { "x": 9424, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 39.aseprite": {
+    "frame": { "x": 9672, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 40.aseprite": {
+    "frame": { "x": 9920, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 41.aseprite": {
+    "frame": { "x": 10168, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 42.aseprite": {
+    "frame": { "x": 10416, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 43.aseprite": {
+    "frame": { "x": 10664, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 44.aseprite": {
+    "frame": { "x": 10912, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 45.aseprite": {
+    "frame": { "x": 11160, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 46.aseprite": {
+    "frame": { "x": 11408, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   },
+   "fish_ripple 47.aseprite": {
+    "frame": { "x": 11656, "y": 0, "w": 248, "h": 127 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 248, "h": 127 },
+    "sourceSize": { "w": 248, "h": 127 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://github.com/LibreSprite/LibreSprite/",
+  "version": "1.1-dev",
+  "image": "C:\\Users\\Alucard7th\\AppData\\Local\\DuckStation\\screenshots\\fish_ripple.png",
+  "format": "RGBA8888",
+  "size": { "w": 11904, "h": 127 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Ripples", "from": 0, "to": 47, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
+  ]
+ }
+}
