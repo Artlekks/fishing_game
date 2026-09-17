@@ -460,6 +460,8 @@ func _on_bite_triggered() -> void:
 	if phase != Phase.IN_WATER:
 		return
 
+	caster.hide_bait_ripple()
+
 	bite_opportunity_animation_active = false
 	bite_animation_active = true
 	current_reel_animation = &""
@@ -471,11 +473,15 @@ func _on_bite_opportunity_started() -> void:
 		return
 
 	bite_opportunity_animation_active = true
+
+	caster.show_bait_ripple()
 	sprite_director.play(&"Reel_Front")
 	
 func _on_bite_missed() -> void:
 	if phase != Phase.IN_WATER:
 		return
+
+	caster.hide_bait_ripple()
 
 	bite_opportunity_animation_active = false
 	current_reel_animation = &""

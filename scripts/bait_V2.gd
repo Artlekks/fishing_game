@@ -4,6 +4,7 @@ signal landed(point: Vector3)
 signal returned
 signal depth_changed(current_depth: float, total_depth: float)
 
+@onready var ripple_view: Node3D = $RippleView
 @export var gravity: float = 24.0
 @export var return_distance: float = 0.5
 @export var data: BaitData
@@ -70,6 +71,13 @@ func launch(
 	air_curve_input = 0.0
 	air_curve_angle = 0.0
 	state = State.FLYING
+
+	ripple_view.configure(
+		self,
+		water_y
+	)
+
+	ripple_view.hide_ripple()
 
 func set_air_curve(value: float) -> void:
 	air_curve_input = clampf(value, -1.0, 1.0)
@@ -475,3 +483,10 @@ func twitch_side(direction: float) -> void:
 
 func set_reel_speed_multiplier(value: float) -> void:
 	reel_speed_multiplier = maxf(value, 0.0)
+
+func show_ripple() -> void:
+	ripple_view.show_ripple()
+
+
+func hide_ripple() -> void:
+	ripple_view.hide_ripple()

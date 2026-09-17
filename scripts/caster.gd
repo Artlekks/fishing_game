@@ -176,3 +176,12 @@ func set_air_curve(value: float) -> void:
 func set_bait_frozen(active: bool) -> void:
 	if is_instance_valid(active_bait):
 		active_bait.set_simulation_frozen(active)
+
+func show_bait_ripple() -> void:
+	if is_instance_valid(active_bait):
+		active_bait.show_ripple()
+
+
+func hide_bait_ripple() -> void:
+	if is_instance_valid(active_bait):
+		active_bait.hide_ripple()
