@@ -616,23 +616,24 @@ script = ExtResource("43_jf01x")
 [node name="Root" type="Control" parent="UI/FishingHud/FishingInfoView" unique_id=23403449]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 40.0
+offset_left = 30.0
 offset_top = 40.0
-offset_right = 600.0
-offset_bottom = 100.0
+offset_right = 610.0
+offset_bottom = 54.0
 
 [node name="InfoFrame" type="TextureRect" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1141065130]
 layout_mode = 0
 offset_top = -20.0
 offset_right = 186.0
-scale = Vector2(3, 3)
+scale = Vector2(2, 2)
 texture = ExtResource("44_wnbcf")
 stretch_mode = 4
 
 [node name="MessageLabel" type="Label" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1168696638]
 layout_mode = 0
+offset_top = -10.0
 offset_right = 560.0
-offset_bottom = 60.0
+offset_bottom = 13.0
 
 [node name="FishingCatchView" type="CanvasLayer" parent="UI/FishingHud" unique_id=2015128177]
 script = ExtResource("45_kheg5")
