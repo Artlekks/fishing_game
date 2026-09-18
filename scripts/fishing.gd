@@ -25,6 +25,7 @@ enum Phase {
 @onready var power: Node = $Power
 @onready var caster: Node3D = $Caster
 @onready var encounter: Node = $Encounter
+@onready var throw_preview: Node3D = $ThrowPreview
 
 @export var game_mode: Node
 @export var camera_rig: Node
@@ -69,7 +70,8 @@ func _ready() -> void:
 	encounter.fish_caught.connect(_on_fish_caught)
 	fishing_catch_view.shown.connect(_on_catch_view_shown)
 	fishing_catch_view.dismissed.connect(_on_catch_view_dismissed)
-
+	power.power_changed.connect(_on_power_changed)
+	
 	camera_rig.connect(
 		"fishing_view_ready",
 		Callable(self, "_on_fishing_view_ready")
@@ -128,6 +130,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if phase == Phase.PREP_THROW or phase == Phase.CHARGE:
 		if event.is_action_pressed("cancel_fishing"):
+			throw_preview.hide_preview()
 			if (
 				power_meter_view != null
 				and power_meter_view.has_method("cancel_to_aim")
@@ -144,6 +147,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			
 	if phase == Phase.CHARGE:
 		if event.is_action_pressed("enter_fishing"):
+			throw_preview.hide_preview()
+			
 			var captured_power: float = power.capture()
 
 			var zone = game_mode.active_fish_zone
@@ -637,3 +642,21 @@ func _on_result_screen_revealed() -> void:
 
 	phase = Phase.AIM
 	aim.resume()
+
+func _on_power_changed(value: float) -> void:
+	if phase != Phase.PREP_THROW and phase != Phase.CHARGE:
+		return
+
+	var zone = game_mode.active_fish_zone
+
+	if zone == null:
+		throw_preview.hide_preview()
+		return
+
+	var points: PackedVector3Array = caster.predict_cast(
+		value,
+		aim.get_direction(),
+		zone.get_water_y()
+	)
+
+	throw_preview.show_preview(points)

@@ -62,6 +62,7 @@
 [ext_resource type="Script" uid="uid://cx7dasqcwn8j8" path="res://scripts/fishing_catch_view.gd" id="45_kheg5"]
 [ext_resource type="Texture2D" uid="uid://3iqyvi72swnm" path="res://assets/sprites/Atlas_Fishes.png" id="46_hmxwl"]
 [ext_resource type="FontFile" uid="uid://c35wcinto4ik1" path="res://assets/fonts/BOF_Font.fnt" id="48_1gbnc"]
+[ext_resource type="Script" uid="uid://c4s43igyy5g0v" path="res://scripts/throw_preview.gd" id="56_bqx6j"]
 [ext_resource type="Script" uid="uid://bikrpbvei4d02" path="res://scripts/fishing_info_controller.gd" id="58_1hrhd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
@@ -166,6 +167,18 @@ blend_mode = 2
 [sub_resource type="AtlasTexture" id="AtlasTexture_hmxwl"]
 atlas = ExtResource("46_hmxwl")
 region = Rect2(5, 217, 72, 48)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1gbnc"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.5372549, 1, 1, 1)
+
+[sub_resource type="TorusMesh" id="TorusMesh_1gbnc"]
+material = SubResource("StandardMaterial3D_1gbnc")
+inner_radius = 0.2
+outer_radius = 0.26
+rings = 24
+ring_segments = 24
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -276,6 +289,9 @@ collision_layer = 1
 
 [node name="ShadowSprite3D" parent="Player/CharacterBody3D/AnimatedSprite3D" parent_id_path=PackedInt32Array(363575400, 477032395) index="0" unique_id=1206580126]
 texture = ExtResource("23_30w2a")
+
+[node name="BaitSpawner" parent="Player/CharacterBody3D" index="3" unique_id=175473048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07116139, 0.30348152, 0.25534296)
 
 [node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
@@ -752,6 +768,16 @@ script = ExtResource("13_k4i7q")
 
 [node name="Power" type="Node" parent="Game/Fishing" unique_id=1465953422]
 script = ExtResource("14_c57dm")
+speed = 0.65
+
+[node name="ThrowPreview" type="Node3D" parent="Game/Fishing" unique_id=444278920]
+script = ExtResource("56_bqx6j")
+
+[node name="Arc" type="MeshInstance3D" parent="Game/Fishing/ThrowPreview" unique_id=247921347]
+
+[node name="LandingRing" type="MeshInstance3D" parent="Game/Fishing/ThrowPreview" unique_id=1311900188]
+visible = false
+mesh = SubResource("TorusMesh_1gbnc")
 
 [node name="Caster" type="Node3D" parent="Game/Fishing" unique_id=1862145617 node_paths=PackedStringArray("spawn_point", "reel_target")]
 script = ExtResource("15_hrkbp")

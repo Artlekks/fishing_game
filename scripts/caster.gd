@@ -15,6 +15,7 @@ signal bait_distance_changed(distance_meters: float)
 @export var reel_target: Node3D
 @export_category("Distance Display")
 @export var distance_meter_scale: float = 2.0
+@export var cast_gravity: float = 24.0
 
 var active_bait: Node3D
 var current_bait_depth: float = 0.0
@@ -59,18 +60,9 @@ func perform_cast(
 	direction.y = 0.0
 	direction = direction.normalized()
 
-	var speed := lerpf(
-		min_speed,
-		max_speed,
-		clampf(power, 0.0, 1.0)
-	)
-
-	var angle := deg_to_rad(launch_angle_degrees)
-
-	var initial_velocity := Vector3(
-		direction.x * speed * cos(angle),
-		speed * sin(angle),
-		direction.z * speed * cos(angle)
+	var initial_velocity := calculate_initial_velocity(
+		power,
+		direction
 	)
 
 	active_bait = bait_scene.instantiate()
@@ -84,7 +76,8 @@ func perform_cast(
 	active_bait.returned.connect(_on_bait_returned)
 
 	active_bait.set_reel_target(reel_target)
-
+	active_bait.gravity = cast_gravity
+	
 	active_bait.launch(
 		spawn_point.global_position,
 		initial_velocity,
@@ -93,7 +86,63 @@ func perform_cast(
 	)
 	return active_bait
 
+func predict_cast(
+	power: float,
+	direction: Vector3,
+	water_y: float
+) -> PackedVector3Array:
+	var points := PackedVector3Array()
 
+	if spawn_point == null:
+		return points
+
+	var position := spawn_point.global_position
+	var velocity := calculate_initial_velocity(
+		power,
+		direction
+	)
+
+	var step := 1.0 / float(Engine.physics_ticks_per_second)
+
+	points.append(position)
+
+	for i in range(300):
+		# Same integration order as bait_V2.gd.
+		velocity.y -= cast_gravity * step
+
+		var next_position := position + velocity * step
+
+		if position.y >= water_y and next_position.y <= water_y:
+			next_position.y = water_y
+			points.append(next_position)
+			break
+
+		points.append(next_position)
+		position = next_position
+
+	return points
+	
+func calculate_initial_velocity(
+	power: float,
+	direction: Vector3
+) -> Vector3:
+	direction.y = 0.0
+	direction = direction.normalized()
+
+	var speed := lerpf(
+		min_speed,
+		max_speed,
+		clampf(power, 0.0, 1.0)
+	)
+
+	var angle := deg_to_rad(launch_angle_degrees)
+
+	return Vector3(
+		direction.x * speed * cos(angle),
+		speed * sin(angle),
+		direction.z * speed * cos(angle)
+	)
+	
 func _on_bait_landed(point: Vector3) -> void:
 	bait_landed.emit(point)
 
