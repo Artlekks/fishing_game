@@ -31,6 +31,14 @@ signal fish_spent
 @export var caster: Node
 
 @export_category("Spent Recovery")
+@export_range(0.0, 1.0, 0.05)
+var spent_behavior_intensity: float = 0.20
+
+@export_range(0.0, 1.0, 0.05)
+var spent_resistance: float = 0.18
+
+@export_range(0.0, 1.0, 0.05)
+var spent_pull_strength: float = 0.20
 @export var spent_recovery_time: float = 5.0
 @export_range(0.0, 1.0, 0.05) var spent_recovery_stamina_ratio: float = 0.35
 @export_range(0.0, 1.0, 0.05) var spent_restart_intensity: float = 0.65
@@ -48,6 +56,10 @@ var direct_hit_chance: float = 0.5
 
 @export_range(0.0, 1.0, 0.05)
 var max_bite_chance_per_check: float = 1.0
+
+@export_category("Release Reaction")
+@export_range(0.0, 1.0, 0.05)
+var release_movement_intensity: float = 0.35
 
 var fish_behavior_pressure: float = 0.0
 var current_tension_state: int = FishingTension.State.SAFE
@@ -246,7 +258,28 @@ func _process(delta: float) -> void:
 		return
 
 	if fight_state == FightState.SPENT:
-		fish_pull_changed.emit(0.0)
+		var spent_pressure := clampf(
+			fish_behavior_pressure,
+			0.0,
+			1.0
+		)
+
+		var current_spent_resistance := (
+			spent_resistance
+			* lerpf(0.5, 1.0, spent_pressure)
+		)
+
+		tension.set_fish_resistance(
+			current_spent_resistance
+		)
+
+		fish_pull_changed.emit(
+			lerpf(
+				spent_pull_strength * 0.5,
+				spent_pull_strength,
+				spent_pressure
+			)
+		)
 
 		recovery_time_left -= delta
 
@@ -327,8 +360,17 @@ func _process(delta: float) -> void:
 		_finish_resistance_round() 
 		
 func set_player_reeling(active: bool) -> void:
+	var was_reeling := player_reeling
+
 	player_reeling = active
 	tension.set_player_reeling(active)
+
+	# K has just been released.
+	if was_reeling and not active:
+		if fight_state != FightState.NONE:
+			fish_behavior.react_to_slack(
+				release_movement_intensity
+			)
 
 func set_player_steering(value: float) -> void:
 	player_steering = clampf(value, -1.0, 1.0)
@@ -424,13 +466,17 @@ func _enter_spent() -> void:
 	
 	recovery_time_left = spent_recovery_time
 
-	tension.set_fish_resistance(0.0)
+	tension.set_fish_resistance(spent_resistance)
 	tension.set_reel_gain_multiplier(spent_tension_multiplier)
 
-	fish_behavior.stop()
+	# The fish is exhausted, not dead.
+	fish_behavior.start(spent_behavior_intensity)
 
+	# Keep this at zero so the animation system still
+	# considers the fish "spent" and stays relaxed.
 	fish_resistance_changed.emit(0.0)
-	fish_pull_changed.emit(0.0)
+
+	fish_pull_changed.emit(spent_pull_strength)
 
 	caster.set_reel_speed_multiplier(spent_reel_speed_multiplier)
 

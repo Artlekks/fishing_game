@@ -118,3 +118,21 @@ func configure(fish: FishInstance) -> void:
 
 	min_change_time = fish.direction_change_min
 	max_change_time = fish.direction_change_max
+	
+func react_to_slack(new_intensity: float = 0.35) -> void:
+	intensity = clampf(new_intensity, 0.0, 1.0)
+	active = true
+
+	# Don't use SURGE_AWAY here.
+	# Releasing the reel should create movement,
+	# not automatically make the fish sprint away.
+	current_fight_back = randi_range(
+		FightBackType.SIDE_RUN,
+		FightBackType.ERRATIC
+	)
+
+	side_direction = -1.0 if randf() < 0.5 else 1.0
+
+	fight_back_started.emit(current_fight_back)
+
+	_choose_new_movement()

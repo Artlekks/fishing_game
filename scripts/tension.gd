@@ -40,7 +40,6 @@ enum State {
 
 # Small player influence around the center.
 @export var reel_target_offset: float = 0.03
-@export var release_target_offset: float = 0.03
 
 # Fish resistance below this does not push the bar toward danger.
 @export_range(0.0, 1.0, 0.05)
@@ -48,6 +47,8 @@ var thrash_threshold: float = 0.70
 
 # Maximum additional tension caused by a fully thrashing fish.
 @export var thrash_target_offset: float = 0.25
+@export var release_tension_speed: float = 0.12
+@export var passive_resistance_offset: float = 0.08
 
 var value: float = 0.45
 var active: bool = false
@@ -93,32 +94,57 @@ func _process(delta: float) -> void:
 	# ---------------------------------------------------------
 	var safe_center := (safe_min + safe_max) * 0.5
 
-	var target_tension := safe_center
+	var target_tension: float = 0.0
+	var response_speed: float = release_tension_speed
 
-	# Player influence is intentionally small.
 	if player_reeling:
+		# K held: tension naturally settles around the safe center.
+		target_tension = safe_center
+
 		target_tension += (
 			reel_target_offset
 			* reel_gain_multiplier
 		)
-	else:
-		target_tension -= release_target_offset
 
-
-	# Only a genuinely strong fish action pushes us toward danger.
-	if fish_resistance > thrash_threshold:
-		var thrash_amount := inverse_lerp(
-			thrash_threshold,
-			1.0,
+		# Even normal fish resistance gives the gauge
+		# a little organic movement.
+		target_tension += (
 			fish_resistance
+			* passive_resistance_offset
 		)
+
+		# Only genuine thrashing adds serious danger.
+		if fish_resistance > thrash_threshold:
+			var thrash_amount := inverse_lerp(
+				thrash_threshold,
+				1.0,
+				fish_resistance
+			)
+
+			target_tension += (
+				thrash_amount
+				* thrash_target_offset
+			)
 
 		target_tension += (
-			thrash_amount
-			* thrash_target_offset
+			player_tension_bias
+			* directional_tension_speed
 		)
 
+		response_speed = tension_response_speed
 
+
+	target_tension = clampf(
+		target_tension,
+		0.0,
+		1.0
+	)
+
+	value = move_toward(
+		value,
+		target_tension,
+		response_speed * delta
+	)
 	# W/S can still bias tension.
 	if player_reeling:
 		target_tension += (
