@@ -9,7 +9,7 @@ region = Rect2(5, 58, 72, 48)
 
 [resource]
 script = ExtResource("1_7q5vc")
-fish_name = "Common"
+fish_name = "Sea Bass"
 preferred_depth_max = 0.3
 accepts_all_lures = true
 lateral_activity = 0.1

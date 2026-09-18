@@ -61,6 +61,7 @@
 [ext_resource type="Texture2D" uid="uid://1fdaxsgd80ca" path="res://assets/sprites/CatchFrame.png" id="45_h3od0"]
 [ext_resource type="Script" uid="uid://cx7dasqcwn8j8" path="res://scripts/fishing_catch_view.gd" id="45_kheg5"]
 [ext_resource type="Texture2D" uid="uid://3iqyvi72swnm" path="res://assets/sprites/Atlas_Fishes.png" id="46_hmxwl"]
+[ext_resource type="FontFile" uid="uid://c35wcinto4ik1" path="res://assets/fonts/BOF_Font.fnt" id="48_1gbnc"]
 [ext_resource type="Script" uid="uid://bikrpbvei4d02" path="res://scripts/fishing_info_controller.gd" id="58_1hrhd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
@@ -664,6 +665,39 @@ scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_hmxwl")
 stretch_mode = 2
 
+[node name="FishNameLabel" type="Label" parent="UI/FishingHud/FishingCatchView/Root" unique_id=456680469]
+layout_mode = 0
+offset_left = 226.0
+offset_top = 90.0
+offset_right = 346.0
+offset_bottom = 113.0
+scale = Vector2(1.6, 1.6)
+theme_override_fonts/font = ExtResource("48_1gbnc")
+text = "Sea Bass"
+horizontal_alignment = 1
+
+[node name="FishSizeLabel" type="Label" parent="UI/FishingHud/FishingCatchView/Root" unique_id=1917514658]
+layout_mode = 0
+offset_left = 333.0
+offset_top = 148.0
+offset_right = 373.0
+offset_bottom = 171.0
+scale = Vector2(1.6, 1.6)
+theme_override_fonts/font = ExtResource("48_1gbnc")
+text = "68"
+horizontal_alignment = 2
+
+[node name="FishPointsLabel" type="Label" parent="UI/FishingHud/FishingCatchView/Root" unique_id=690097807]
+layout_mode = 0
+offset_left = 332.0
+offset_top = 190.0
+offset_right = 372.0
+offset_bottom = 213.0
+scale = Vector2(1.6, 1.6)
+theme_override_fonts/font = ExtResource("48_1gbnc")
+text = "280"
+horizontal_alignment = 2
+
 [node name="ScreenTransition" type="CanvasLayer" parent="UI/FishingHud" unique_id=515018801]
 layer = 100
 script = ExtResource("43_n6fh7")
@@ -708,6 +742,7 @@ power_meter_view = NodePath("../../UI/FishingHud/PowerMeter")
 depth_meter_view = NodePath("../../UI/FishingHud/PowerMeter/DepthMeter")
 screen_transition = NodePath("../../UI/FishingHud/ScreenTransition")
 fishing_catch_view = NodePath("../../UI/FishingHud/FishingCatchView")
+catch_frame_delay = 0.3
 
 [node name="Aim" type="Node" parent="Game/Fishing" unique_id=1873530056]
 script = ExtResource("13_k4i7q")

@@ -15,6 +15,7 @@ enum Phase {
 	CATCH,
 	LINE_BROKEN,
 	WAIT_RESULT,
+	CATCH_DISMISS,
 	RESULT_TRANSITION,
 	PUT_AWAY,
 	EXIT
@@ -33,6 +34,8 @@ enum Phase {
 @export var depth_meter_view: Node
 @export var screen_transition: Node
 @export var fishing_catch_view: Node
+@export_category("Catch Result")
+@export var catch_frame_delay: float = 0.5
 
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
@@ -64,7 +67,9 @@ func _ready() -> void:
 	encounter.hook_off.connect(_on_fight_failed)
 	encounter.line_broken.connect(_on_line_broken)
 	encounter.fish_caught.connect(_on_fish_caught)
-	
+	fishing_catch_view.shown.connect(_on_catch_view_shown)
+	fishing_catch_view.dismissed.connect(_on_catch_view_dismissed)
+
 	camera_rig.connect(
 		"fishing_view_ready",
 		Callable(self, "_on_fishing_view_ready")
@@ -96,7 +101,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if phase == Phase.WAIT_RESULT:
 		if event.is_action_pressed("enter_fishing"):
-			_begin_result_transition()
+			if caught_fish != null:
+				phase = Phase.CATCH_DISMISS
+				fishing_catch_view.dismiss_catch()
+			else:
+				_begin_result_transition()
 
 		return
 		
@@ -357,10 +366,14 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		return
 	
 	if animation_name == &"Fishing_Catch" and phase == Phase.CATCH:
+		await get_tree().create_timer(catch_frame_delay).timeout
+
+		if phase != Phase.CATCH:
+			return
+
 		if caught_fish != null:
 			fishing_catch_view.show_catch(caught_fish)
 
-		phase = Phase.WAIT_RESULT
 		return
 	
 	if animation_name == &"Reel_Broken_Rod" and phase == Phase.LINE_BROKEN:
@@ -378,7 +391,13 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		strong_pull_animation_active = false
 		current_reel_animation = &""
 		return
-		
+
+func _on_catch_view_shown() -> void:
+	if phase != Phase.CATCH:
+		return
+
+	phase = Phase.WAIT_RESULT
+	
 func _on_exploration_view_ready() -> void:
 	if phase != Phase.EXIT:
 		return
@@ -588,7 +607,30 @@ func _on_result_screen_covered() -> void:
 
 	screen_transition.fade_from_black()
 
+func _on_catch_view_dismissed() -> void:
+	if phase != Phase.CATCH_DISMISS:
+		return
 
+	caster.set_reeling(false)
+	caster.cancel_bait()
+
+	camera_rig.set_fishing_camera_frozen(false)
+	camera_rig.reset_fishing_follow()
+
+	power_meter_view.reset_to_aim()
+	depth_meter_view.reset_to_aim()
+
+	current_fish_pull = 0.0
+	current_reel_animation = &""
+	strong_pull_animation_active = false
+
+	caught_fish = null
+
+	sprite_director.play(&"Fishing_Idle")
+
+	phase = Phase.AIM
+	aim.resume()
+	
 func _on_result_screen_revealed() -> void:
 	if phase != Phase.RESULT_TRANSITION:
 		return
