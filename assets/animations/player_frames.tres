@@ -1194,7 +1194,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ufpf8")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"Reel_Bite",
 "speed": 8.0
 }, {
@@ -1220,7 +1220,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_o1ick")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"Reel_Bite_Strong",
 "speed": 8.0
 }, {
