@@ -41,10 +41,10 @@ enum Phase {
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
 var current_reel_animation: StringName = &""
-var strong_pull_animation_active: bool = false
 var bite_opportunity_animation_active: bool = false
 var bite_animation_active: bool = false
 var current_fish_pull: float = 0.0
+var fish_resisting: bool = false
 var caught_fish: FishInstance = null
 
 func _ready() -> void:
@@ -64,7 +64,6 @@ func _ready() -> void:
 	encounter.fish_pull_changed.connect(_on_fish_pull_changed)
 	encounter.fish_movement_changed.connect(_on_fish_movement_changed)
 	encounter.fish_depth_intent_changed.connect(_on_fish_depth_intent_changed)
-	encounter.strong_pull_started.connect(_on_strong_pull_started)
 	encounter.hook_off.connect(_on_fight_failed)
 	encounter.line_broken.connect(_on_line_broken)
 	encounter.fish_caught.connect(_on_fish_caught)
@@ -193,16 +192,24 @@ func _unhandled_input(event: InputEvent) -> void:
 
 			encounter.set_player_reeling(true)
 			caster.set_reeling(true)
-			sprite_director.play(&"Reel")
+			current_reel_animation = &""
+			_update_reel_animation()
 			return
 
 		if event.is_action_released("enter_fishing"):
 			encounter.set_player_reeling(false)
 			caster.set_reeling(false)
-			sprite_director.play(&"Reel_Idle")
+			current_reel_animation = &""
+			_update_reel_animation()
 			return
 	
-	if phase == Phase.FIGHT:
+	if event.is_action_pressed("move_back"):
+		if not bite_animation_active:
+			bite_animation_active = true
+			current_reel_animation = &""
+			sprite_director.play(&"Reel_Bite")
+		return
+
 		if event.is_action_pressed("enter_fishing"):
 			_set_fight_reeling(true)
 			return
@@ -211,34 +218,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			_set_fight_reeling(false)
 			return
 
-func _on_strong_pull_started() -> void:
-	if phase != Phase.FIGHT:
-		return
-
-	if not Input.is_action_pressed("enter_fishing"):
-		return
-
-	if strong_pull_animation_active:
-		return
-
-	strong_pull_animation_active = true
-	current_reel_animation = &"Reel_Back_Strong"
-	sprite_director.play(&"Reel_Back_Strong")
-	
 func _set_fight_reeling(active: bool) -> void:
 	encounter.set_player_reeling(active)
 	caster.set_reeling(active)
 
-	# Once the player actively reels during a fight,
-	# normal reeling takes priority over the HIT reaction.
-	if active and bite_animation_active:
-		bite_animation_active = false
-		current_reel_animation = &""
-
-	if not active:
-		strong_pull_animation_active = false
-		current_reel_animation = &""
-
+	current_reel_animation = &""
 	_update_reel_animation()
 		
 func _on_mode_changed(new_mode) -> void:
@@ -269,36 +253,26 @@ func _on_fishing_view_ready() -> void:
 	sprite_director.play(&"Prep_Fishing")
 
 func _update_reel_animation() -> void:
+	# Bite-window pose owns the animation until HIT or MISS resolves.
 	if bite_opportunity_animation_active:
 		return
 
+	# Reel_Bite_Strong is a one-shot confirmed-HIT reaction.
 	if bite_animation_active:
 		return
 
-	if strong_pull_animation_active:
-		return
-
 	var is_reeling := Input.is_action_pressed("enter_fishing")
-
-	var horizontal := Input.get_axis(
-		"ds_left",
-		"ds_right"
-	)
-
-	var vertical := Input.get_axis(
-		"move_forward",
-		"move_back"
-	)
-
+	var horizontal := Input.get_axis("ds_left", "ds_right")
+	var vertical := Input.get_axis("move_forward", "move_back")
 	var desired_animation: StringName
 
-	if is_reeling and vertical < -0.1:
-		desired_animation = &"Reel_Front"
+	# STEP 2 PRIORITY:
+	# 1. Left/right steering animation.
+	# 2. Forward/back input while actively reeling.
+	# 3. Otherwise use the base fight/water rules from Step 1.
 
-	elif is_reeling and vertical > 0.1:
-		desired_animation = &"Reel_Back"
-
-	elif horizontal < -0.1:
+	# A / D steering.
+	if horizontal < -0.1:
 		desired_animation = (
 			&"Reel_Left"
 			if is_reeling
@@ -312,12 +286,42 @@ func _update_reel_animation() -> void:
 			else &"Reel_Right_Idle"
 		)
 
+	# W / S only override the pose while K is held.
+	elif is_reeling and vertical < -0.1:
+		desired_animation = &"Reel_Front"
+
+	elif is_reeling and vertical > 0.1:
+		desired_animation = &"Reel_Back"
+
+	# No directional override: use the Step 1 fishing rules.
+	elif phase == Phase.FIGHT:
+		if fish_resisting:
+			if is_reeling:
+				desired_animation = &"Reel_Back_Strong"
+			else:
+				desired_animation = &"Reel_Front"
+		else:
+			if is_reeling:
+				desired_animation = &"Reel_Back"
+			else:
+				desired_animation = &"Reel_Idle"
+
+	elif phase == Phase.IN_WATER:
+		if is_reeling:
+			desired_animation = &"Reel"
+		else:
+			desired_animation = &"Reel_Idle"
+
+	elif phase == Phase.IN_WATER:
+		if is_reeling:
+			# No hooked fish: normal lure retrieval.
+			desired_animation = &"Reel"
+		else:
+			# Default water pose for now, including after MISS.
+			desired_animation = &"Reel_Back"
+
 	else:
-		desired_animation = (
-			&"Reel"
-			if is_reeling
-			else &"Reel_Idle"
-		)
+		return
 
 	if desired_animation == current_reel_animation:
 		return
@@ -384,18 +388,17 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		phase = Phase.WAIT_RESULT
 		return
 	
-	if animation_name == &"Reel_Bite" and bite_animation_active:
+	if (
+		(animation_name == &"Reel_Bite_Strong"
+		or animation_name == &"Reel_Bite")
+		and bite_animation_active
+	):
 		bite_animation_active = false
 		current_reel_animation = &""
 
 		_update_reel_animation()
 		return
 	
-	if animation_name == &"Reel_Back_Strong":
-		strong_pull_animation_active = false
-		current_reel_animation = &""
-		return
-
 func _on_catch_view_shown() -> void:
 	if phase != Phase.CATCH:
 		return
@@ -422,6 +425,7 @@ func _on_bait_landed(_point: Vector3) -> void:
 		
 func _enter_in_water() -> void:
 	phase = Phase.IN_WATER
+	current_reel_animation = &"Reel_Idle"
 	sprite_director.play(&"Reel_Idle")
 
 func _on_bait_returned() -> void:
@@ -453,7 +457,14 @@ func _process(_delta: float) -> void:
 		
 	if phase != Phase.IN_WATER and phase != Phase.FIGHT:
 		return
-
+	
+	if phase == Phase.FIGHT:
+		if Input.is_action_just_pressed("move_back"):
+			if not bite_animation_active:
+				bite_animation_active = true
+				current_reel_animation = &""
+				sprite_director.play(&"Reel_Bite")
+			
 	var steering := Input.get_axis("ds_left", "ds_right")
 	var vertical := Input.get_axis(
 		"move_forward",
@@ -474,6 +485,7 @@ func _on_fish_hooked() -> void:
 		return
 
 	phase = Phase.FIGHT
+	fish_resisting = true
 	caster.set_fight_mode(true)
 
 	var is_reeling := Input.is_action_pressed("enter_fishing")
@@ -481,9 +493,19 @@ func _on_fish_hooked() -> void:
 	encounter.set_player_reeling(is_reeling)
 	caster.set_reeling(is_reeling)
 
+	# If the HIT reaction is still playing, it finishes first.
+	# Otherwise immediately resolve to Reel_Front / Reel_Back_Strong.
+	if not bite_animation_active:
+		current_reel_animation = &""
+		_update_reel_animation()
+
 func _on_fish_exhausted() -> void:
 	if phase != Phase.FIGHT:
 		return
+
+	fish_resisting = false
+	current_reel_animation = &""
+	_update_reel_animation()
 
 func _on_fish_caught(fish: FishInstance) -> void:
 	caught_fish = fish
@@ -498,7 +520,7 @@ func _on_bite_triggered() -> void:
 	bite_animation_active = true
 	current_reel_animation = &""
 
-	sprite_director.play(&"Reel_Bite")
+	sprite_director.play(&"Reel_Bite_Strong")
 
 func _on_bite_opportunity_started() -> void:
 	if phase != Phase.IN_WATER:
@@ -525,6 +547,13 @@ func _on_fish_resistance_changed(value: float) -> void:
 		return
 
 	caster.set_fight_resistance(value)
+
+	var was_resisting := fish_resisting
+	fish_resisting = value > 0.01
+
+	if fish_resisting != was_resisting:
+		current_reel_animation = &""
+		_update_reel_animation()
 
 func _on_fish_pull_changed(value: float) -> void:
 	if phase != Phase.FIGHT:
@@ -553,7 +582,9 @@ func _on_line_broken() -> void:
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
-	strong_pull_animation_active = false
+	fish_resisting = false
+	bite_opportunity_animation_active = false
+	bite_animation_active = false
 
 	phase = Phase.LINE_BROKEN
 	sprite_director.play(&"Reel_Broken_Rod")
@@ -571,7 +602,9 @@ func _on_fight_failed() -> void:
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
-	strong_pull_animation_active = false
+	fish_resisting = false
+	bite_opportunity_animation_active = false
+	bite_animation_active = false
 
 	phase = Phase.LINE_BROKEN
 	sprite_director.play(&"Reel_Broken_Rod")
@@ -605,7 +638,9 @@ func _on_result_screen_covered() -> void:
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
-	strong_pull_animation_active = false
+	fish_resisting = false
+	bite_opportunity_animation_active = false
+	bite_animation_active = false
 
 	sprite_director.play(&"Fishing_Idle")
 
@@ -626,7 +661,9 @@ func _on_catch_view_dismissed() -> void:
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""
-	strong_pull_animation_active = false
+	fish_resisting = false
+	bite_opportunity_animation_active = false
+	bite_animation_active = false
 
 	caught_fish = null
 

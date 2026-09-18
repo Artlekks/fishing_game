@@ -17,6 +17,7 @@
 [ext_resource type="Resource" uid="uid://bliqlnu71ix85" path="res://data/fish/test_fish_rare.tres" id="11_v7stt"]
 [ext_resource type="Script" uid="uid://cb6v6f0ntyhvg" path="res://scripts/depth_meter_view.gd" id="12_7s285"]
 [ext_resource type="Script" uid="uid://bkfjklhkvyb14" path="res://scripts/aim.gd" id="13_k4i7q"]
+[ext_resource type="Script" uid="uid://c1nagc5sqiw7x" path="res://scripts/screen_space_marker.gd" id="14_0pfgo"]
 [ext_resource type="Script" uid="uid://dphljovh5lu0g" path="res://scripts/exploration_hud.gd" id="14_04ybk"]
 [ext_resource type="Script" uid="uid://b4pt5ur3sew6u" path="res://scripts/power.gd" id="14_c57dm"]
 [ext_resource type="Texture2D" uid="uid://bbthseaubq6v1" path="res://assets/sprites/Compass_Face.png" id="14_lu0sf"]
@@ -290,15 +291,17 @@ collision_layer = 1
 [node name="ShadowSprite3D" parent="Player/CharacterBody3D/AnimatedSprite3D" parent_id_path=PackedInt32Array(363575400, 477032395) index="0" unique_id=1206580126]
 texture = ExtResource("23_30w2a")
 
-[node name="BaitSpawner" parent="Player/CharacterBody3D" index="3" unique_id=175473048]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07116139, 0.30348152, 0.25534296)
-
-[node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07116139, 0.30348152, 0.25534296)
-gizmo_extents = 0.1
+[node name="BaitSpawner" parent="Player/CharacterBody3D" index="3" unique_id=175473048 node_paths=PackedStringArray("anchor", "camera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("14_0pfgo")
 anchor = NodePath("..")
 camera = NodePath("../../../CameraRig/Camera3D")
-screen_offset = Vector2(10, 10)
+screen_offset = Vector2(30, -60)
+
+[node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
+anchor = NodePath("..")
+camera = NodePath("../../../CameraRig/Camera3D")
+screen_offset = Vector2(30, -60)
 
 [node name="RyuScreenNotifier" type="VisibleOnScreenNotifier3D" parent="Player/CharacterBody3D" unique_id=2104172510]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27968735, -0.11015487)
@@ -815,12 +818,12 @@ script = ExtResource("30_lyatm")
 
 [node name="Tension" type="Node" parent="Game/Fishing/Encounter" unique_id=634102310]
 script = ExtResource("31_v7stt")
-start_tension = 0.08
+start_tension = 0.1
 safe_min = 0.32
 safe_max = 0.72
 reel_gain_speed = 0.12
 resistance_gain_speed = 0.05
-line_break_delay = 1.0
+line_break_delay = 2.5
 
 [node name="FishingInfoController" type="Node" parent="Game/Fishing" unique_id=661892573 node_paths=PackedStringArray("encounter", "info_view", "screen_transition")]
 script = ExtResource("58_1hrhd")
