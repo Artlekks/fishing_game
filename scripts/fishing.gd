@@ -475,8 +475,15 @@ func _process(_delta: float) -> void:
 	caster.set_reel_steering(steering)
 	
 	if phase == Phase.FIGHT:
+		var is_reeling := Input.is_action_pressed("enter_fishing")
+
+		# Continuous fight input.
+		# Do not rely only on key press/release events for the mechanic.
+		encounter.set_player_reeling(is_reeling)
+		caster.set_reeling(is_reeling)
+
 		encounter.set_player_steering(steering)
-	
+
 	if phase == Phase.IN_WATER or phase == Phase.FIGHT:
 		_update_reel_animation()
 	

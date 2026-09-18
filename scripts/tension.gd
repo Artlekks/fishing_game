@@ -31,6 +31,23 @@ enum State {
 @export var directional_tension_speed: float = 0.035
 @export_category("Failure")
 @export var line_break_delay: float = 1.5
+@export_category("Fight Start")
+@export var hit_grace_time: float = 0.75
+@export_category("Fight Balance")
+
+# How quickly tension moves toward its desired position.
+@export var tension_response_speed: float = 0.18
+
+# Small player influence around the center.
+@export var reel_target_offset: float = 0.03
+@export var release_target_offset: float = 0.03
+
+# Fish resistance below this does not push the bar toward danger.
+@export_range(0.0, 1.0, 0.05)
+var thrash_threshold: float = 0.70
+
+# Maximum additional tension caused by a fully thrashing fish.
+@export var thrash_target_offset: float = 0.25
 
 var value: float = 0.45
 var active: bool = false
@@ -41,57 +58,113 @@ var failure_enabled: bool = false
 var reel_gain_multiplier: float = 1.0
 var player_tension_bias: float = 0.0
 var overload_time: float = 0.0
+var hit_grace_time_left: float = 0.0
 
 func _process(delta: float) -> void:
 	if not active:
 		return
 
-	var change := 0.0
+	# ---------------------------------------------------------
+	# FREE REEL
+	# Keep the old simple behaviour before a fish is hooked.
+	# ---------------------------------------------------------
+	if not failure_enabled:
+		var change := 0.0
 
-	if player_reeling:
-		if failure_enabled:
-			change += reel_gain_speed * reel_gain_multiplier
-		else:
+		if player_reeling:
 			change += free_reel_gain_speed
-	else:
-		if failure_enabled:
-			change -= release_loss_speed
 		else:
 			change -= free_reel_loss_speed
-			
+
+		value = clampf(
+			value + change * delta,
+			0.0,
+			free_reel_max
+		)
+
+		tension_changed.emit(value)
+		_update_state()
+		return
+
+
+	# ---------------------------------------------------------
+	# FISH FIGHT
+	# Tension naturally wants to stay around the middle.
+	# ---------------------------------------------------------
+	var safe_center := (safe_min + safe_max) * 0.5
+
+	var target_tension := safe_center
+
+	# Player influence is intentionally small.
 	if player_reeling:
-		change += player_tension_bias * directional_tension_speed
-	
-	change += fish_resistance * resistance_gain_speed
+		target_tension += (
+			reel_target_offset
+			* reel_gain_multiplier
+		)
+	else:
+		target_tension -= release_target_offset
 
-	var max_value := 1.0 if failure_enabled else free_reel_max
 
-	value = clampf(
-		value + change * delta,
+	# Only a genuinely strong fish action pushes us toward danger.
+	if fish_resistance > thrash_threshold:
+		var thrash_amount := inverse_lerp(
+			thrash_threshold,
+			1.0,
+			fish_resistance
+		)
+
+		target_tension += (
+			thrash_amount
+			* thrash_target_offset
+		)
+
+
+	# W/S can still bias tension.
+	if player_reeling:
+		target_tension += (
+			player_tension_bias
+			* directional_tension_speed
+		)
+
+
+	target_tension = clampf(
+		target_tension,
 		0.0,
-		max_value
+		1.0
+	)
+
+
+	# Smoothly move toward the desired tension instead of
+	# constantly accumulating tension forever.
+	value = move_toward(
+		value,
+		target_tension,
+		tension_response_speed * delta
 	)
 
 	tension_changed.emit(value)
 
 	_update_state()
 
-	if failure_enabled and value <= 0.0:
+
+	# Slack failure.
+	if value <= 0.0:
 		active = false
 		hook_off.emit()
 		return
 
-	if failure_enabled:
-		if current_state == State.OVERLOAD:
-			overload_time += delta
 
-			if overload_time >= line_break_delay:
-				active = false
-				overload_time = 0.0
-				line_broken.emit()
-				return
-		else:
+	# Overload failure.
+	if current_state == State.OVERLOAD:
+		overload_time += delta
+
+		if overload_time >= line_break_delay:
+			active = false
 			overload_time = 0.0
+			line_broken.emit()
+			return
+	else:
+		overload_time = 0.0
 
 func set_reel_gain_multiplier(value: float) -> void:
 	reel_gain_multiplier = maxf(value, 0.0)
@@ -103,10 +176,10 @@ func start() -> void:
 	player_reeling = false
 	reel_gain_multiplier = 1.0
 	overload_time = 0.0
+	hit_grace_time_left = hit_grace_time
 	
 	_update_state()
 	tension_changed.emit(value)
-
 
 func stop() -> void:
 	active = false
@@ -114,6 +187,7 @@ func stop() -> void:
 	fish_resistance = 0.0
 	failure_enabled = false
 	overload_time = 0.0
+	hit_grace_time_left = 0.0
 	
 func set_player_reeling(reeling: bool) -> void:
 	player_reeling = reeling
