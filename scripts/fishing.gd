@@ -32,6 +32,7 @@ enum Phase {
 @export var power_meter_view: Node
 @export var depth_meter_view: Node
 @export var screen_transition: Node
+@export var fishing_catch_view: Node
 
 var phase: int = Phase.INACTIVE
 var bait_landed_during_throw: bool = false
@@ -40,6 +41,7 @@ var strong_pull_animation_active: bool = false
 var bite_opportunity_animation_active: bool = false
 var bite_animation_active: bool = false
 var current_fish_pull: float = 0.0
+var caught_fish: FishInstance = null
 
 func _ready() -> void:
 	game_mode.mode_changed.connect(_on_mode_changed)
@@ -61,6 +63,7 @@ func _ready() -> void:
 	encounter.strong_pull_started.connect(_on_strong_pull_started)
 	encounter.hook_off.connect(_on_fight_failed)
 	encounter.line_broken.connect(_on_line_broken)
+	encounter.fish_caught.connect(_on_fish_caught)
 	
 	camera_rig.connect(
 		"fishing_view_ready",
@@ -354,6 +357,9 @@ func _on_animation_finished(animation_name: StringName) -> void:
 		return
 	
 	if animation_name == &"Fishing_Catch" and phase == Phase.CATCH:
+		if caught_fish != null:
+			fishing_catch_view.show_catch(caught_fish)
+
 		phase = Phase.WAIT_RESULT
 		return
 	
@@ -455,6 +461,9 @@ func _on_fish_hooked() -> void:
 func _on_fish_exhausted() -> void:
 	if phase != Phase.FIGHT:
 		return
+
+func _on_fish_caught(fish: FishInstance) -> void:
+	caught_fish = fish
 	
 func _on_bite_triggered() -> void:
 	if phase != Phase.IN_WATER:
@@ -567,6 +576,9 @@ func _on_result_screen_covered() -> void:
 
 	power_meter_view.reset_to_aim()
 	depth_meter_view.reset_to_aim()
+	
+	fishing_catch_view.hide_catch()
+	caught_fish = null
 
 	current_fish_pull = 0.0
 	current_reel_animation = &""

@@ -42,6 +42,10 @@ var resistance_rounds: int = 2
 @export var recovery_time_min: float = 0.8
 @export var recovery_time_max: float = 1.5
 
+@export_category("Presentation")
+
+@export var portrait: Texture2D
+
 func get_lure_match_multiplier(bait: BaitData) -> float:
 	if bait == null:
 		return 1.0

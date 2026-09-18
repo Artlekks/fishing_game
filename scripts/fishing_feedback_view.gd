@@ -25,14 +25,18 @@ enum FeedbackType {
 @export_category("Timing")
 @export var display_time: float = 0.8
 @export var fade_time: float = 0.15
-
+@export var slide_time: float = 0.18
+@export var slide_padding_px: float = 30.0
+@export var screen_transition: Node
 
 var _feedback_tween: Tween = null
-
+var _rest_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	_rest_position = feedback_texture.position
 	feedback_texture.visible = false
-
+	screen_transition.covered.connect(clear)
+	
 	if encounter == null:
 		push_warning("FishingFeedbackView: Encounter is not assigned.")
 		return
@@ -74,7 +78,7 @@ func _on_line_broken() -> void:
 	show_feedback(FeedbackType.LINE_BREAK)
 
 
-func _on_fish_caught() -> void:
+func _on_fish_caught(_fish: FishInstance) -> void:
 	show_feedback(FeedbackType.CATCH)
 
 
@@ -88,23 +92,44 @@ func show_feedback(type: FeedbackType) -> void:
 
 	feedback_texture.texture = texture
 	feedback_texture.modulate.a = 1.0
+	feedback_texture.position = _get_offscreen_right_position()
 	feedback_texture.visible = true
 
 	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
 
-	tween.tween_interval(display_time)
-
+	# Every feedback enters from the right.
 	tween.tween_property(
 		feedback_texture,
-		"modulate:a",
-		0.0,
-		fade_time
+		"position",
+		_rest_position,
+		slide_time
+	)
+
+	# Hook Off and Line Break stay in the middle.
+	if (
+		type == FeedbackType.HOOK_OFF
+		or type == FeedbackType.LINE_BREAK
+	):
+		_feedback_tween = tween
+		return
+
+	# HIT / MISS / CATCH stay briefly...
+	tween.tween_interval(display_time)
+
+	# ...then leave through the left.
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		feedback_texture,
+		"position",
+		_get_offscreen_left_position(),
+		slide_time
 	)
 
 	tween.tween_callback(_hide_feedback)
 
 	_feedback_tween = tween
-
 
 func _get_feedback_texture(type: FeedbackType) -> Texture2D:
 	match type:
@@ -125,12 +150,11 @@ func _get_feedback_texture(type: FeedbackType) -> Texture2D:
 
 	return null
 
-
 func _hide_feedback() -> void:
 	feedback_texture.visible = false
+	feedback_texture.position = _rest_position
 	feedback_texture.modulate.a = 1.0
 	_feedback_tween = null
-
 
 func _kill_feedback_tween() -> void:
 	if (
@@ -140,3 +164,27 @@ func _kill_feedback_tween() -> void:
 		_feedback_tween.kill()
 
 	_feedback_tween = null
+
+func clear() -> void:
+	_kill_feedback_tween()
+
+	feedback_texture.visible = false
+	feedback_texture.position = _rest_position
+	feedback_texture.modulate.a = 1.0
+	
+func _get_offscreen_right_position() -> Vector2:
+	var viewport_width := get_viewport().get_visible_rect().size.x
+
+	return _rest_position + Vector2(
+		viewport_width + feedback_texture.size.x + slide_padding_px,
+		0.0
+	)
+
+
+func _get_offscreen_left_position() -> Vector2:
+	var viewport_width := get_viewport().get_visible_rect().size.x
+
+	return _rest_position - Vector2(
+		viewport_width + feedback_texture.size.x + slide_padding_px,
+		0.0
+	)

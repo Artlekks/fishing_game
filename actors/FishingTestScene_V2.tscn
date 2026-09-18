@@ -58,6 +58,9 @@
 [ext_resource type="Script" uid="uid://b55i7dk41uy35" path="res://scripts/fishing_info_view.gd" id="43_jf01x"]
 [ext_resource type="Script" uid="uid://df3lc2dpk1rx7" path="res://scripts/screen_transition.gd" id="43_n6fh7"]
 [ext_resource type="Texture2D" uid="uid://biwb03lpmn68q" path="res://assets/sprites/info_frame.png" id="44_wnbcf"]
+[ext_resource type="Texture2D" uid="uid://1fdaxsgd80ca" path="res://assets/sprites/CatchFrame.png" id="45_h3od0"]
+[ext_resource type="Script" uid="uid://cx7dasqcwn8j8" path="res://scripts/fishing_catch_view.gd" id="45_kheg5"]
+[ext_resource type="Texture2D" uid="uid://3iqyvi72swnm" path="res://assets/sprites/Atlas_Fishes.png" id="46_hmxwl"]
 [ext_resource type="Script" uid="uid://bikrpbvei4d02" path="res://scripts/fishing_info_controller.gd" id="58_1hrhd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahm77"]
@@ -158,6 +161,10 @@ _data = {
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_gdibe"]
 blend_mode = 2
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hmxwl"]
+atlas = ExtResource("46_hmxwl")
+region = Rect2(5, 217, 72, 48)
 
 [node name="FishingTestScene_V2" type="Node3D" unique_id=2114470757]
 
@@ -575,7 +582,7 @@ offset_bottom = 35.0
 texture = ExtResource("22_f3f7x")
 stretch_mode = 2
 
-[node name="FishingFeedbackView" type="CanvasLayer" parent="UI/FishingHud" unique_id=1387392026 node_paths=PackedStringArray("encounter")]
+[node name="FishingFeedbackView" type="CanvasLayer" parent="UI/FishingHud" unique_id=1387392026 node_paths=PackedStringArray("encounter", "screen_transition")]
 script = ExtResource("37_egn4m")
 encounter = NodePath("../../../Game/Fishing/Encounter")
 hit_texture = ExtResource("38_m07ff")
@@ -583,6 +590,7 @@ hook_off_texture = ExtResource("39_n6fh7")
 miss_texture = ExtResource("40_jf01x")
 line_break_texture = ExtResource("41_1hrhd")
 catch_texture = ExtResource("42_wnbcf")
+screen_transition = NodePath("../ScreenTransition")
 
 [node name="FeedbackTexture" type="TextureRect" parent="UI/FishingHud/FishingFeedbackView" unique_id=805338122]
 texture_filter = 1
@@ -624,6 +632,35 @@ layout_mode = 0
 offset_right = 560.0
 offset_bottom = 60.0
 
+[node name="FishingCatchView" type="CanvasLayer" parent="UI/FishingHud" unique_id=2015128177]
+script = ExtResource("45_kheg5")
+
+[node name="Root" type="Control" parent="UI/FishingHud/FishingCatchView" unique_id=870960186]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CatchFrame" type="TextureRect" parent="UI/FishingHud/FishingCatchView/Root" unique_id=773873745]
+layout_mode = 0
+offset_left = 162.0
+offset_top = 68.0
+offset_right = 321.0
+offset_bottom = 209.0
+scale = Vector2(2, 2)
+texture = ExtResource("45_h3od0")
+stretch_mode = 2
+
+[node name="FishPortrait" type="TextureRect" parent="UI/FishingHud/FishingCatchView/Root" unique_id=1954250058]
+layout_mode = 0
+offset_left = 175.86
+offset_top = 132.0
+offset_right = 247.86
+offset_bottom = 180.0
+scale = Vector2(2, 2)
+texture = SubResource("AtlasTexture_hmxwl")
+stretch_mode = 2
+
 [node name="ScreenTransition" type="CanvasLayer" parent="UI/FishingHud" unique_id=515018801]
 layer = 100
 script = ExtResource("43_n6fh7")
@@ -658,7 +695,7 @@ exploration_camera = NodePath("../../CameraRig/Camera3D")
 camera_rig = NodePath("../../CameraRig")
 fish_zone = NodePath("../../World/FishZone_V2")
 
-[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player", "power_meter_view", "depth_meter_view", "screen_transition")]
+[node name="Fishing" type="Node" parent="Game" unique_id=1752533199 node_paths=PackedStringArray("game_mode", "camera_rig", "sprite_director", "player", "power_meter_view", "depth_meter_view", "screen_transition", "fishing_catch_view")]
 script = ExtResource("3_tf5uk")
 game_mode = NodePath("../GameMode")
 camera_rig = NodePath("../../CameraRig")
@@ -667,6 +704,7 @@ player = NodePath("../../Player/CharacterBody3D")
 power_meter_view = NodePath("../../UI/FishingHud/PowerMeter")
 depth_meter_view = NodePath("../../UI/FishingHud/PowerMeter/DepthMeter")
 screen_transition = NodePath("../../UI/FishingHud/ScreenTransition")
+fishing_catch_view = NodePath("../../UI/FishingHud/FishingCatchView")
 
 [node name="Aim" type="Node" parent="Game/Fishing" unique_id=1873530056]
 script = ExtResource("13_k4i7q")

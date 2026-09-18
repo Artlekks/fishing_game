@@ -4,7 +4,7 @@ signal bite_opportunity_started
 signal bite_triggered
 signal bite_missed
 signal fish_hooked
-signal fish_caught
+signal fish_caught(fish: FishInstance)
 signal fish_stamina_changed(current: float, maximum: float)
 signal fish_exhausted
 signal fish_resistance_changed(value: float)
@@ -239,7 +239,7 @@ func catch_fish() -> void:
 	fish_behavior.stop()
 
 	print("CAUGHT!")
-	fish_caught.emit()
+	fish_caught.emit(active_fish)
 
 func _process(delta: float) -> void:
 	if fight_state == FightState.NONE:
