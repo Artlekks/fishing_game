@@ -303,6 +303,7 @@ current = true
 
 [node name="ExplorationHud" type="CanvasLayer" parent="UI" unique_id=981426337 node_paths=PackedStringArray("exploration", "camera_rig", "game_mode")]
 layer = 40
+visible = false
 script = ExtResource("14_04ybk")
 exploration = NodePath("../../Game/Exploration")
 camera_rig = NodePath("../../CameraRig")
@@ -632,9 +633,11 @@ stretch_mode = 4
 
 [node name="MessageLabel" type="Label" parent="UI/FishingHud/FishingInfoView/Root" unique_id=1168696638]
 layout_mode = 0
-offset_top = -10.0
-offset_right = 560.0
-offset_bottom = 13.0
+offset_left = 12.0
+offset_top = -2.0
+offset_right = 552.0
+offset_bottom = 21.0
+theme_override_fonts/font = ExtResource("48_1gbnc")
 
 [node name="FishingCatchView" type="CanvasLayer" parent="UI/FishingHud" unique_id=2015128177]
 script = ExtResource("45_kheg5")
