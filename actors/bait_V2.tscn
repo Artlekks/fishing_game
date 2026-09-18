@@ -383,6 +383,8 @@ shape = SubResource("SphereShape3D_xb8r5")
 script = ExtResource("3_ehehl")
 
 [node name="RippleSprite" type="AnimatedSprite3D" parent="RippleView" unique_id=1166987595]
+pixel_size = 0.002
+fixed_size = true
 texture_filter = 0
 sprite_frames = SubResource("SpriteFrames_l3qxs")
 animation = &"Ripple"

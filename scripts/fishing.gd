@@ -113,8 +113,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 	if phase == Phase.AIM:
 		if event.is_action_pressed("enter_fishing"):
-			aim.stop()
-
 			phase = Phase.PREP_THROW
 			power.start()
 			sprite_director.play(&"Prep_Throw")
@@ -147,6 +145,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			
 	if phase == Phase.CHARGE:
 		if event.is_action_pressed("enter_fishing"):
+			aim.stop()
 			throw_preview.hide_preview()
 			
 			var captured_power: float = power.capture()

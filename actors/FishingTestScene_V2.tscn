@@ -175,8 +175,8 @@ albedo_color = Color(0.5372549, 1, 1, 1)
 
 [sub_resource type="TorusMesh" id="TorusMesh_1gbnc"]
 material = SubResource("StandardMaterial3D_1gbnc")
-inner_radius = 0.2
-outer_radius = 0.26
+inner_radius = 0.1
+outer_radius = 0.13
 rings = 24
 ring_segments = 24
 
@@ -294,7 +294,7 @@ texture = ExtResource("23_30w2a")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07116139, 0.30348152, 0.25534296)
 
 [node name="ReelEndPoint" parent="Player/CharacterBody3D" index="5" unique_id=1454488651 node_paths=PackedStringArray("anchor", "camera")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07116139, 0.30348152, 0.25534296)
 gizmo_extents = 0.1
 anchor = NodePath("..")
 camera = NodePath("../../../CameraRig/Camera3D")
@@ -783,8 +783,7 @@ mesh = SubResource("TorusMesh_1gbnc")
 script = ExtResource("15_hrkbp")
 bait_scene = ExtResource("16_cxlon")
 spawn_point = NodePath("../../../Player/CharacterBody3D/BaitSpawner")
-min_speed = 5.0
-max_speed = 15.0
+min_speed = 2.0
 selected_bait_data = ExtResource("17_n1yj2")
 reel_target = NodePath("../../../Player/CharacterBody3D/ReelEndPoint")
 distance_meter_scale = 4.0
