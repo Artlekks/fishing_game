@@ -85,13 +85,14 @@ func _display_message(message: Dictionary) -> void:
 
 	message_label.text = message["text"]
 
-	root.position = _get_offscreen_right_position()
+	# Start above the screen.
+	root.position = _get_offscreen_top_position()
 	root.visible = true
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_SINE)
 
-	# Right → resting position.
+	# Above → resting position.
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property(
 		root,
@@ -100,22 +101,22 @@ func _display_message(message: Dictionary) -> void:
 		slide_time
 	)
 
-	# Stay on screen.
+	# Stay visible.
 	tween.tween_interval(message["duration"])
 
-	# Resting position → right.
+	# Resting position → above.
 	tween.set_ease(Tween.EASE_IN)
 	tween.tween_property(
 		root,
 		"position",
-		_get_offscreen_right_position(),
+		_get_offscreen_top_position(),
 		slide_time
 	)
 
 	tween.tween_callback(_on_message_finished)
 
 	_message_tween = tween
-
+	
 func _interrupt_with_message(message: Dictionary) -> void:
 	_kill_message_tween()
 	_display_message(message)
@@ -138,10 +139,8 @@ func _kill_message_tween() -> void:
 
 	_message_tween = null
 
-func _get_offscreen_right_position() -> Vector2:
-	var viewport_width := get_viewport().get_visible_rect().size.x
-
-	return _rest_position + Vector2(
-		viewport_width + root.size.x + slide_padding_px,
-		0.0
+func _get_offscreen_top_position() -> Vector2:
+	return Vector2(
+		_rest_position.x,
+		-root.size.y - slide_padding_px
 	)

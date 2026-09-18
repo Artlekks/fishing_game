@@ -590,6 +590,8 @@ hook_off_texture = ExtResource("39_n6fh7")
 miss_texture = ExtResource("40_jf01x")
 line_break_texture = ExtResource("41_1hrhd")
 catch_texture = ExtResource("42_wnbcf")
+display_time = 1.2
+slide_time = 0.35
 screen_transition = NodePath("../ScreenTransition")
 
 [node name="FeedbackTexture" type="TextureRect" parent="UI/FishingHud/FishingFeedbackView" unique_id=805338122]
