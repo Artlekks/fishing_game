@@ -64,6 +64,20 @@ var release_movement_intensity: float = 0.40
 @export_range(0.0, 1.0, 0.05)
 var spent_release_movement_intensity: float = 0.22
 
+@export_category("Fight State Movement")
+
+@export_range(0.0, 1.0, 0.05)
+var resisting_behavior_intensity: float = 1.0
+
+@export_range(0.0, 1.0, 0.05)
+var exhausted_behavior_intensity: float = 0.30
+
+@export_range(0.0, 1.0, 0.05)
+var exhausted_resistance: float = 0.10
+
+@export_range(0.0, 1.0, 0.05)
+var exhausted_pull_strength: float = 0.18
+
 var fish_behavior_pressure: float = 0.0
 var current_tension_state: int = FishingTension.State.SAFE
 var player_steering: float = 0.0
@@ -292,6 +306,33 @@ func _process(delta: float) -> void:
 		return
 
 	if fight_state == FightState.EXHAUSTED:
+		var exhausted_pressure := clampf(
+			fish_behavior_pressure,
+			0.0,
+			1.0
+		)
+
+		var current_exhausted_resistance := (
+			exhausted_resistance
+			* lerpf(
+				0.5,
+				1.0,
+				exhausted_pressure
+			)
+		)
+
+		tension.set_fish_resistance(
+			current_exhausted_resistance
+		)
+
+		fish_pull_changed.emit(
+			lerpf(
+				exhausted_pull_strength * 0.5,
+				exhausted_pull_strength,
+				exhausted_pressure
+			)
+		)
+
 		recovery_time_left -= delta
 
 		if recovery_time_left <= 0.0:
@@ -386,7 +427,10 @@ func _react_to_reel_release() -> void:
 
 	var reaction_intensity := release_movement_intensity
 
-	if fight_state == FightState.SPENT:
+	if fight_state == FightState.EXHAUSTED:
+		reaction_intensity = exhausted_behavior_intensity
+
+	elif fight_state == FightState.SPENT:
 		reaction_intensity = spent_release_movement_intensity
 
 	fish_behavior.react_to_release(
@@ -435,7 +479,9 @@ func _start_resistance_round() -> void:
 		_get_max_stamina()
 	)
 
-	fish_behavior.start(1.0)
+	fish_behavior.start(
+		resisting_behavior_intensity
+	)
 
 	print(
 		"RESISTANCE STARTED | Rounds remaining: ",
@@ -452,16 +498,28 @@ func _finish_resistance_round() -> void:
 	fish_stamina = 0.0
 	fish_exhausted.emit()
 
+	# Animation/controller still sees the fish as exhausted,
+	# so we keep this at zero.
 	fish_resistance_changed.emit(0.0)
-	fish_pull_changed.emit(0.0)
-
-	fish_behavior.stop()
 
 	if rounds_remaining <= 0:
 		_enter_spent()
 		return
 
 	fight_state = FightState.EXHAUSTED
+
+	# Exhausted does NOT mean motionless.
+	tension.set_fish_resistance(
+		exhausted_resistance
+	)
+
+	fish_pull_changed.emit(
+		exhausted_pull_strength
+	)
+
+	fish_behavior.start(
+		exhausted_behavior_intensity
+	)
 
 	var recovery_min := 0.8
 	var recovery_max := 1.5
@@ -479,7 +537,6 @@ func _finish_resistance_round() -> void:
 		"FISH EXHAUSTED | Rounds left: ",
 		rounds_remaining
 	)
-
 
 func _enter_spent() -> void:
 	fight_state = FightState.SPENT

@@ -16,6 +16,18 @@ signal pressure_changed(value: float)
 @export var lateral_response_speed: float = 2.5
 @export var depth_response_speed: float = 2.0
 @export var pressure_response_speed: float = 2.5
+@export_category("Thrashing")
+
+@export_range(0.0, 1.0, 0.05)
+var thrash_chance_per_change: float = 0.20
+
+@export_range(0.0, 1.0, 0.05)
+var thrash_min_intensity: float = 0.60
+
+@export var thrash_multiplier: float = 1.35
+
+@export var thrash_time_min: float = 0.25
+@export var thrash_time_max: float = 0.55
 
 enum FightBackType {
 	SURGE_AWAY,
@@ -108,7 +120,9 @@ func stop() -> void:
 	depth_changed.emit(0.0)
 	pressure_changed.emit(0.0)
 	
-func _choose_new_movement() -> void:
+func _choose_new_movement(
+	allow_thrash: bool = true
+) -> void:
 	var new_lateral := 0.0
 	var new_depth := 0.0
 	var new_pressure := 0.0
@@ -179,13 +193,65 @@ func _choose_new_movement() -> void:
 
 			new_pressure = 0.75
 
-	target_lateral = new_lateral * intensity
-	target_depth = new_depth * intensity
-	target_pressure = new_pressure * intensity
 
-	time_until_change = randf_range(
-		min_change_time,
-		max_change_time
+	var movement_intensity := intensity
+
+	var is_thrashing := (
+		allow_thrash
+		and intensity >= thrash_min_intensity
+		and randf() < thrash_chance_per_change
+	)
+
+	if is_thrashing:
+		movement_intensity = minf(
+			intensity * thrash_multiplier,
+			1.0
+		)
+
+		new_lateral = clampf(
+			new_lateral * thrash_multiplier,
+			-1.0,
+			1.0
+		)
+
+		new_depth = clampf(
+			new_depth * thrash_multiplier,
+			-1.0,
+			1.0
+		)
+
+		new_pressure = maxf(
+			new_pressure,
+			0.95
+		)
+
+		time_until_change = randf_range(
+			thrash_time_min,
+			thrash_time_max
+		)
+
+		strong_pull_started.emit()
+
+	else:
+		time_until_change = randf_range(
+			min_change_time,
+			max_change_time
+		)
+
+
+	target_lateral = (
+		new_lateral
+		* movement_intensity
+	)
+
+	target_depth = (
+		new_depth
+		* movement_intensity
+	)
+
+	target_pressure = (
+		new_pressure
+		* movement_intensity
 	)
 
 func configure(fish: FishInstance) -> void:
@@ -242,7 +308,7 @@ func react_to_release(
 
 	fight_back_started.emit(current_fight_back)
 
-	_choose_new_movement()
+	_choose_new_movement(false)
 
 	# Restore the normal state intensity after generating
 	# this reaction. The reaction itself has already been emitted.
