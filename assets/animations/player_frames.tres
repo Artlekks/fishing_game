@@ -971,7 +971,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_r5pix")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"Idle_LookAt_Horizon",
 "speed": 5.0
 }, {

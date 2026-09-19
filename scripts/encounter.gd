@@ -57,9 +57,12 @@ var direct_hit_chance: float = 0.5
 @export_range(0.0, 1.0, 0.05)
 var max_bite_chance_per_check: float = 1.0
 
-@export_category("Release Reaction")
+@export_category("Release Movement")
 @export_range(0.0, 1.0, 0.05)
-var release_movement_intensity: float = 0.35
+var release_movement_intensity: float = 0.40
+
+@export_range(0.0, 1.0, 0.05)
+var spent_release_movement_intensity: float = 0.22
 
 var fish_behavior_pressure: float = 0.0
 var current_tension_state: int = FishingTension.State.SAFE
@@ -365,6 +368,11 @@ func set_player_reeling(active: bool) -> void:
 	player_reeling = active
 	tension.set_player_reeling(active)
 
+	# Only react on the transition:
+	# K held -> K released.
+	if was_reeling and not active:
+		_react_to_reel_release()
+
 	# K has just been released.
 	if was_reeling and not active:
 		if fight_state != FightState.NONE:
@@ -372,6 +380,19 @@ func set_player_reeling(active: bool) -> void:
 				release_movement_intensity
 			)
 
+func _react_to_reel_release() -> void:
+	if fight_state == FightState.NONE:
+		return
+
+	var reaction_intensity := release_movement_intensity
+
+	if fight_state == FightState.SPENT:
+		reaction_intensity = spent_release_movement_intensity
+
+	fish_behavior.react_to_release(
+		reaction_intensity
+	)
+	
 func set_player_steering(value: float) -> void:
 	player_steering = clampf(value, -1.0, 1.0)
 	

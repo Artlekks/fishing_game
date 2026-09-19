@@ -136,3 +136,39 @@ func react_to_slack(new_intensity: float = 0.35) -> void:
 	fight_back_started.emit(current_fight_back)
 
 	_choose_new_movement()
+	
+func react_to_release(
+	reaction_intensity: float = 0.40
+) -> void:
+	if not active:
+		return
+
+	# Releasing tension gives the fish freedom to move,
+	# but should not automatically make it surge straight away.
+	current_fight_back = randi_range(
+		FightBackType.SIDE_RUN,
+		FightBackType.ERRATIC
+	)
+
+	side_direction = (
+		-1.0
+		if randf() < 0.5
+		else 1.0
+	)
+
+	var previous_intensity := intensity
+
+	intensity = clampf(
+		reaction_intensity,
+		0.0,
+		1.0
+	)
+
+	fight_back_started.emit(current_fight_back)
+
+	_choose_new_movement()
+
+	# Restore the normal state intensity after generating
+	# this reaction. The reaction itself has already been emitted.
+	intensity = previous_intensity
+	
