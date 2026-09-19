@@ -12,6 +12,11 @@ signal pressure_changed(value: float)
 @export var pause_time_min: float = 0.3
 @export var pause_time_max: float = 0.7
 
+@export_category("Movement Smoothing")
+@export var lateral_response_speed: float = 2.5
+@export var depth_response_speed: float = 2.0
+@export var pressure_response_speed: float = 2.5
+
 enum FightBackType {
 	SURGE_AWAY,
 	SIDE_RUN,
@@ -26,6 +31,11 @@ var active: bool = false
 var time_until_change: float = 0.0
 var lateral: float = 0.0
 var depth: float = 0.0
+var target_lateral: float = 0.0
+var target_depth: float = 0.0
+
+var pressure: float = 0.0
+var target_pressure: float = 0.0
 var lateral_activity: float = 1.0
 var vertical_activity: float = 1.0
 var intensity: float = 1.0
@@ -39,7 +49,28 @@ func _process(delta: float) -> void:
 	if time_until_change <= 0.0:
 		_choose_new_movement()
 
+	lateral = move_toward(
+		lateral,
+		target_lateral,
+		lateral_response_speed * delta
+	)
 
+	depth = move_toward(
+		depth,
+		target_depth,
+		depth_response_speed * delta
+	)
+
+	pressure = move_toward(
+		pressure,
+		target_pressure,
+		pressure_response_speed * delta
+	)
+
+	movement_changed.emit(lateral)
+	depth_changed.emit(depth)
+	pressure_changed.emit(pressure)
+	
 func start(new_intensity: float = 1.0) -> void:
 	intensity = clampf(new_intensity, 0.0, 1.0)
 	active = true
@@ -64,53 +95,98 @@ func start(new_intensity: float = 1.0) -> void:
 
 func stop() -> void:
 	active = false
+
+	target_lateral = 0.0
+	target_depth = 0.0
+	target_pressure = 0.0
+
 	lateral = 0.0
-	movement_changed.emit(lateral)
 	depth = 0.0
-	depth_changed.emit(depth)
+	pressure = 0.0
+
+	movement_changed.emit(0.0)
+	depth_changed.emit(0.0)
 	pressure_changed.emit(0.0)
 	
 func _choose_new_movement() -> void:
-	var pressure := 0.0
+	var new_lateral := 0.0
+	var new_depth := 0.0
+	var new_pressure := 0.0
 
 	match current_fight_back:
 		FightBackType.SURGE_AWAY:
-			lateral = randf_range(-0.15, 0.15) * lateral_activity
-			depth = randf_range(-0.1, 0.1) * vertical_activity
-			pressure = 1.0
+			new_lateral = (
+				randf_range(-0.15, 0.15)
+				* lateral_activity
+			)
+
+			new_depth = (
+				randf_range(-0.1, 0.1)
+				* vertical_activity
+			)
+
+			new_pressure = 1.0
 
 		FightBackType.SIDE_RUN:
-			lateral = side_direction * lateral_activity
-			depth = randf_range(-0.2, 0.2) * vertical_activity
-			pressure = 0.6
+			new_lateral = (
+				side_direction
+				* lateral_activity
+			)
+
+			new_depth = (
+				randf_range(-0.2, 0.2)
+				* vertical_activity
+			)
+
+			new_pressure = 0.6
 
 		FightBackType.DIVE:
-			lateral = randf_range(-0.3, 0.3) * lateral_activity
-			depth = -1.0 * vertical_activity
-			pressure = 0.8
+			new_lateral = (
+				randf_range(-0.3, 0.3)
+				* lateral_activity
+			)
+
+			new_depth = (
+				-1.0
+				* vertical_activity
+			)
+
+			new_pressure = 0.8
 
 		FightBackType.RISE:
-			lateral = randf_range(-0.3, 0.3) * lateral_activity
-			depth = 1.0 * vertical_activity
-			pressure = 0.4
+			new_lateral = (
+				randf_range(-0.3, 0.3)
+				* lateral_activity
+			)
+
+			new_depth = (
+				1.0
+				* vertical_activity
+			)
+
+			new_pressure = 0.4
 
 		FightBackType.ERRATIC:
-			lateral = randf_range(-1.0, 1.0) * lateral_activity
-			depth = randf_range(-1.0, 1.0) * vertical_activity
-			pressure = 0.75
+			new_lateral = (
+				randf_range(-1.0, 1.0)
+				* lateral_activity
+			)
+
+			new_depth = (
+				randf_range(-1.0, 1.0)
+				* vertical_activity
+			)
+
+			new_pressure = 0.75
+
+	target_lateral = new_lateral * intensity
+	target_depth = new_depth * intensity
+	target_pressure = new_pressure * intensity
 
 	time_until_change = randf_range(
 		min_change_time,
 		max_change_time
 	)
-
-	lateral *= intensity
-	depth *= intensity
-	pressure *= intensity
-
-	movement_changed.emit(lateral)
-	depth_changed.emit(depth)
-	pressure_changed.emit(pressure)
 
 func configure(fish: FishInstance) -> void:
 	lateral_activity = fish.lateral_activity
