@@ -25,14 +25,8 @@ class_name FishData
 
 @export_category("Fight Behavior")
 
-@export_range(0.0, 1.0, 0.05)
-var lateral_activity: float = 1.0
-
-@export_range(0.0, 1.0, 0.05)
-var vertical_activity: float = 1.0
-
-@export var direction_change_min: float = 0.8
-@export var direction_change_max: float = 2.0
+@export_category("Fight Behavior")
+@export var behavior_profile: FishBehaviorProfile
 
 @export_category("Endurance")
 

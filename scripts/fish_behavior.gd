@@ -6,16 +6,24 @@ signal fight_back_started(fight_back_type: int)
 signal strong_pull_started
 signal pressure_changed(value: float)
 
+
+@export_category("Movement")
 @export var min_change_time: float = 0.8
 @export var max_change_time: float = 2.0
-@export_range(0.0, 1.0, 0.05) var pause_chance: float = 0.25
+
+@export_range(0.0, 1.0, 0.05)
+var pause_chance: float = 0.25
+
 @export var pause_time_min: float = 0.3
 @export var pause_time_max: float = 0.7
+
 
 @export_category("Movement Smoothing")
 @export var lateral_response_speed: float = 2.5
 @export var depth_response_speed: float = 2.0
 @export var pressure_response_speed: float = 2.5
+
+
 @export_category("Thrashing")
 
 @export_range(0.0, 1.0, 0.05)
@@ -29,6 +37,7 @@ var thrash_min_intensity: float = 0.60
 @export var thrash_time_min: float = 0.25
 @export var thrash_time_max: float = 0.55
 
+
 enum FightBackType {
 	SURGE_AWAY,
 	SIDE_RUN,
@@ -37,20 +46,33 @@ enum FightBackType {
 	ERRATIC
 }
 
+
 var current_fight_back: int = FightBackType.SURGE_AWAY
 var side_direction: float = 1.0
+
 var active: bool = false
 var time_until_change: float = 0.0
+var intensity: float = 1.0
+
+
+# Current smoothed movement.
 var lateral: float = 0.0
 var depth: float = 0.0
+var pressure: float = 0.0
+
+
+# Desired movement.
 var target_lateral: float = 0.0
 var target_depth: float = 0.0
-
-var pressure: float = 0.0
 var target_pressure: float = 0.0
+
+
+# Species-specific movement values.
 var lateral_activity: float = 1.0
 var vertical_activity: float = 1.0
-var intensity: float = 1.0
+
+var behavior_profile: FishBehaviorProfile = null
+
 
 func _process(delta: float) -> void:
 	if not active:
@@ -82,22 +104,55 @@ func _process(delta: float) -> void:
 	movement_changed.emit(lateral)
 	depth_changed.emit(depth)
 	pressure_changed.emit(pressure)
-	
-func start(new_intensity: float = 1.0) -> void:
-	intensity = clampf(new_intensity, 0.0, 1.0)
-	active = true
 
-	current_fight_back = randi_range(
-		FightBackType.SURGE_AWAY,
-		FightBackType.ERRATIC
+
+func configure(fish: FishInstance) -> void:
+	behavior_profile = null
+
+	if fish == null:
+		return
+
+	var profile: FishBehaviorProfile = fish.behavior_profile
+
+	if profile == null:
+		return
+
+	behavior_profile = profile
+
+	lateral_activity = profile.lateral_activity
+	vertical_activity = profile.vertical_activity
+
+	min_change_time = profile.direction_change_min
+	max_change_time = profile.direction_change_max
+
+	thrash_chance_per_change = profile.thrash_chance
+	thrash_multiplier = profile.thrash_multiplier
+
+
+func start(new_intensity: float = 1.0) -> void:
+	intensity = clampf(
+		new_intensity,
+		0.0,
+		1.0
 	)
 
-	side_direction = -1.0 if randf() < 0.5 else 1.0
-	fight_back_started.emit(current_fight_back)
-	
+	active = true
+
+	current_fight_back = _choose_fight_back_type()
+
+	side_direction = (
+		-1.0
+		if randf() < 0.5
+		else 1.0
+	)
+
+	fight_back_started.emit(
+		current_fight_back
+	)
+
 	if current_fight_back == FightBackType.SURGE_AWAY:
 		strong_pull_started.emit()
-	
+
 	print(
 		"FIGHT BACK TYPE: ",
 		FightBackType.keys()[current_fight_back]
@@ -105,8 +160,10 @@ func start(new_intensity: float = 1.0) -> void:
 
 	_choose_new_movement()
 
+
 func stop() -> void:
 	active = false
+	time_until_change = 0.0
 
 	target_lateral = 0.0
 	target_depth = 0.0
@@ -119,7 +176,57 @@ func stop() -> void:
 	movement_changed.emit(0.0)
 	depth_changed.emit(0.0)
 	pressure_changed.emit(0.0)
-	
+
+
+func react_to_release(
+	reaction_intensity: float = 0.40
+) -> void:
+	if not active:
+		return
+
+	# Releasing K gives the fish freedom to move,
+	# but does not automatically cause a full surge away.
+	current_fight_back = _choose_fight_back_type(
+		false
+	)
+
+	side_direction = (
+		-1.0
+		if randf() < 0.5
+		else 1.0
+	)
+
+	var previous_intensity := intensity
+
+	intensity = clampf(
+		reaction_intensity,
+		0.0,
+		1.0
+	)
+
+	fight_back_started.emit(
+		current_fight_back
+	)
+
+	# Release reactions cannot randomly become
+	# full thrashing events.
+	_choose_new_movement(false)
+
+	# The generated movement target already contains
+	# the release intensity, so restore the normal
+	# fight-state intensity afterward.
+	intensity = previous_intensity
+
+
+# Compatibility with the earlier name.
+# Once Encounter definitely uses react_to_release(),
+# we can remove this later.
+func react_to_slack(
+	new_intensity: float = 0.35
+) -> void:
+	react_to_release(new_intensity)
+
+
 func _choose_new_movement(
 	allow_thrash: bool = true
 ) -> void:
@@ -128,6 +235,7 @@ func _choose_new_movement(
 	var new_pressure := 0.0
 
 	match current_fight_back:
+
 		FightBackType.SURGE_AWAY:
 			new_lateral = (
 				randf_range(-0.15, 0.15)
@@ -140,6 +248,7 @@ func _choose_new_movement(
 			)
 
 			new_pressure = 1.0
+
 
 		FightBackType.SIDE_RUN:
 			new_lateral = (
@@ -154,6 +263,7 @@ func _choose_new_movement(
 
 			new_pressure = 0.6
 
+
 		FightBackType.DIVE:
 			new_lateral = (
 				randf_range(-0.3, 0.3)
@@ -167,6 +277,7 @@ func _choose_new_movement(
 
 			new_pressure = 0.8
 
+
 		FightBackType.RISE:
 			new_lateral = (
 				randf_range(-0.3, 0.3)
@@ -179,6 +290,7 @@ func _choose_new_movement(
 			)
 
 			new_pressure = 0.4
+
 
 		FightBackType.ERRATIC:
 			new_lateral = (
@@ -201,6 +313,7 @@ func _choose_new_movement(
 		and intensity >= thrash_min_intensity
 		and randf() < thrash_chance_per_change
 	)
+
 
 	if is_thrashing:
 		movement_intensity = minf(
@@ -254,63 +367,67 @@ func _choose_new_movement(
 		* movement_intensity
 	)
 
-func configure(fish: FishInstance) -> void:
-	lateral_activity = fish.lateral_activity
-	vertical_activity = fish.vertical_activity
 
-	min_change_time = fish.direction_change_min
-	max_change_time = fish.direction_change_max
-	
-func react_to_slack(new_intensity: float = 0.35) -> void:
-	intensity = clampf(new_intensity, 0.0, 1.0)
-	active = true
+func _choose_fight_back_type(
+	allow_surge: bool = true
+) -> int:
+	# No profile assigned:
+	# fall back to equal random behavior.
+	if behavior_profile == null:
+		if allow_surge:
+			return randi_range(
+				FightBackType.SURGE_AWAY,
+				FightBackType.ERRATIC
+			)
 
-	# Don't use SURGE_AWAY here.
-	# Releasing the reel should create movement,
-	# not automatically make the fish sprint away.
-	current_fight_back = randi_range(
-		FightBackType.SIDE_RUN,
-		FightBackType.ERRATIC
+		return randi_range(
+			FightBackType.SIDE_RUN,
+			FightBackType.ERRATIC
+		)
+
+
+	var surge_weight := (
+		behavior_profile.surge_weight
+		if allow_surge
+		else 0.0
 	)
 
-	side_direction = -1.0 if randf() < 0.5 else 1.0
-
-	fight_back_started.emit(current_fight_back)
-
-	_choose_new_movement()
-	
-func react_to_release(
-	reaction_intensity: float = 0.40
-) -> void:
-	if not active:
-		return
-
-	# Releasing tension gives the fish freedom to move,
-	# but should not automatically make it surge straight away.
-	current_fight_back = randi_range(
-		FightBackType.SIDE_RUN,
-		FightBackType.ERRATIC
+	var total_weight := (
+		surge_weight
+		+ behavior_profile.side_run_weight
+		+ behavior_profile.dive_weight
+		+ behavior_profile.rise_weight
+		+ behavior_profile.erratic_weight
 	)
 
-	side_direction = (
-		-1.0
-		if randf() < 0.5
-		else 1.0
-	)
 
-	var previous_intensity := intensity
+	if total_weight <= 0.0:
+		return FightBackType.ERRATIC
 
-	intensity = clampf(
-		reaction_intensity,
-		0.0,
-		1.0
-	)
 
-	fight_back_started.emit(current_fight_back)
+	var roll := randf() * total_weight
 
-	_choose_new_movement(false)
 
-	# Restore the normal state intensity after generating
-	# this reaction. The reaction itself has already been emitted.
-	intensity = previous_intensity
-	
+	if roll < surge_weight:
+		return FightBackType.SURGE_AWAY
+
+	roll -= surge_weight
+
+
+	if roll < behavior_profile.side_run_weight:
+		return FightBackType.SIDE_RUN
+
+	roll -= behavior_profile.side_run_weight
+
+
+	if roll < behavior_profile.dive_weight:
+		return FightBackType.DIVE
+
+	roll -= behavior_profile.dive_weight
+
+
+	if roll < behavior_profile.rise_weight:
+		return FightBackType.RISE
+
+
+	return FightBackType.ERRATIC
